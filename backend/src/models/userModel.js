@@ -35,9 +35,30 @@ const userSchema = new mongoose.Schema({
         resetHour: { type: Number, default: 0 },
         theme: { type: String, enum: ['light', 'dark'], default: 'light' }
     },
+    quoteCategoryPreferences: {
+        type: [String],
+        validate: {
+            validator: arr => arr.length <= 3,
+            message: "You can select up to 3 quote categories."
+        },
+        default: []
+    },
     profilePicture: {
         type: String,
         default: ""
+    },
+    stats: {
+        totalTasksCompleted: { type: Number, default: 0 },
+        totalMemosCreated: { type: Number, default: 0 },
+        totalDailyPlanCompleted: { type: Number, default: 0 },
+
+        // streak tracking
+        dailyStreak: { type: Number, default: 0 },
+        longestStreak: { type: Number, default: 0 },
+
+        // optional helpful stats
+        tasksCompletedToday: { type: Number, default: 0 },
+        tasksFailedYesterday: { type: Number, default: 0 }
     },
     createdAt: {
         type: Date,

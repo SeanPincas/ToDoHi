@@ -14,8 +14,7 @@ const userRoutes = require("./routes/userRoute.js");
 const taskRoutes = require("./routes/taskRoute.js");
 const memoRoutes = require("./routes/memoRoute.js");
 const dailyPlanRoutes = require("./routes/dailyPlanRoute.js");
-const qouteRoutes = require("./routes/qouteRoute.js");
-const notificationRoutes = require("./routes/notificationRoute.js");
+const quoteRoutes = require("./routes/quoteRoute.js");
 
 // Environment Setup
 dotenv.config();
@@ -24,7 +23,10 @@ dotenv.config();
 const app = express();
 
 // Enable CORS and JSON body parsing
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // your React frontend
+  credentials: true               // allow cookies/auth headers
+}));
 app.use(express.json());
 
 // ---------------- RATE LIMITER ----------------
@@ -46,8 +48,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/memos", memoRoutes);
 app.use("/api/daily-plans", dailyPlanRoutes);
-// app.use("/api/qoutes", qouteRoutes);
-// app.use("/api/notifications", notificationRoutes);
+app.use("/api/quotes", quoteRoutes);
 
 app.use("/uploads", express.static("uploads")); // Serve uploaded files
 

@@ -1,17 +1,16 @@
 const Task = require("../models/taskModel.js");
+const User = require("../models/userModel.js");
+
+const {
+    validCategories,
+    isToday,
+    isYesterday
+} = require("../utils/helpers.js");
 
 // --------------------------- CREATE NEW TASK ---------------------------
 exports.createTask = async (req, res) => {
     try {
-        const { title, description, category, containerColor } = req.body;
-
-        // Validate category: fallback to "others" if invalid
-        const validCategories = [
-            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking', 
-            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance', 
-            'errands', 'pet-care', 'learning', 'creative', 'maintenance', 
-            'shopping', 'travel', 'others'
-        ];
+        const { title, description, category, containerColor, deadline } = req.body;
 
         const newTask = await Task.create({
             userId: req.user._id,
@@ -22,9 +21,15 @@ exports.createTask = async (req, res) => {
             deadline: deadline || null
         });
 
+        // ---------------- STATS: increment totalTasksCreated ----------------
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $inc: { "stats.totalTasksCreated": 1 } }
+        );
+
         res.status(201).json({ message: "Task created", task: newTask })
     } catch (err) {
-        res.status(500).json({ message: "Error Creating Task", error: err.mesage })
+        res.status(500).json({ message: "Error Creating Task", error: err.message })
     }
 };
 
@@ -32,7 +37,7 @@ exports.createTask = async (req, res) => {
 exports.getTasks = async (req, res) => {
     try {
         const tasks = await Task.find({ userId: req.user._id })
-                                .sort({ orderIndex: 1, createdAt: -1 });
+            .sort({ orderIndex: 1, createdAt: -1 });
 
         res.json(tasks);
     } catch (err) {
@@ -44,13 +49,13 @@ exports.getTasks = async (req, res) => {
 exports.updateTask = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, category, containerColor, status, deadline }= req.body;
+        const { title, description, category, containerColor, status, deadline } = req.body;
 
         // Validate category: fallback to "others" if invalid
         const validCategories = [
-            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking', 
-            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance', 
-            'errands', 'pet-care', 'learning', 'creative', 'maintenance', 
+            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
+            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance',
+            'errands', 'pet-care', 'learning', 'creative', 'maintenance',
             'shopping', 'travel', 'others'
         ];
 
@@ -71,7 +76,7 @@ exports.updateTask = async (req, res) => {
             updates,
             { new: true }
         )
-        
+
         if (!updated) return res.status(404).json({ message: "Task Not Found" });
 
         res.json({ message: "Task Updated", task: updated });
@@ -84,6 +89,7 @@ exports.updateTask = async (req, res) => {
 exports.deleteTask = async (req, res) => {
     try {
         const { id } = req.params;
+
         const deleted = await Task.findOneAndDelete({ _id: id, userId: req.user._id });
 
         if (!deleted) return res.status(404).json({ message: "Task Not Deleted" })
@@ -106,6 +112,12 @@ exports.markComplete = async (req, res) => {
 
         if (!task) return res.status(404).json({ message: "Task Not Found" })
 
+        // ---------------- STATS: increment totalTasksCompleted ----------------
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $inc: { "stats.totalTasksCompleted": 1 } }
+        );
+
         res.json({ message: "Task Completed", task })
     } catch (err) {
         res.status(500).json({ message: "Error Marking Task Complete", error: err.message })
@@ -115,11 +127,13 @@ exports.markComplete = async (req, res) => {
 // --------------------------- REORDER TASK MANUALLY -----------------------------
 exports.reorderTasks = async (req, res) => {
     try {
-        const { orderIds } = res.body;
+        const { orderIds } = req.body;
 
         await Promise.all(
             orderIds.map((id, index) =>
-                Task.findByIdAndUpdate({ _id: id, userId: req.user._id }, { orderIndex: index })
+                Task.findByIdAndUpdate(
+                    { _id: id, userId: req.user._id },
+                    { orderIndex: index })
             )
         )
 
@@ -128,36 +142,3 @@ exports.reorderTasks = async (req, res) => {
         res.status(500).json({ message: "Error Reordering Tasks", error: err.message })
     }
 };
-
-// --------------------------- AUTO FAIL EXPIRED TASK -----------------------------
-exports.autoFailTasks = async (req,res) => {
-    try {
-        // find the user making this requrest
-        const user = await User.findById(req.user._id);
-        // determine tehir reset hour
-        const resetHour = user?.preference?.resetHour ?? 0;
-
-        const now = new Date();
-        const userResetTime = new Date();
-        userResetTime.setHours(resetHour,0,0,0);
-
-        // If the current time is past resetHour, then we use today's resetHour, otherwise use today's  resetHour so it doesnt skip
-        if (now < userResetTime) {
-            userResetTime.setData(userResetTime.getDate() - 1)
-        }
-
-        //update Tasks created before reset time and not completed\failed
-        const result = await Task.updateMany(
-            {
-                userId: req.user._id,
-                status: { $nin: ['completed', 'failed'] },
-                createAt: { $lt: userResetTime }
-            },
-            { status: 'failed', isExpired: true }
-        )
-
-        res.json({ message: 'Expired tasks marked as failed', result })
-    } catch (err) {
-        res.status(500).json({ message: "Error auto-fauling tasks", error: err.message })
-    }
-}

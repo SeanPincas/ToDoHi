@@ -80,6 +80,31 @@ function getNextDay(dateStr) {
     return date.toISOString().split("T")[0];
 }
 
+// --------------------------- HELPER #7: Check if date is TODAY ---------------------------
+function isToday(date) {
+    const d = new Date(date);
+    const now = new Date();
+
+    return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()
+    );
+}
+
+// --------------------------- HELPER #8: Check if date is YESTERDAY ---------------------------
+function isYesterday(date) {
+    const d = new Date(date);
+    const now = new Date();
+    now.setDate(now.getDate() - 1);
+
+    return (
+        d.getFullYear() === now.getFullYear() &&
+        d.getMonth() === now.getMonth() &&
+        d.getDate() === now.getDate()
+    );
+}
+
 // Export everything
 module.exports = {
     validCategories,
@@ -88,5 +113,7 @@ module.exports = {
     minutesToTime,
     splitOverMidnight,
     overwriteExistingPlans,
-    getNextDay
+    getNextDay,
+    isToday,
+    isYesterday
 };

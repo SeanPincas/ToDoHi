@@ -2,6 +2,8 @@ const DailyPlan = require("../models/dailyPlanModel.js");
 const PlanHistory = require("../models/planHistoryModel.js");
 const Task = require("../models/taskModel.js");
 const Memo = require("../models/memoModel.js");
+const User = require("../models/userModel.js");
+
 const {
     validCategories,
     isValidTimeFormat,
@@ -12,7 +14,9 @@ const {
     getNextDay
 } = require("../utils/helpers.js");
 
-// --------------------------- CREATE PLAN FOR A GIVEN DATE ---------------------------
+// ======================================================================
+// --------------------------- CREATE PLAN FOR A GIVEN DATE ------------
+// ======================================================================
 exports.createDailyPlanEntry = async (req, res) => {
     try {
         const {
@@ -29,9 +33,9 @@ exports.createDailyPlanEntry = async (req, res) => {
 
         const userId = req.user._id;
 
-        // ---------- VALIDATIONS ---------
+        // ---------- VALIDATIONS ----------
         if (!isValidTimeFormat(startTime) || !isValidTimeFormat(endTime)) {
-            return res.status(400).json({ message: "Invalid Time Format. Use HH:mm " });
+            return res.status(400).json({ message: "Invalid Time Format. Use HH:mm" });
         }
 
         if (!validCategories.includes(category)) {
@@ -44,11 +48,10 @@ exports.createDailyPlanEntry = async (req, res) => {
         // Split into chunks (1 or 2)
         const chunks = splitOverMidnight(startMin, endMin);
 
-        // ------------------ PROCESS EVERY CHUNK ------------------
+        // ---------- PROCESS EACH CHUNK ----------
         for (const chunk of chunks) {
             const chunkDate = chunk.isNextDay ? getNextDay(date) : date;
 
-            // Step A: Find or create document for this day
             let doc = await DailyPlan.findOne({ userId, date: chunkDate });
             if (!doc) {
                 doc = await DailyPlan.create({
@@ -58,14 +61,10 @@ exports.createDailyPlanEntry = async (req, res) => {
                 });
             }
 
-            // Step B: Overwrite overlaps on chunkDate before inserting new block
-            doc.dailyPlan = overwriteExistingPlans(
-                doc.dailyPlan,
-                chunk.start,
-                chunk.end
-            );
+            // Overwrite overlaps
+            doc.dailyPlan = overwriteExistingPlans(doc.dailyPlan, chunk.start, chunk.end);
 
-            // Step C: Prepare new plan object
+            // New plan object
             const newPlan = {
                 title,
                 description,
@@ -76,19 +75,13 @@ exports.createDailyPlanEntry = async (req, res) => {
                 containerColor
             };
 
-            // Step D: Insert order rule:
-            //   - first chunk of original day → append (push)
-            //   - second chunk of next day → prepend (unshift)
-            if (chunk.isNextDay) {
-                doc.dailyPlan.unshift(newPlan); // first item of next day
-            } else {
-                doc.dailyPlan.push(newPlan);    // last item of current day
-            }
+            if (chunk.isNextDay) doc.dailyPlan.unshift(newPlan);
+            else doc.dailyPlan.push(newPlan);
 
             await doc.save();
         }
 
-        // Save To PlanHistory
+        // Save to history
         await PlanHistory.create({
             userId,
             title,
@@ -99,19 +92,19 @@ exports.createDailyPlanEntry = async (req, res) => {
             containerColor
         });
 
-        // add and sync task logic
+        // Sync to Task
         if (addToTask) {
             await Task.create({
                 userId,
                 title,
                 description,
-                deadline: date,            // match daily plan date
+                deadline: date,
                 category,
                 containerColor
             });
         }
 
-        // add and sync memo logic
+        // Sync to Memo
         if (addToMemo) {
             await Memo.create({
                 userId,
@@ -128,12 +121,15 @@ exports.createDailyPlanEntry = async (req, res) => {
             taskAdded: !!addToTask,
             memoAdded: !!addToMemo
         });
+
     } catch (err) {
         res.status(500).json({ message: "Error Creating Daily Plan", error: err.message });
     }
 };
 
-// --------------------------- GET DAILY PLAN (SORTED) ---------------------------
+// ======================================================================
+// --------------------------- GET DAILY PLAN (SORTED) ------------------
+// ======================================================================
 exports.getDailyPlan = async (req, res) => {
     try {
         const { date } = req.params;
@@ -145,22 +141,23 @@ exports.getDailyPlan = async (req, res) => {
             return res.status(200).json({ dailyPlan: [], message: "No Plans Yet" });
         }
 
-        // Sort by startTime (converted to minutes)
-        const sorted = doc.dailyPlan.sort((a, b) =>
-            timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+        const sorted = doc.dailyPlan.sort(
+            (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
         );
 
-        return res.status(200).json({ dailyPlan: sorted });
+        res.json({ dailyPlan: sorted });
 
     } catch (err) {
-        return res.status(500).json({ message: "Error Fetching Plans", error: err.message });
+        res.status(500).json({ message: "Error Fetching Plans", error: err.message });
     }
 };
 
-// --------------------------- EDIT DAILY PLAN (SPLIT CHUNKS + OVERWRITE) ---------------------------
+// ======================================================================
+// --------------------------- EDIT DAILY PLAN --------------------------
+// ======================================================================
 exports.editDailyPlan = async (req, res) => {
     try {
-        const { date, planId } = req.params;   // YYYY-MM-DD
+        const { date, planId } = req.params;
         const userId = req.user._id;
 
         const {
@@ -174,34 +171,32 @@ exports.editDailyPlan = async (req, res) => {
             addToMemo
         } = req.body;
 
-        // --------------------------- VALIDATION ---------------------------
         if (!isValidTimeFormat(startTime) || !isValidTimeFormat(endTime)) {
             return res.status(400).json({ message: "Invalid Time Format. Use HH:mm" });
         }
+
         if (!validCategories.includes(category)) {
             return res.status(400).json({ message: "Invalid Category" });
         }
 
         const startMin = timeToMinutes(startTime);
         const endMin = timeToMinutes(endTime);
-        const newChunks = splitOverMidnight(startMin, endMin); // Break the NEW times into daily chunks
+        const newChunks = splitOverMidnight(startMin, endMin);
 
-        // --------------------------- STEP 1: FETCH THE CURRENT DAY DOCUMENT ---------------------------
         let currentDoc = await DailyPlan.findOne({ userId, date });
-        if (!currentDoc) return res.status(404).json({ message: "Day not found" });
+        if (!currentDoc) return res.status(404).json({ message: "Day Not Found" });
 
         const oldPlan = currentDoc.dailyPlan.id(planId);
-        if (!oldPlan) return res.status(404).json({ message: "Plan not found" });
+        if (!oldPlan) return res.status(404).json({ message: "Plan Not Found" });
 
-        // Keep linked references
         const linkedTaskId = oldPlan.linkedTaskId || null;
         const linkedMemoId = oldPlan.linkedMemoId || null;
 
-        // --------------------------- STEP 2: REMOVE ONLY THE OLD PLAN FROM THIS DAY ---------------------------
+        // Remove old plan
         currentDoc.dailyPlan = currentDoc.dailyPlan.filter(p => p._id.toString() !== planId);
         await currentDoc.save();
 
-        // --------------------------- STEP 3: INSERT UPDATED CHUNKS ---------------------------
+        // Insert updated chunks
         for (const chunk of newChunks) {
             const chunkDate = chunk.isNextDay ? getNextDay(date) : date;
 
@@ -214,7 +209,6 @@ exports.editDailyPlan = async (req, res) => {
                 });
             }
 
-            // remove overlaps
             doc.dailyPlan = overwriteExistingPlans(doc.dailyPlan, chunk.start, chunk.end);
 
             const updatedPlan = {
@@ -235,7 +229,7 @@ exports.editDailyPlan = async (req, res) => {
             await doc.save();
         }
 
-        // ---------- SYNC TASK ----------
+        // Sync Task or Memo
         if (addToTask && linkedTaskId) {
             await Task.findByIdAndUpdate(linkedTaskId, {
                 title,
@@ -245,7 +239,6 @@ exports.editDailyPlan = async (req, res) => {
             });
         }
 
-        // ---------- SYNC MEMO ----------
         if (addToMemo && linkedMemoId) {
             await Memo.findByIdAndUpdate(linkedMemoId, {
                 title,
@@ -255,7 +248,7 @@ exports.editDailyPlan = async (req, res) => {
             });
         }
 
-        // ---------- HISTORY ----------
+        // Save history
         await PlanHistory.create({
             userId,
             title,
@@ -273,15 +266,15 @@ exports.editDailyPlan = async (req, res) => {
     }
 };
 
-
-// --------------------------- DRAG AND DROP UPDATE (POSITION AND TIME CHANGE) ---------------------------
+// ======================================================================
+// --------------------------- UPDATE PLAN TIME --------------------------
+// ======================================================================
 exports.updatePlanTime = async (req, res) => {
     try {
         const { date, planId } = req.params;
         const { startTime, endTime } = req.body;
         const userId = req.user._id;
 
-        // ---------- VALIDATION ----------
         if (!isValidTimeFormat(startTime) || !isValidTimeFormat(endTime)) {
             return res.status(400).json({ message: "Invalid Time Format" });
         }
@@ -290,24 +283,18 @@ exports.updatePlanTime = async (req, res) => {
         const endMin = timeToMinutes(endTime);
         const newChunks = splitOverMidnight(startMin, endMin);
 
-
-        // ---------- FETCH CURRENT DAY ----------
         let currentDoc = await DailyPlan.findOne({ userId, date });
         if (!currentDoc) return res.status(404).json({ message: "Day Not Found" });
 
         const oldPlan = currentDoc.dailyPlan.id(planId);
         if (!oldPlan) return res.status(404).json({ message: "Plan Not Found" });
 
-        // Preserve linked items
         const linkedTaskId = oldPlan.linkedTaskId || null;
         const linkedMemoId = oldPlan.linkedMemoId || null;
 
-        // Remove from today's doc only
         currentDoc.dailyPlan = currentDoc.dailyPlan.filter(p => p._id.toString() !== planId);
         await currentDoc.save();
 
-
-        // ---------- INSERT NEW CHUNKS ----------
         for (const chunk of newChunks) {
             const chunkDate = chunk.isNextDay ? getNextDay(date) : date;
 
@@ -320,7 +307,6 @@ exports.updatePlanTime = async (req, res) => {
                 });
             }
 
-            // Remove overlaps
             doc.dailyPlan = overwriteExistingPlans(doc.dailyPlan, chunk.start, chunk.end);
 
             const updatedPlan = {
@@ -348,7 +334,9 @@ exports.updatePlanTime = async (req, res) => {
     }
 };
 
-// --------------------------- DELETE A SINGLE PLAN (ONLY THIS DAY) ---------------------------
+// ======================================================================
+// --------------------------- DELETE PLAN -------------------------------
+// ======================================================================
 exports.deletePlan = async (req, res) => {
     try {
         const { date, planId } = req.params;
@@ -370,29 +358,23 @@ exports.deletePlan = async (req, res) => {
     }
 };
 
-// --------------------------- COPY A WHOLE DAILYPLAN OF THE DAY TO ANOTHER DAY ---------------------------
+// ======================================================================
+// --------------------------- COPY DAILY PLAN ---------------------------
+// ======================================================================
 exports.copyDailyPlan = async (req, res) => {
     try {
         const { fromDate, toDates, range } = req.body;
         const userId = req.user._id;
 
-        // ------------------------------------------------------------------
-        // 1) Validate source day
-        // ------------------------------------------------------------------
         const from = await DailyPlan.findOne({ userId, date: fromDate });
         if (!from) return res.status(404).json({ message: "Source Day Not Found" });
 
-        // ------------------------------------------------------------------
-        // 2) Build full list of target dates
-        // ------------------------------------------------------------------
         let targetDays = [];
 
-        // Option A: direct array
         if (Array.isArray(toDates) && toDates.length > 0) {
             targetDays.push(...toDates);
         }
 
-        // Option B: date range
         if (range?.start && range?.end) {
             let current = new Date(range.start);
             const end = new Date(range.end);
@@ -403,28 +385,16 @@ exports.copyDailyPlan = async (req, res) => {
             }
         }
 
-        // If no targets at all
         if (targetDays.length === 0) {
-            return res.status(400).json({
-                message: "No valid target dates provided"
-            });
+            return res.status(400).json({ message: "No valid target dates provided" });
         }
 
-        // Remove duplicates
-        targetDays = [...new Set(targetDays)];
-
-        // Prevent copying into the same day
-        targetDays = targetDays.filter(d => d !== fromDate);
+        targetDays = [...new Set(targetDays)].filter(d => d !== fromDate);
 
         if (targetDays.length === 0) {
-            return res.status(400).json({
-                message: "Cannot copy to the same day"
-            });
+            return res.status(400).json({ message: "Cannot copy to the same day" });
         }
 
-        // ------------------------------------------------------------------
-        // 3) Perform copy for each day
-        // ------------------------------------------------------------------
         const clonedPlans = JSON.parse(JSON.stringify(from.dailyPlan));
 
         for (const date of targetDays) {
@@ -438,7 +408,6 @@ exports.copyDailyPlan = async (req, res) => {
                 });
             }
 
-            // overwrite day
             to.dailyPlan = clonedPlans;
             to.updatedAt = new Date();
             await to.save();
@@ -457,24 +426,84 @@ exports.copyDailyPlan = async (req, res) => {
     }
 };
 
-// --------------------------- MARK DAY AS COMPLETE ---------------------------
+// ======================================================================
+// --------------------------- MARK DAY COMPLETE (TOGGLE) ---------------
+// ======================================================================
 exports.markDayComplete = async (req, res) => {
     try {
         const { date } = req.body;
         const userId = req.user._id;
 
+        const today = new Date();
+        const target = new Date(date);
+
+        const clean = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        const todayClean = clean(today);
+        const targetClean = clean(target);
+
+        const isToday = todayClean.getTime() === targetClean.getTime();
+
+        // --------------------- ONLY TODAY CAN BE MARKED/UNMARKED ---------------------
+        if (!isToday) {
+            return res.status(400).json({
+                message: "Only today's day can be marked or unmarked."
+            });
+        }
+
+        // Fetch daily plan document
         const doc = await DailyPlan.findOne({ userId, date });
         if (!doc) return res.status(404).json({ message: "Day Not Found" });
 
-        doc.isCompleted = true;
-        doc.updatedAt = new Date();
+        // Fetch user stats
+        const user = await User.findById(userId);
+        let { dailyStreak, longestStreak } = user.stats;
 
+        // --------------------- CASE A: Already Completed → UNDO ---------------------
+        if (doc.status === "completed") {
+
+            doc.status = "pending";
+            doc.updatedAt = new Date();
+            await doc.save();
+
+            dailyStreak = Math.max(0, dailyStreak - 1);
+
+            await User.findByIdAndUpdate(userId, {
+                $set: { "stats.dailyStreak": dailyStreak }
+            });
+
+            return res.json({
+                message: "Day Completion Undone",
+                dailyStreak
+            });
+        }
+
+        // --------------------- CASE B: Mark as Completed ---------------------
+        doc.status = "completed";
+        doc.updatedAt = new Date();
         await doc.save();
 
-        res.json({ message: "Day Marked as Completed" });
+        dailyStreak += 1;
+        if (dailyStreak > longestStreak) longestStreak = dailyStreak;
+
+        await User.findByIdAndUpdate(userId, {
+            $inc: { "stats.totalDailyPlanCompleted": 1 },
+            $set: {
+                "stats.dailyStreak": dailyStreak,
+                "stats.longestStreak": longestStreak
+            }
+        });
+
+        return res.json({
+            message: "Day Marked as Completed",
+            dailyStreak,
+            longestStreak
+        });
 
     } catch (err) {
-        res.status(500).json({ message: "Error Completing Day", error: err.message });
+        res.status(500).json({
+            message: "Error Completing Day",
+            error: err.message
+        });
     }
 };
-

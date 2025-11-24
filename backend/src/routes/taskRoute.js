@@ -9,6 +9,5 @@ router.put("/:id", AuthMiddleware, TaskController.updateTask);
 router.delete("/:id", AuthMiddleware, TaskController.deleteTask);
 router.patch("/:id/complete", AuthMiddleware, TaskController.markComplete);
 router.put("/reorder", AuthMiddleware, TaskController.reorderTasks);
-router.post("/auto-fail", AuthMiddleware, TaskController.autoFailTasks);
 
 module.exports = router;

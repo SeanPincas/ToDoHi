@@ -1,5 +1,6 @@
 const Memo = require("../models/memoModel.js");
 const Task = require("../models/taskModel.js");
+const User = require("../models/userModel.js");
 
 // --------------------------- CREATE MEMO MANUALLY ---------------------------
 exports.createMemo = async (req, res) => {
@@ -21,6 +22,12 @@ exports.createMemo = async (req, res) => {
             containerColor: containerColor || "#ffffff",
             position: position || { x: 0, y: 0, z: 1 }
         })
+
+        // ---------------- STATS: increment totalMemosCreated ----------------
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $inc: { "stats.totalMemosCreated": 1 } }
+        );
 
         res.status(201).json({ message: "Memo Created Successfully", memo: newMemo })
     } catch (err) {
@@ -56,6 +63,12 @@ exports.createMemoFromTask = async (req, res) => {
             containerColor: task.containerColor || "#ffffff",
             taskSourceId: task._id
         };
+
+        // ---------------- STATS: increment totalMemosCreated ----------------
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $inc: { "stats.totalMemosCreated": 1 } }
+        );
 
         const newMemo = await Memo.create(memoData);
 
@@ -107,7 +120,7 @@ exports.updateMemoPosition = async (req, res) => {
             { "position.x": x, "position.y": y, "position.z": z },
             { new: true }
         );
-        
+
 
         if (!updateMemo) return res.status(404).json({ message: "Memo Not Found" });
 
@@ -122,12 +135,16 @@ exports.deleteMemo = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const deleted = await Memo.findOneAndDelete({ _id: id, userId: req.user._id });
+        const deleted = await Memo.findOneAndDelete({
+            _id: id,
+            userId: req.user._id
+        });
 
         if (!deleted) return res.status(404).json({ message: "Memo Not Found" });
 
         res.json({ message: "Memo Deleted Successfully" });
+
     } catch (err) {
-        res.status(500).json({ message: "Error Deleting Memo", error: err.message })
+        res.status(500).json({ message: "Error Deleting Memo", error: err.message });
     }
 };

@@ -21,5 +21,4 @@ router.delete("/:date/:planId", auth, deletePlan);
 router.post("/copy", auth, copyDailyPlan);
 router.post("/complete", auth, markDayComplete);
 
-
 module.exports = router;
