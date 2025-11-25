@@ -1,0 +1,41 @@
+/* --------------------------- GLOBAL LAYOUT WRAPPER --------------------------- */
+.layout-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg-main);
+    font-family: var(--font-main);
+}
+
+/* --------------------------- MAIN CONTENT AREA --------------------------- */
+.layout-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    justify-content: center;   /* centers horizontally */
+    align-items: flex-start;   /* starts at top */
+}
+
+/* ----- Content Container (fixed width card) ----- */
+.content-container {
+    width: 100%;
+    max-width: 1400px;  /* <--- IMPORTANT */
+    background: var(--bg-paper);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+
+    border: 2px solid var(--outline-dark);
+}
+
+/* --------------------------- MOBILE RESPONSIVE --------------------------- */
+@media (max-width: 900px) {
+    .layout-content {
+        padding: 15px;
+    }
+
+    .content-container {
+        padding: 18px;
+        border-radius: 10px;
+    }
+}

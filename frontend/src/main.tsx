@@ -1,10 +1,15 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+// ------------------------------ MAIN ---------------------------------
+// React entry point. Renders App into #root (Vite default).
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./index.css"; // Global CSS
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const el = document.getElementById("root")!;
+const root = createRoot(el);
+root.render(
+  <React.StrictMode>
+    <App/>
+  </React.StrictMode>
+);
+
