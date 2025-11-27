@@ -9,11 +9,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
-import DashboardPage from "../pages/Dashboard";
+import DashboardPage from "../pages/DashboardPage";
 import MemoBoardPage from "../pages/MemoBoardPage";
 
 import ProtectedRoute from "./ProtectedRoute";
-import { Layout } from "../components/layout/Layout"; // <-- IMPORTANT
+import Layout from "../components/layout/Layout"; // <-- IMPORTANT
 
 const AppRouter: React.FC = () => {
     return (

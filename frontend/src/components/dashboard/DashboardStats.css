@@ -1,0 +1,103 @@
+/* --------------------------- DASHBOARD STATS BAR -------------------------- */
+
+.stats-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    background: var(--white);
+    border: 3px solid var(--blue-dark);
+    border-radius: 14px;
+
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 25px;
+
+    /* Removed padding & gap as requested */
+    padding: 0;
+    gap: 0;
+}
+
+/* --------------------------- INDIVIDUAL STAT ITEM ------------------------- */
+
+.stats-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+
+    border-right: 2px solid var(--blue-dark);
+    padding: 14px 6px; /* minimal padding to keep inside spacing */
+}
+
+.stats-item:last-child {
+    border-right: none;
+}
+
+/* --------------------------- TEXT STYLING --------------------------- */
+
+.stats-label {
+    font-size: 14px;
+    opacity: 0.85;
+    color: var(--blue-dark);
+    min-height: 18px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.stats-value {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--blue-dark);
+    margin-top: 4px;
+}
+
+/* ------------------------------ RESPONSIVE -------------------------------- */
+/* ---------------- MOBILE (List mode) ------------- */
+@media (max-width: 426px) {
+    .stats-bar {
+        flex-direction: column;    /* vertical list */
+    }
+
+    .stats-item {
+        flex-direction: row;       /* label left, value right */
+        justify-content: space-between;
+        align-items: center;
+
+        text-align: left;
+        padding: 12px 14px;
+
+        border-right: none;        /* no vertical dividers */
+        border-bottom: 2px solid var(--blue-dark);
+    }
+
+    .stats-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Label left */
+    .stats-label {
+        font-size: 15px;
+        opacity: 0.9;
+        justify-content: flex-start;
+        align-items: center;
+        min-height: auto;
+        margin-bottom: 0;
+    }
+
+    /* Value right */
+    .stats-value {
+        font-size: 24px;
+        margin-top: 0;
+    }
+}
+
+/* ----------------- TABLET ----------------- */
+@media (min-width: 427px) and (max-width: 768px) {
+    .stats-value {
+        font-size: 26px;
+    }
+}

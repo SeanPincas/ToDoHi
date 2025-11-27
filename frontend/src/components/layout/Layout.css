@@ -3,39 +3,30 @@
     display: flex;
     width: 100%;
     min-height: 100vh;
-    background: var(--bg-main);
-    font-family: var(--font-main);
+    background: var(--paper-bg);
+    font-family: var(--font-main, 'Kalam', sans-serif);
 }
 
 /* --------------------------- MAIN CONTENT AREA --------------------------- */
 .layout-content {
     flex: 1;
-    padding: 30px;
+    padding: 20px;
+
     display: flex;
-    justify-content: center;   /* centers horizontally */
-    align-items: flex-start;   /* starts at top */
+    justify-content: center;
+    align-items: flex-start;
 }
 
-/* ----- Content Container (fixed width card) ----- */
+/* --------------------------- CONTENT CONTAINER (NO CARD STYLE) --------------------------- */
 .content-container {
     width: 100%;
-    max-width: 1400px;  /* <--- IMPORTANT */
-    background: var(--bg-paper);
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-
-    border: 2px solid var(--outline-dark);
+    max-width: 1400px;  /* only width control */
+    /* No padding, no border, no background */
 }
 
-/* --------------------------- MOBILE RESPONSIVE --------------------------- */
-@media (max-width: 900px) {
+/* --------------------------- MOBILE --------------------------- */
+@media (max-width: 768px) {
     .layout-content {
-        padding: 15px;
-    }
-
-    .content-container {
-        padding: 18px;
-        border-radius: 10px;
+        padding: 12px;
     }
 }
