@@ -1,14 +1,18 @@
 // ----------------------------- APP -------------------------------
-// Wrap the app with AuthProvider so the entire tree can access auth.
-// AppRouter contains all routes (public + protected).
+// Wrap the entire application with all providers that need global access.
+// This includes AuthProvider (authentication) and TodoProvider (tasks).
+
 import React from "react";
 import { AuthProvider } from "./context/AuthContext";
+import { TodoProvider } from "./context/TodoContext";
 import AppRouter from "./router/AppRouter";
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppRouter />
+      <TodoProvider>
+        <AppRouter />
+      </TodoProvider>
     </AuthProvider>
   );
 };
