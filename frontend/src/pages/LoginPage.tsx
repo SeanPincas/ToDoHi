@@ -1,38 +1,75 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+// =====================================================================================================
+//                                            LOGIN PAGE (Sticky Note UI)
+// =====================================================================================================
+
+import React, { useState } from "react";
+import "../pages/LoginPage.css"; // <- ensure path matches your project
+import { useAuthContext } from "../context/AuthContext";
 
 const LoginPage: React.FC = () => {
-    const { login } = useContext(AuthContext);
-    const navigate = useNavigate();
+  const { login } = useAuthContext();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  // ------------------------------ SUBMIT HANDLER -------------------------------------------
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
 
-    // NOTE: replace with real API call (authApi.login)
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    if (!email || !password) {
+      setError("Please enter email and password.");
+      return;
+    }
 
-        // fake token for demo — replace with real response.token
-        const fakeToken = "DEMO_TOKEN";
-        login(fakeToken);
+    setBusy(true);
+    try {
+      await login(email, password);
+      // login navigates to dashboard
+    } catch (error: any) {
+      setError(error?.response?.data?.message || "Login failed");
+    } finally {
+      setBusy(false);
+    }
+  };
 
-        // redirect to dashboard
-        navigate("/");
-    };
+  return (
+    <div className="login-page-wrap">
+      <form className="sticky-card" onSubmit={handleSubmit}>
+        <h2 className="sticky-title">Hello, Welcome!</h2>
+        <p className="sticky-sub">Login to your ToDoHi</p>
 
-    return (
-        <div className="login-page">
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <label>Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} />
-                <label>Password</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button type="submit">Log In</button>
-            </form>
+        {error && <div className="sticky-error">{error}</div>}
+
+        <label className="sticky-label">Email</label>
+        <input
+          className="sticky-input"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="user@example.com"
+          type="email"
+        />
+
+        <label className="sticky-label">Password</label>
+        <input
+          className="sticky-input"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          type="password"
+        />
+
+        <button type="submit" className="btn-primary sticky-btn" disabled={busy}>
+          {busy ? "Signing in..." : "Sign in"}
+        </button>
+
+        <div className="sticky-footer">
+          Don't have an account? <a href="/register">Register</a>
         </div>
-    )
-}
+      </form>
+    </div>
+  );
+};
 
-export default LoginPage
+export default LoginPage;

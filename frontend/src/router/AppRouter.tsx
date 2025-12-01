@@ -1,8 +1,7 @@
 // ---------------------------- APP ROUTER -----------------------------------
 // Centralized route definitions for the app.
-// - Public routes: /login, /register
-// - Protected routes: / (dashboard), /memos, etc.
-// - Now wrapped inside <Layout> so the sidebar + page content show properly.
+// AuthProvider + TodoProvider MUST be inside BrowserRouter so that
+// all pages (DashboardPage, MemoPage, etc.) have access to both contexts.
 
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -13,40 +12,48 @@ import DashboardPage from "../pages/DashboardPage";
 import MemoBoardPage from "../pages/MemoBoardPage";
 
 import ProtectedRoute from "./ProtectedRoute";
-import Layout from "../components/layout/Layout"; // <-- IMPORTANT
+import Layout from "../components/layout/Layout";
+import { AuthProvider } from "../context/AuthContext";
+import { TodoProvider } from "../context/TodoContext";
 
 const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
-            <Routes>
-                {/* ---------- Public Routes ---------- */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+            <AuthProvider>
+                <TodoProvider>
+                    <Routes>
 
-                {/* ---------- Protected Routes (Layout + Sidebar) ---------- */}
-                <Route element={<ProtectedRoute />}>
-                    <Route
-                        path="/"
-                        element={
-                            <Layout>
-                                <DashboardPage />
-                            </Layout>
-                        }
-                    />
+                        {/* ---------- Public Routes ---------- */}
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
 
-                    <Route
-                        path="/memos"
-                        element={
-                            <Layout>
-                                <MemoBoardPage />
-                            </Layout>
-                        }
-                    />
-                </Route>
+                        {/* ---------- Protected Routes ---------- */}
+                        <Route element={<ProtectedRoute />}>
+                            <Route
+                                path="/"
+                                element={
+                                    <Layout>
+                                        <DashboardPage />
+                                    </Layout>
+                                }
+                            />
 
-                {/* ---------- Fallback ---------- */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                            <Route
+                                path="/memos"
+                                element={
+                                    <Layout>
+                                        <MemoBoardPage />
+                                    </Layout>
+                                }
+                            />
+                        </Route>
+
+                        {/* ---------- Fallback ---------- */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+
+                    </Routes>
+                </TodoProvider>
+            </AuthProvider>
         </BrowserRouter>
     );
 };

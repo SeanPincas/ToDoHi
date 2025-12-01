@@ -83,7 +83,7 @@ export const Sidebar = () => {
 
                     {/* ----- SECTION 5: USER PROFILE & LOGOUT ----- */}
                     <div className="sidebar-section profile-section">
-                        <img src="/defalt-profile.png" alt="User Profile Img" className="sidebar-profile-pic" />
+                        <img src="/default-profile.png" alt="User Profile Img" className="sidebar-profile-pic" />
                         <p className="profile-name">Username</p>
 
                         <button className="logout-btn">Logout</button>

@@ -1,0 +1,97 @@
+/* ===================================================================================================== */
+/*                                             REGISTER PAGE                                             */
+/* ===================================================================================================== */
+
+/* Page wrapper: centers the card */
+.register-page-wrap {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+/* Sticky note card */
+.register-card {
+    width: 340px;
+    padding: 20px;
+    background: linear-gradient(180deg, #fffaf0 0%, #fff8e6 100%);
+    border: 2px solid var(--blue-dark);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* Title */
+.register-title {
+    margin: 0 0 10px 0;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Form layout */
+.register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Label */
+.register-label {
+    margin-top: 8px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Input fields */
+.register-input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(0,0,0,0.08);
+    outline: none;
+    font-family: inherit;
+}
+
+/* Error message box */
+.register-error {
+    background: rgba(255, 59, 48, 0.08);
+    border: 1px solid rgba(255, 59, 48, 0.16);
+    color: var(--btn-danger);
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Register button */
+.register-btn {
+    margin-top: 16px;
+    background: var(--btn-primary);
+    border: 2px solid var(--blue-dark);
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.register-btn:hover {
+    background: var(--btn-primary-hover);
+}
+
+/* Bottom text */
+.register-bottom-text {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 14px;
+}
+
+/* Login link from bottom text */
+.register-link {
+    color: var(--blue-dark);
+    font-weight: 600;
+    text-decoration: underline;
+}

@@ -1,20 +1,13 @@
 // ----------------------------- APP -------------------------------
-// Wrap the entire application with all providers that need global access.
-// This includes AuthProvider (authentication) and TodoProvider (tasks).
+// App simply renders the AppRouter.
+// All global providers (AuthProvider, TodoProvider) live INSIDE AppRouter
+// so they are wrapped by <BrowserRouter> (required for useNavigate).
 
 import React from "react";
-import { AuthProvider } from "./context/AuthContext";
-import { TodoProvider } from "./context/TodoContext";
 import AppRouter from "./router/AppRouter";
 
 const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <TodoProvider>
-        <AppRouter />
-      </TodoProvider>
-    </AuthProvider>
-  );
+  return <AppRouter />;
 };
 
 export default App;

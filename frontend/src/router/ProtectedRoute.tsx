@@ -2,19 +2,25 @@
 // 
 // Small wrapper that only renders children if user is authenticated.
 // If not authenticated → redirect to /login -- NOTE: uses React Router v6 (Navigate) and AuthContext token.
-import React,{ useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext.tsx";
+import { useAuthContext } from "../context/AuthContext";
 
-const ProtectedRoute: React.FC = () => {
-    const {token} = useContext(AuthContext);
+const ProtectedRoute = () => {
 
-    // If no token => redirect to login page
-    if (!token) {
-        return <Navigate to="/login" replace/>;
+    const { isAuthenticated, loading } = useAuthContext();
+
+    // ------------------ STILL CHECKING TOKEN / USER ------------------
+    // Prevents redirect loops & page flicker
+    if (loading) {
+        return null; // you can replace with a Loader component later
     }
 
-    // If token exist => render nested routes (outlet)
+    // ------------------ NOT LOGGED IN ------------------
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    // ------------------ AUTHENTICATED ------------------
     return <Outlet />;
 };
 

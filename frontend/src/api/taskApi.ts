@@ -30,7 +30,7 @@ export interface Task {
 // FETCH ALL TASKS of the logged-in user
 export const getAllTasks = async (): Promise<Task[]> => {
     const res = await axios.get(`${API_URL}`, authHeaders());
-    return res.data.task;
+    return res.data;
 };
 
 // CREATE a new task
