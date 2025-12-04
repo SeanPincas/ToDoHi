@@ -51,7 +51,6 @@
     cursor: pointer;
     background: var(--paper-bg);
 
-    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -64,7 +63,7 @@
 /* ---------------- FILTER TABS ---------------- */
 .todo-tabs {
     display: flex;
-    gap: 8px;
+    gap: 5px;
     overflow-x: auto;
 
     scrollbar-width: none;
