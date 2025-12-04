@@ -1,0 +1,194 @@
+/* ========================================================================
+   AddTaskModal.css — Notebook Style (Custom Dropdown + No Deadline)
+========================================================================== */
+
+.todo-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 40;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.todo-modal-card {
+    width: 420px;
+    max-width: 90%;
+    background: var(--paper-bg);
+    border: 2px solid var(--blue-dark);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    animation: popIn 0.18s ease-out;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* HEADER */
+.todo-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.modal-x-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* ERROR */
+.todo-modal-error {
+    background: rgba(255, 59, 48, 0.12);
+    border: 1px solid rgba(255, 59, 48, 0.25);
+    color: var(--red-accent);
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+/* FORM */
+.todo-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.todo-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-label {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.todo-input,
+.todo-textarea {
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 2px solid rgba(0,0,0,0.15);
+    background: white;
+    font-family: inherit;
+}
+
+.todo-textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* ==================== CUSTOM DROPDOWN ==================== */
+.todo-dropdown {
+    position: relative;
+    padding: 10px;
+    background: white;
+    border: 2px solid rgba(0,0,0,0.15);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.todo-dropdown.open {
+    border-color: var(--blue-dark);
+}
+
+.todo-dropdown-selected {
+    font-size: 14px;
+}
+
+.todo-dropdown-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.todo-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 2px solid var(--blue-dark);
+    border-radius: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 50;
+    animation: dropdownFade 0.15s ease-out;
+}
+
+@keyframes dropdownFade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.todo-dropdown-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.todo-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.todo-dropdown-item:hover {
+    background: #eaf3ff;
+}
+
+/* ==================== COLOR PICKER ==================== */
+.todo-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 28px);
+    gap: 6px;
+}
+
+.todo-color-option {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 2px solid black; /* requested */
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.todo-color-option.selected {
+    border-color: var(--blue-dark);
+    transform: scale(1.12);
+}
+
+/* FOOTER */
+.todo-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-cancel {
+    background: #ccc;
+    border: 2px solid var(--blue-dark);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--btn-primary);
+    border: 2px solid var(--blue-dark);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}

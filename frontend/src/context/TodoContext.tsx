@@ -5,11 +5,13 @@
 // - Add/update/delete tasks
 // - Drag & Drop reordering
 // - Filtering (All, Today, Completed, Failed)
-// Everything is stored here and shared across the entire app.
+// - MODALS (Add / Edit / View / DeleteConfirm)
+// =====================================================================================================
 
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import type { Task } from "../api/taskApi.ts"
+import type { Task } from "../api/taskApi.ts";
+
 import {
     getAllTasks,
     createTask,
@@ -18,60 +20,95 @@ import {
     reorderTaskPositions
 } from "../api/taskApi.ts";
 
-// ------------------------------ CONTEXT TYPE --------------------------------------
-// We define WHAT values and functions the TodoContext will give to the entire app.
-interface TodoContextType {
-    tasks: Task[];               // all tasks (raw list from backend)
-    todayTasks: Task[];          // tasks relevant today (for dashboard preview)
-    loading: boolean;            // loading state for UI feedback
+// ------------------------------ MODAL TYPES --------------------------------------
+export type ModalType = "add" | "edit" | "view" | "deleteConfirm";
 
-    // CRUD functions
-    fetchTasks: () => Promise<void>;                                        // get all tasks from backend
-    addTask: (data: Partial<Task>) => Promise<void>;                        // create a new task
-    updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;  // update an existing task
-    deleteTask: (taskId: string) => Promise<void>;                          // remove task
+// What the modal state looks like
+interface ModalState {
+    isOpen: boolean;
+    type: ModalType | null;
+    data?: any; // can hold task object for view/edit/delete
+}
+
+// ------------------------------ CONTEXT TYPE --------------------------------------
+interface TodoContextType {
+    tasks: Task[];
+    todayTasks: Task[];
+    loading: boolean;
+
+    // CRUD
+    fetchTasks: () => Promise<void>;
+    addTask: (data: Partial<Task>) => Promise<void>;
+    updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
+    deleteTask: (taskId: string) => Promise<void>;
 
     // Drag & Drop reorder
     reorderTasks: (orderedList: Task[]) => Promise<void>;
 
-    // Task Filters
-    filterAll: Task[];         // every task
-    filterOngoing: Task[];     // status === "ongoing"
-    filterCompleted: Task[];   // status === "completed"
-    filterFailed: Task[];      // failed or expired tasks
+    // Filters
+    filterAll: Task[];
+    filterOngoing: Task[];
+    filterCompleted: Task[];
+    filterFailed: Task[];
 
+    // MODALS
+    modal: ModalState;
+    openModal: (type: ModalType, data?: any) => void;
+    closeModal: () => void;
 }
 
 // ------------------------------ CREATE CONTEXT -------------------------------------
 const TodoContext = createContext<TodoContextType | null>(null);
 
-// ------------------------------ CUSTOM HOOK -----------------------------------
+// ------------------------------ CUSTOM HOOK ----------------------------------------
 export const useTodo = () => {
     const ctx = useContext(TodoContext);
     if (!ctx) throw new Error("useTodo must be used inside <TodoProvider>");
     return ctx;
 };
 
-// ------------------------------ PROVIDER START ---------------------------------
+// ------------------------------ PROVIDER START --------------------------------------
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     // =================================================================================================
-    //                                      REACT STATES
+    //                                       REACT STATES
     // =================================================================================================
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
+    // -------------------------- MODAL STATE --------------------------
+    const [modal, setModal] = useState<ModalState>({
+        isOpen: false,
+        type: null,
+        data: null
+    });
+
+    // -------------------------- OPEN MODAL ---------------------------
+    const openModal = (type: ModalType, data: any = null) => {
+        setModal({
+            isOpen: true,
+            type,
+            data
+        });
+    };
+
+    // -------------------------- CLOSE MODAL --------------------------
+    const closeModal = () => {
+        setModal({
+            isOpen: false,
+            type: null,
+            data: null
+        });
+    };
+
     // =================================================================================================
     //                                      FETCH TASKS FROM BACKEND
     // =================================================================================================
-    // Runs 1 time on mount (Dashboard loads)
-    // Fetches all tasks of the logged-in user
     const fetchTasks = async () => {
         try {
             setLoading(true);
             const data = await getAllTasks();
 
-            // Sort tasks by orderIndex for proper display
             const sorted = data.sort((a, b) => a.orderIndex - b.orderIndex);
 
             setTasks(sorted);
@@ -87,65 +124,57 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     // =================================================================================================
-    //               FILTERING LOGIC (ALL / ONGOING / COMPLETED / FAILED)
+    //                                   FILTERING LOGIC
     // =================================================================================================
-
-    // Helper: get today's date yyyy-mm-dd
     const todayString = new Date().toISOString().split("T")[0];
 
-    // Show only tasks with today's deadline OR status ongoing
     const todayTasks = tasks.filter(t => {
         const deadline = t.deadline ? t.deadline.split("T")[0] : null;
         return deadline === todayString || t.status === "ongoing";
     });
 
-    // All tasks (just return tasks array)
     const filterAll = tasks;
-
-    // Ongoing tasks only
-    const filterOngoing = tasks.filter(t => t.status === "ongoing")
-
-    // Completed tasks only
+    const filterOngoing = tasks.filter(t => t.status === "ongoing");
     const filterCompleted = tasks.filter(t => t.status === "completed");
-
-    // Failed tasks only
     const filterFailed = tasks.filter(t => t.status === "failed" || t.isExpired);
 
     // =================================================================================================
-    //                                 ADD A NEW TASK
+    //                                   ADD NEW TASK
     // =================================================================================================
     const addTask = async (data: Partial<Task>) => {
         try {
             const newTask = await createTask(data);
 
-            setTasks(prev => {
-                // insert new task at bottom with proper orderIndex
-                return [...prev, newTask].sort((a, b) => a.orderIndex - b.orderIndex);
-            });
+            setTasks(prev =>
+                [...prev, newTask].sort((a, b) => a.orderIndex - b.orderIndex)
+            );
         } catch (error) {
             console.error("[TodoContext] Error Creating Task:", error);
         }
     };
 
     // =================================================================================================
-    //                                 UPDATE EXISTING TASK
+    //                                   UPDATE TASK
     // =================================================================================================
     const updateTask = async (taskId: string, updates: Partial<Task>) => {
         try {
             const updated = await apiUpdateTask(taskId, updates);
-            setTasks(prev => prev.map(t => (t._id === taskId ? { ...t, ...updated } : t)))
-        } catch (error) {
 
-            console.error("[TodoContext] Error Updating Task", error)
+            setTasks(prev =>
+                prev.map(t => (t._id === taskId ? { ...t, ...updated } : t))
+            );
+        } catch (error) {
+            console.error("[TodoContext] Error Updating Task:", error);
         }
     };
 
     // =================================================================================================
-    //                                 DELETE A TASK
+    //                                   DELETE TASK
     // =================================================================================================
     const deleteTask = async (taskId: string) => {
         try {
             await apiDeleteTask(taskId);
+
             setTasks(prev => prev.filter(t => t._id !== taskId));
         } catch (error) {
             console.error("[TodoContext] Error deleting task:", error);
@@ -153,20 +182,17 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // =================================================================================================
-    //                        DRAG & DROP — SAVE NEW ORDER TO BACKEND
+    //                                   REORDER TASKS
     // =================================================================================================
     const reorderTasks = async (orderedList: Task[]) => {
         try {
-            // Add new orderIndex to each item
             const updatedOrder = orderedList.map((task, index) => ({
                 ...task,
                 orderIndex: index,
-            }))
+            }));
 
-            // Save to server
             await reorderTaskPositions(updatedOrder);
 
-            // Save to State
             setTasks(updatedOrder);
         } catch (error) {
             console.error("[TodoContext] Error Reordering Tasks:", error);
@@ -174,7 +200,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // =================================================================================================
-    //                                 PROVIDER VALUE
+    //                                PROVIDER VALUE
     // =================================================================================================
     return (
         <TodoContext.Provider
@@ -187,13 +213,18 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
                 updateTask,
                 deleteTask,
                 reorderTasks,
+
                 filterAll,
                 filterOngoing,
                 filterCompleted,
                 filterFailed,
+
+                modal,
+                openModal,
+                closeModal,
             }}
         >
             {children}
         </TodoContext.Provider>
-    )
-}
+    );
+};

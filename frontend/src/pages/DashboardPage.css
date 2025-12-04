@@ -41,7 +41,6 @@
     background: var(--white);
     border: 3px solid var(--blue-dark);
     border-radius: 14px;
-    padding: 18px;
     min-height: 250px;
     display: flex;
     flex-direction: column;
@@ -62,7 +61,6 @@
 .bento-scroll {
     flex: 1;
     overflow-y: auto;
-    padding-right: 6px;
 }
 
 .bento-scroll::-webkit-scrollbar {

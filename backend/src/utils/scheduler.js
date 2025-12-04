@@ -10,7 +10,7 @@ async function markExpiredTasksNow() {
 
         const res = await Task.updateMany(
             {
-                status: { $in: ["pending", "in-progress"] },
+                status: { $in: ["pending"] },
                 deadline: { $exists: true, $ne: null, $lte: now }
             },
             {

@@ -73,23 +73,19 @@ const Dashboard: React.FC = () => {
 
                 {/* ---------- BENTO GRID ---------- */}
                 <div className="dashboard-bento-grid">
-
                     <div className="bento-box">
-                        <h3 className="bento-title">To-Do List</h3>
                         <div className="bento-scroll">
                             <TodoPreview />
                         </div>
                     </div>
 
                     <div className="bento-box">
-                        <h3 className="bento-title">Daily Planner</h3>
                         <div className="bento-scroll">
                             <DailyPlanPreview />
                         </div>
                     </div>
 
                     <div className="bento-box">
-                        <h3 className="bento-title">Memos</h3>
                         <div className="bento-scroll">
                             <MemoPreview />
                         </div>

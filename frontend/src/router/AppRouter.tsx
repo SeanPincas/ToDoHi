@@ -15,14 +15,15 @@ import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/layout/Layout";
 import { AuthProvider } from "../context/AuthContext";
 import { TodoProvider } from "../context/TodoContext";
+import AddTaskModal from "../components/todo/AddTaskModal";
 
 const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
             <AuthProvider>
                 <TodoProvider>
-                    <Routes>
 
+                    <Routes>
                         {/* ---------- Public Routes ---------- */}
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
@@ -50,8 +51,15 @@ const AppRouter: React.FC = () => {
 
                         {/* ---------- Fallback ---------- */}
                         <Route path="*" element={<Navigate to="/" replace />} />
-
                     </Routes>
+
+                    {/* ===================================================== */}
+                    {/*                   GLOBAL TODO MODALS                 */}
+                    {/* ===================================================== */}
+                    <AddTaskModal />
+                    {/*<EditTaskModal />*/}
+                    {/*<ViewTaskModal />*/}
+                    {/*<VerificationModal />*/}
                 </TodoProvider>
             </AuthProvider>
         </BrowserRouter>

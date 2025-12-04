@@ -1,173 +1,153 @@
-/* ===================================================================================================== */
-/*                                        TODO PREVIEW (DASHBOARD)                                      */
-/* ----------------------------------------------------------------------------------------------------- */
-/*  ✔ Matches your notebook theme (paper, blue-dark borders, soft shadows)                               */
-/*  ✔ Fully responsive for mobile → desktop                                                              */
-/*  ✔ Cleaner spacing + better layout                                                                    */
-/* ===================================================================================================== */
+/* ========================================================================== */
+/* TODO PREVIEW — CLEAN RESPONSIVE VERSION                                    */
+/* ========================================================================== */
 
 .todo-preview-container {
+    max-height: 330px;        /* <= choose size you like */
+    min-height: 260px;
+
     background: var(--white);
-    border: 2px solid var(--blue-dark);
+    padding: 12px;
     border-radius: 12px;
-    padding: 16px;
-    width: 100%;
+    box-shadow: var(--shadow-soft);
+
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    box-shadow: var(--shadow-soft);
+    gap: 10px;
+
+    /* FIX: no vertical scrollbar on the container */
+    overflow: hidden;
+
+    /* FIX: allow task list to scroll inside */
+    max-height: 75vh;
+    position: relative;
 }
 
-/* ===================================================================================================== */
-/*                                              HEADER AREA                                               */
-/* ===================================================================================================== */
-
+/* ---------------- HEADER ---------------- */
 .todo-preview-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* mobile friendly */
-    gap: 10px;
+    align-items: center;   /* FIX: perfect vertical centering */
 }
 
-/* ---------- Tabs ---------- */
-.todo-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+.todo-preview-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
 }
 
-.todo-tabs button {
-    background: transparent;
-    border: 2px solid var(--blue-dark);
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    opacity: 0.8;
-    transition: 0.2s;
-}
-
-.todo-tabs button:hover {
-    opacity: 1;
-    background: var(--blue-light);
-}
-
-.todo-tabs button.active {
-    background: var(--blue-light);
-    opacity: 1;
-    font-weight: bold;
-}
-
-/* ---------- Action Buttons (Rearrange + Delete) ---------- */
-
+/* Action button group */
 .todo-preview-action {
     display: flex;
+    align-items: center;
     gap: 8px;
 }
 
 .icon-btn {
-    background: var(--paper-bg);
+    padding: 6px 10px;
+    font-size: 18px;
     border: 2px solid var(--blue-dark);
-    padding: 8px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 20px;
+    background: var(--paper-bg);
+
     display: flex;
     align-items: center;
-    transition: 0.2s;
+    justify-content: center;
 }
 
+.icon-btn.active,
 .icon-btn:hover {
     background: var(--blue-light);
 }
 
-.icon-btn.active {
-    background: var(--blue-light);
+/* ---------------- FILTER TABS ---------------- */
+.todo-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+.todo-tabs::-webkit-scrollbar {
+    display: none;
 }
 
-/* ===================================================================================================== */
-/*                                             TASK LIST AREA                                            */
-/* ===================================================================================================== */
+.todo-tabs button {
+    white-space: nowrap;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--blue-dark);
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+}
 
+.todo-tabs button.active {
+    background: var(--blue-light);
+    font-weight: 700;
+}
+
+/* ---------------- TASK LIST ---------------- */
 .todo-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+
+    /* FIX: this scrolls, NOT the container */
+    overflow-y: auto;
+    flex: 1;
 }
 
-/* ===================================================================================================== */
-/*                                             ADD TASK BUTTON                                           */
-/* ===================================================================================================== */
+.todo-list::-webkit-scrollbar {
+    width: 0;
+}
 
+/* ---------------- ADD TASK BUTTON (STICKY) ---------------- */
+/* FIXED BELOW INSIDE THE CONTAINER */
 .add-task-btn {
-    margin-top: 12px;
-    background: var(--btn-primary);
+    position: sticky;
+    bottom: 0;
+
+    padding: 12px 14px;
+    border-radius: 10px;
     border: 2px solid var(--blue-dark);
-    padding: 12px;
-    color: var(--text-main);
+    background: var(--btn-primary);
+
     width: 100%;
-    border-radius: 8px;
-    cursor: pointer;
+    margin-top: 10px;
+
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
+
     font-weight: 600;
-    transition: 0.2s;
+    cursor: pointer;
+    z-index: 5;  /* FIX: stays above tasks */
 }
 
 .add-task-btn:hover {
     background: var(--btn-primary-hover);
 }
 
-/* ===================================================================================================== */
-/*                                           RESPONSIVE DESIGN                                           */
-/* ===================================================================================================== */
+/* ========================================================================== */
+/* RESPONSIVE ADJUSTMENTS                                                     */
+/* ========================================================================== */
 
-/* SMALL MOBILE (0–480px) */
-@media (max-width: 480px) {
-    .todo-preview-container {
-        padding: 12px;
-    }
-
-    .todo-tabs button {
-        font-size: 12px;
-        padding: 5px 10px;
-    }
-
-    .icon-btn {
-        padding: 6px;
-        font-size: 18px;
-    }
-
-    .add-task-btn {
-        padding: 10px;
-        font-size: 15px;
-    }
+/* Mobile L - 425px */
+@media (max-width: 425px) {
+    .todo-preview-title { font-size: 16px; }
+    .icon-btn { font-size: 16px; padding: 6px 8px; }
+    .todo-tabs button { font-size: 11px; padding: 5px 9px; }
 }
 
-/* TABLET (481–768px) */
-@media (max-width: 768px) {
-    .todo-preview-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .todo-preview-action {
-        align-self: flex-end;
-    }
+/* Tablet */
+@media (min-width: 426px) and (max-width: 768px) {
+    .todo-tabs button { font-size: 12px; padding: 6px 10px; }
 }
 
-/* DESKTOP LARGE + WIDESCREEN (1500px+) */
-@media (min-width: 1500px) {
-    .todo-preview-container {
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .todo-tabs button {
-        font-size: 16px;
-        padding: 8px 14px;
-    }
+/* Desktop */
+@media (min-width: 769px) {
+    .todo-tabs button { font-size: 13px; padding: 6px 12px; }
 }
