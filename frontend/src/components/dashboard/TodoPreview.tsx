@@ -2,7 +2,7 @@
 //                            TODO PREVIEW (DASHBOARD)
 // =================================================================================
 
-import { useState } from "react";
+import React, { useState } from "react";
 import "./TodoPreview.css";
 
 // dnd-kit imports
@@ -20,19 +20,26 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
+// Context + types
 import { useTodo } from "../../context/TodoContext";
 import type { Task } from "../../api/taskApi";
 
-// Sortable Item Component
+// Sortable Task Item
 import { SortableTaskItem } from "../todo/SortableTaskItem";
 
-// Icons
-import { RiDragMove2Fill } from "react-icons/ri";
-import { RiDeleteBin6Fill } from "react-icons/ri";
-import { RiAddFill } from "react-icons/ri";
+// Icons from shared icon library
+import { Icons } from "../../utils/iconLibrary";
+
+// Task utilities — NEW REFACTORED VERSION
+import {
+  TASK_TABS,
+  TASK_TAB_LABELS,
+  type TaskTab,
+} from "../../utils/taskUtils";
+
 
 // ------------------------------ COMPONENT START ------------------------
-const TodoPreview = () => {
+const TodoPreview: React.FC = () => {
   const {
     filterAll,
     filterPending,
@@ -40,18 +47,18 @@ const TodoPreview = () => {
     filterFailed,
     reorderTasks,
     updateTask,
-    openModal, // ← required for AddTaskModal
+    openModal,
   } = useTodo();
 
   // =====================================================================
   //                              UI STATES
   // =====================================================================
-  const [activeTab, setActiveTab] =
-    useState<"all" | "pending" | "completed" | "failed">("pending");
+  const [activeTab, setActiveTab] = useState<TaskTab>("pending");
 
   const [isRearrangeMode, setIsRearrangeMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedToDelete, setSelectedToDelete] = useState<string[]>([]);
+
 
   // =====================================================================
   //                              FILTER LOGIC
@@ -73,13 +80,12 @@ const TodoPreview = () => {
 
   const tasks = getActiveList();
 
+
   // =====================================================================
   //                            DND-KIT SETUP
   // =====================================================================
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
   const handleDragEnd = (event: any) => {
@@ -95,6 +101,7 @@ const TodoPreview = () => {
     reorderTasks(newOrder);
   };
 
+
   // =====================================================================
   //                        TOGGLE COMPLETION STATUS
   // =====================================================================
@@ -102,6 +109,7 @@ const TodoPreview = () => {
     const newStatus = task.status === "completed" ? "pending" : "completed";
     updateTask(task._id, { status: newStatus });
   };
+
 
   // =====================================================================
   //                        DELETE SELECTION TOGGLE
@@ -114,6 +122,7 @@ const TodoPreview = () => {
     );
   };
 
+
   // =====================================================================
   //                                 RENDER
   // =====================================================================
@@ -121,7 +130,7 @@ const TodoPreview = () => {
     <div className="todo-preview-container">
 
       {/* =============================================================== */}
-      {/*                          HEADER: TITLE + BUTTONS                */}
+      {/*                          HEADER                                 */}
       {/* =============================================================== */}
       <div className="todo-preview-header">
         <h2 className="todo-preview-title">To-Do List</h2>
@@ -129,52 +138,36 @@ const TodoPreview = () => {
         <div className="todo-preview-actions">
           <button
             className={`icon-btn ${isRearrangeMode ? "active" : ""}`}
-            onClick={() => setIsRearrangeMode(!isRearrangeMode)}
+            onClick={() => setIsRearrangeMode((prev) => !prev)}
           >
-            <RiDragMove2Fill />
+            <Icons.Drag />
           </button>
 
           <button
             className={`icon-btn ${isDeleteMode ? "active" : ""}`}
-            onClick={() => setIsDeleteMode(!isDeleteMode)}
+            onClick={() => setIsDeleteMode((prev) => !prev)}
           >
-            <RiDeleteBin6Fill />
+            <Icons.Delete />
           </button>
         </div>
       </div>
+
 
       {/* =============================================================== */}
       {/*                           FILTER TABS                           */}
       {/* =============================================================== */}
       <div className="todo-tabs">
-        <button
-          className={activeTab === "all" ? "active" : ""}
-          onClick={() => setActiveTab("all")}
-        >
-          ALL
-        </button>
-
-        <button
-          className={activeTab === "pending" ? "active" : ""}
-          onClick={() => setActiveTab("pending")}
-        >
-          ONGOING
-        </button>
-
-        <button
-          className={activeTab === "completed" ? "active" : ""}
-          onClick={() => setActiveTab("completed")}
-        >
-          COMPLETED
-        </button>
-
-        <button
-          className={activeTab === "failed" ? "active" : ""}
-          onClick={() => setActiveTab("failed")}
-        >
-          FAILED
-        </button>
+        {TASK_TABS.map((tab) => (
+          <button
+            key={tab}
+            className={activeTab === tab ? "active" : ""}
+            onClick={() => setActiveTab(tab)}
+          >
+            {TASK_TAB_LABELS[tab].toUpperCase()}
+          </button>
+        ))}
       </div>
+
 
       {/* =============================================================== */}
       {/*                     TASK LIST + DRAG & DROP                     */}
@@ -204,12 +197,14 @@ const TodoPreview = () => {
         </SortableContext>
       </DndContext>
 
+
       {/* =============================================================== */}
       {/*                        ADD TASK BUTTON                          */}
       {/* =============================================================== */}
       <button className="add-task-btn" onClick={() => openModal("add")}>
-        <RiAddFill /> Add Task
+        <Icons.Add /> Add Task
       </button>
+
     </div>
   );
 };

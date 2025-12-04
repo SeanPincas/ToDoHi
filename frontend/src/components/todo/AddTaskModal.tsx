@@ -1,52 +1,39 @@
 // ============================================================================
-// AddTaskModal.tsx
-// Modal for creating a new Task in the Todo system.
-//
-// PURPOSE:
-// - Opens when TodoContext.modal.type === "add"
-// - Allows the user to input Title, Description, Category, and Task Color
-// - Uses a **custom dropdown menu** instead of <select>
-// - No "deadline" because your system uses user's resetHour instead
-// - Calls addTask() from TodoContext to create the task in backend
+// AddTaskModal.tsx — Refactored with iconLibrary + modalStyles + taskUtils
 // ============================================================================
 
 import React, { useState, useEffect } from "react";
 import { useTodo } from "../../context/TodoContext";
-
 import {
     TASK_CATEGORIES,
     CATEGORY_LABELS,
     TASK_COLOR_OPTIONS,
+    type TaskCategory,
 } from "../../utils/taskUtils";
+
+import { Icons } from "../../utils/iconLibrary";
+import { modalOverlayStyle, modalCardBaseStyle } from "../../utils/modalStyles";
 
 import "./AddTaskModal.css";
 
 const AddTaskModal: React.FC = () => {
-
-    // ----------------------------------------------------------------------
-    // ACCESS GLOBAL MODAL + TODO ACTIONS
-    // modal  → tells which modal is open
-    // closeModal → hides modal
-    // addTask → creates task + updates state
-    // ----------------------------------------------------------------------
     const { modal, closeModal, addTask } = useTodo();
 
-    // FORM FIELDS
+    // ------------------ FORM FIELDS ------------------
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [category, setCategory] = useState("others");
+    const [category, setCategory] = useState<TaskCategory>("others");
     const [containerColor, setContainerColor] = useState("#ffffff");
+
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+    // Dropdown state
     const [isCatDropdownOpen, setIsCatDropdownOpen] = useState(false);
 
-    // ----------------------------------------------------------------------
-    // RESET FORM EVERY TIME the modal opens
-    // Ensures old values from last task do not persist.
-    // ----------------------------------------------------------------------
+    // ------------------ RESET FORM WHEN OPEN ------------------
     useEffect(() => {
-        if (modal.isOpen) {
+        if (modal.isOpen && modal.type === "add") {
             setTitle("");
             setDescription("");
             setCategory("others");
@@ -54,31 +41,19 @@ const AddTaskModal: React.FC = () => {
             setIsCatDropdownOpen(false);
             setErrorMsg(null);
         }
-    }, [modal.isOpen]);
+    }, [modal.isOpen, modal.type]);
 
-    
-    // Render NOTHING if this modal is not the "add task" modal
+    // ------------------ DO NOT RENDER IF NOT OPEN ------------------
     if (!modal.isOpen || modal.type !== "add") return null;
 
-    // ----------------------------------------------------------------------
-    // CLOSE MODAL (disabled while loading)
-    // ----------------------------------------------------------------------
     const handleClose = () => {
         if (!loading) closeModal();
     };
 
-    // ----------------------------------------------------------------------
-    // SUBMIT HANDLER — Called when user clicks Create Task
-    //
-    // VALIDATES title
-    // CREATES payload object matching backend model
-    // CALLS addTask() from TodoContext
-    // CLOSES modal afterward
-    // ----------------------------------------------------------------------
+    // ------------------ FORM SUBMIT ------------------
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // ❗ Title is required
         if (!title.trim()) {
             setErrorMsg("Task Title is required.");
             return;
@@ -87,7 +62,6 @@ const AddTaskModal: React.FC = () => {
         setLoading(true);
         setErrorMsg(null);
 
-        // Payload must match backend TaskController fields
         const payload = {
             title: title.trim(),
             description: description.trim(),
@@ -96,8 +70,8 @@ const AddTaskModal: React.FC = () => {
         };
 
         try {
-            await addTask(payload);     // create in backend
-            closeModal();               // close modal afterwards
+            await addTask(payload);
+            closeModal();
         } catch (err: any) {
             setErrorMsg(err?.message ?? "Failed to create task.");
         }
@@ -109,39 +83,35 @@ const AddTaskModal: React.FC = () => {
     //                              UI RENDER
     // ======================================================================
     return (
-        <div className="todo-modal-overlay" onMouseDown={handleClose}>
-            {/* Prevent clicking inside modal from closing it */}
+        <div
+            className="todo-modal-overlay"
+            style={modalOverlayStyle}
+            onMouseDown={handleClose}
+        >
             <div
                 className="todo-modal-card"
+                style={modalCardBaseStyle}
                 onMouseDown={(e) => e.stopPropagation()}
             >
-
-                {/* --------------------------------------------------------- */}
-                {/* HEADER */}
-                {/* --------------------------------------------------------- */}
+                {/* ------------------ HEADER ------------------ */}
                 <div className="todo-modal-header">
                     <h3>Create Task</h3>
 
-                    {/* X Button to close modal */}
                     <button className="modal-x-btn" onClick={handleClose}>
-                        ✕
+                        <Icons.Close />
                     </button>
                 </div>
 
-                {/* --------------------------------------------------------- */}
-                {/* ERROR MESSAGE */}
-                {/* --------------------------------------------------------- */}
-                {errorMsg && <div className="todo-modal-error">{errorMsg}</div>}
+                {/* ------------------ ERROR ------------------ */}
+                {errorMsg && (
+                    <div className="todo-modal-error">{errorMsg}</div>
+                )}
 
-                {/* --------------------------------------------------------- */}
-                {/* FORM START */}
-                {/* --------------------------------------------------------- */}
+                {/* ------------------ FORM ------------------ */}
                 <form className="todo-modal-form" onSubmit={handleSubmit}>
-
-                    {/* TITLE FIELD */}
+                    {/* TITLE */}
                     <label className="todo-field">
                         <span className="todo-label">Title *</span>
-
                         <input
                             className="todo-input"
                             value={title}
@@ -150,10 +120,9 @@ const AddTaskModal: React.FC = () => {
                         />
                     </label>
 
-                    {/* DESCRIPTION FIELD */}
+                    {/* DESCRIPTION */}
                     <label className="todo-field">
                         <span className="todo-label">Description</span>
-
                         <textarea
                             className="todo-textarea"
                             value={description}
@@ -162,29 +131,27 @@ const AddTaskModal: React.FC = () => {
                         />
                     </label>
 
-                    {/* ----------------------------------------------------- */}
-                    {/* CUSTOM CATEGORY DROPDOWN (instead of <select>)        */}
-                    {/* ----------------------------------------------------- */}
+                    {/* ------------------ CATEGORY DROPDOWN ------------------ */}
                     <label className="todo-field">
                         <span className="todo-label">Category</span>
 
-                        {/* Dropdown container */}
                         <div
-                            className={`todo-dropdown ${isCatDropdownOpen ? "open" : ""}`}
-                            onClick={() => setIsCatDropdownOpen(!isCatDropdownOpen)}
+                            className={`todo-dropdown ${
+                                isCatDropdownOpen ? "open" : ""
+                            }`}
+                            onClick={() =>
+                                setIsCatDropdownOpen(!isCatDropdownOpen)
+                            }
                         >
-                            {/* Current selected category label */}
                             <span className="todo-dropdown-selected">
                                 {CATEGORY_LABELS[category]}
                             </span>
 
-                            {/* Arrow indicator */}
                             <span className="todo-dropdown-arrow">▼</span>
 
-                            {/* Dropdown menu list */}
                             {isCatDropdownOpen && (
                                 <div className="todo-dropdown-menu">
-                                    {TASK_CATEGORIES.map((cat) => (
+                                    {TASK_CATEGORIES.map((cat: TaskCategory) => (
                                         <div
                                             key={cat}
                                             className="todo-dropdown-item"
@@ -201,9 +168,7 @@ const AddTaskModal: React.FC = () => {
                         </div>
                     </label>
 
-                    {/* ----------------------------------------------------- */}
-                    {/* COLOR PICKER GRID                                     */}
-                    {/* ----------------------------------------------------- */}
+                    {/* ------------------ COLOR PICKER GRID ------------------ */}
                     <label className="todo-field">
                         <span className="todo-label">Task Color</span>
 
@@ -212,20 +177,21 @@ const AddTaskModal: React.FC = () => {
                                 <div
                                     key={c.hex}
                                     className={`todo-color-option ${
-                                        containerColor === c.hex ? "selected" : ""
+                                        containerColor === c.hex
+                                            ? "selected"
+                                            : ""
                                     }`}
                                     style={{ backgroundColor: c.hex }}
-                                    onClick={() => setContainerColor(c.hex)}
+                                    onClick={() =>
+                                        setContainerColor(c.hex)
+                                    }
                                 />
                             ))}
                         </div>
                     </label>
 
-                    {/* ----------------------------------------------------- */}
-                    {/* FOOTER BUTTONS (Cancel + Create Task)                 */}
-                    {/* ----------------------------------------------------- */}
+                    {/* ------------------ FOOTER ------------------ */}
                     <div className="todo-modal-footer">
-
                         <button
                             type="button"
                             className="btn-cancel"
@@ -242,7 +208,6 @@ const AddTaskModal: React.FC = () => {
                         >
                             {loading ? "Creating..." : "Create Task"}
                         </button>
-
                     </div>
                 </form>
             </div>
