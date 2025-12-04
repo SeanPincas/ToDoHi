@@ -47,7 +47,7 @@ interface TodoContextType {
 
     // Filters
     filterAll: Task[];
-    filterOngoing: Task[];
+    filterPending: Task[];
     filterCompleted: Task[];
     filterFailed: Task[];
 
@@ -130,11 +130,11 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     const todayTasks = tasks.filter(t => {
         const deadline = t.deadline ? t.deadline.split("T")[0] : null;
-        return deadline === todayString || t.status === "ongoing";
+        return deadline === todayString || t.status === "pending";
     });
 
     const filterAll = tasks;
-    const filterOngoing = tasks.filter(t => t.status === "ongoing");
+    const filterPending = tasks.filter(t => t.status === "pending");
     const filterCompleted = tasks.filter(t => t.status === "completed");
     const filterFailed = tasks.filter(t => t.status === "failed" || t.isExpired);
 
@@ -215,7 +215,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
                 reorderTasks,
 
                 filterAll,
-                filterOngoing,
+                filterPending,
                 filterCompleted,
                 filterFailed,
 

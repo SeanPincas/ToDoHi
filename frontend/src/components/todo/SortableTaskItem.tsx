@@ -34,11 +34,6 @@ export const SortableTaskItem = ({
     // =================================================================================================
     //                                 DND-KIT SORTABLE HOOK
     // =================================================================================================
-    // useSortable handles:
-    // - position transforms
-    // - drag listeners
-    // - animation
-    // =================================================================================================
     const {
         attributes,
         listeners,
@@ -48,16 +43,39 @@ export const SortableTaskItem = ({
         isDragging,
     } = useSortable({ id: task._id });
 
-    // Convert transforms into style friendly values
-    const style = {
+    // Transform for animation
+    const dndStyle = {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
     };
+
     // =================================================================================================
     //                                 DELETE MODE CHECK
     // =================================================================================================
     const isSelectedForDelete = selectedToDelete.includes(task._id);
+
+    // =================================================================================================
+    //                                    COMBINED STYLE (NEW)
+    // =================================================================================================
+    const containerStyle: React.CSSProperties = {
+        ...dndStyle,
+
+        // ⭐ Apply task color here
+        backgroundColor: task.containerColor || "var(--white)",
+
+        // Notebook border theme
+        border: "2px solid var(--blue-dark)",
+        borderRadius: "10px",
+
+        padding: "10px",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+
+        boxShadow: "0px 2px 4px rgba(0,0,0,0.15)",
+        cursor: isRearrangeMode ? "grab" : "default",
+    };
 
     // =================================================================================================
     //                                              UI RENDER
@@ -65,11 +83,11 @@ export const SortableTaskItem = ({
     return (
         <div
             ref={setNodeRef}
-            style={style}
+            style={containerStyle}
             className={`task-item-container ${isDragging ? "dragging" : ""}`}
         >
 
-            {/* ---------- LEFT SIDE: CHECKBOX + DELETE MODE ---------- */}
+            {/* ---------- LEFT SIDE: CHECKBOX / DELETE SELECTOR ---------- */}
             <div className="task-left-section">
 
                 {/* COMPLETION CHECKBOX */}
@@ -86,7 +104,7 @@ export const SortableTaskItem = ({
                     </div>
                 )}
 
-                {/* DELETE MODE CHECKMARK */}
+                {/* DELETE MODE SELECTOR */}
                 {isDeleteMode && (
                     <div
                         className={`delete-select-circle ${isSelectedForDelete ? "selected" : ""}`}
@@ -101,15 +119,12 @@ export const SortableTaskItem = ({
                 )}
             </div>
 
-            {/* ---------- MIDDLE: TASK BODY ---------- */}
+            {/* ---------- MIDDLE: TASK BODY (TITLE + INFO) ---------- */}
             <div className="task-body">
-
-                {/* -------- TASK TITLE -------- */}
                 <p className={`task-title ${task.status}`}>
                     {task.title}
                 </p>
 
-                {/* -------- TASK CATEGORY OR STATUS -------- */}
                 <span className="task-subinfo">
                     {task.category} • {task.status}
                 </span>

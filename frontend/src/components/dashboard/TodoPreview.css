@@ -1,9 +1,9 @@
 /* ========================================================================== */
-/* TODO PREVIEW — CLEAN RESPONSIVE VERSION                                    */
+/* TODO PREVIEW — CLEAN RESPONSIVE VERSION (FINAL + LOCKED IN)               */
 /* ========================================================================== */
 
 .todo-preview-container {
-    max-height: 330px;        /* <= choose size you like */
+    max-height: 330px;
     min-height: 260px;
 
     background: var(--white);
@@ -15,10 +15,7 @@
     flex-direction: column;
     gap: 10px;
 
-    /* FIX: no vertical scrollbar on the container */
     overflow: hidden;
-
-    /* FIX: allow task list to scroll inside */
     max-height: 75vh;
     position: relative;
 }
@@ -27,7 +24,7 @@
 .todo-preview-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;   /* FIX: perfect vertical centering */
+    align-items: center;
 }
 
 .todo-preview-title {
@@ -40,7 +37,7 @@
 .todo-preview-action {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px; /* slight spacing between rearrange/delete */
 }
 
 .icon-btn {
@@ -50,10 +47,6 @@
     border-radius: 8px;
     cursor: pointer;
     background: var(--paper-bg);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .icon-btn.active,
@@ -61,26 +54,30 @@
     background: var(--blue-light);
 }
 
-/* ---------------- FILTER TABS ---------------- */
+/* ========================================================================== */
+/* FILTER TABS — FINAL UNIVERSAL RESPONSIVE (1 ROW, 4 COLUMNS)               */
+/* ========================================================================== */
+
 .todo-tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-
-    scrollbar-width: none;
-}
-.todo-tabs::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* ALWAYS 4 buttons in a row */
+    gap: 4px;                               /* small controlled spacing */
+    width: 100%;
 }
 
+/* MAIN BUTTON STYLE */
 .todo-tabs button {
-    white-space: nowrap;
-    padding: 6px 12px;
+    padding: 6px 8px;                       /* base padding */
     border-radius: 8px;
     border: 2px solid var(--blue-dark);
     background: white;
-    font-size: 13px;
     cursor: pointer;
+
+    font-size: 12px;                        /* base font */
+    font-weight: 500;
+    white-space: nowrap;
+
+    transition: 0.15s ease-in-out;
 }
 
 .todo-tabs button.active {
@@ -88,13 +85,51 @@
     font-weight: 700;
 }
 
-/* ---------------- TASK LIST ---------------- */
+/* ---------------- MOBILE (≤ 425px) ---------------- */
+@media (max-width: 425px) {
+    .todo-tabs {
+        gap: 3px;
+    }
+
+    .todo-tabs button {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+}
+
+/* ---------------- TABLET (426px – 768px) ---------------- */
+@media (min-width: 426px) and (max-width: 768px) {
+    .todo-tabs button {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+}
+
+/* ---------------- DESKTOP (≥ 769px) ---------------- */
+@media (min-width: 769px) {
+    .todo-tabs {
+        gap: 8px;
+    }
+
+    .todo-tabs button {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+
+    /* reposition action buttons slightly for spacing */
+    .todo-preview-action {
+        gap: 14px;
+    }
+}
+
+/* ========================================================================== */
+/* TASK LIST                                                                  */
+/* ========================================================================== */
 .todo-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
 
-    /* FIX: this scrolls, NOT the container */
     overflow-y: auto;
     flex: 1;
 }
@@ -103,8 +138,10 @@
     width: 0;
 }
 
-/* ---------------- ADD TASK BUTTON (STICKY) ---------------- */
-/* FIXED BELOW INSIDE THE CONTAINER */
+/* ========================================================================== */
+/* ADD TASK BUTTON (STICKY)                                                   */
+/* ========================================================================== */
+
 .add-task-btn {
     position: sticky;
     bottom: 0;
@@ -124,30 +161,9 @@
 
     font-weight: 600;
     cursor: pointer;
-    z-index: 5;  /* FIX: stays above tasks */
+    z-index: 5;
 }
 
 .add-task-btn:hover {
     background: var(--btn-primary-hover);
-}
-
-/* ========================================================================== */
-/* RESPONSIVE ADJUSTMENTS                                                     */
-/* ========================================================================== */
-
-/* Mobile L - 425px */
-@media (max-width: 425px) {
-    .todo-preview-title { font-size: 16px; }
-    .icon-btn { font-size: 16px; padding: 6px 8px; }
-    .todo-tabs button { font-size: 11px; padding: 5px 9px; }
-}
-
-/* Tablet */
-@media (min-width: 426px) and (max-width: 768px) {
-    .todo-tabs button { font-size: 12px; padding: 6px 10px; }
-}
-
-/* Desktop */
-@media (min-width: 769px) {
-    .todo-tabs button { font-size: 13px; padding: 6px 12px; }
 }

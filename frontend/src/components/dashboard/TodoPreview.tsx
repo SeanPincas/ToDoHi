@@ -35,7 +35,7 @@ import { RiAddFill } from "react-icons/ri";
 const TodoPreview = () => {
   const {
     filterAll,
-    filterOngoing,
+    filterPending,
     filterCompleted,
     filterFailed,
     reorderTasks,
@@ -47,7 +47,7 @@ const TodoPreview = () => {
   //                              UI STATES
   // =====================================================================
   const [activeTab, setActiveTab] =
-    useState<"all" | "ongoing" | "completed" | "failed">("ongoing");
+    useState<"all" | "pending" | "completed" | "failed">("pending");
 
   const [isRearrangeMode, setIsRearrangeMode] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -60,14 +60,14 @@ const TodoPreview = () => {
     switch (activeTab) {
       case "all":
         return filterAll;
-      case "ongoing":
-        return filterOngoing;
+      case "pending":
+        return filterPending;
       case "completed":
         return filterCompleted;
       case "failed":
         return filterFailed;
       default:
-        return filterOngoing;
+        return filterPending;
     }
   };
 
@@ -99,7 +99,7 @@ const TodoPreview = () => {
   //                        TOGGLE COMPLETION STATUS
   // =====================================================================
   const toggleCompletion = (task: Task) => {
-    const newStatus = task.status === "completed" ? "ongoing" : "completed";
+    const newStatus = task.status === "completed" ? "pending" : "completed";
     updateTask(task._id, { status: newStatus });
   };
 
@@ -155,8 +155,8 @@ const TodoPreview = () => {
         </button>
 
         <button
-          className={activeTab === "ongoing" ? "active" : ""}
-          onClick={() => setActiveTab("ongoing")}
+          className={activeTab === "pending" ? "active" : ""}
+          onClick={() => setActiveTab("pending")}
         >
           ONGOING
         </button>
