@@ -110,67 +110,56 @@ export const TASK_COLORS = {
     normal: "#4a90e2",
     dark: "#1f5fa1"
   },
-
   red: {
     light: "#ffdad6",
     normal: "#ff6b6b",
     dark: "#c73838"
   },
-
   yellow: {
     light: "#fff2b3",
     normal: "#ffd93b",
     dark: "#c9a41c"
   },
-
   green: {
     light: "#d3f8df",
     normal: "#4cd964",
     dark: "#2f9e45"
   },
-
   orange: {
     light: "#ffe1c4",
     normal: "#ff9f43",
     dark: "#cc6b14"
   },
-
   purple: {
     light: "#e4d6ff",
     normal: "#9c6bff",
     dark: "#6e3acb"
   },
-
   pink: {
     light: "#ffd6ec",
     normal: "#ff6fb5",
     dark: "#d14a87"
   },
-
   teal: {
     light: "#c8f7f4",
     normal: "#32d1c6",
     dark: "#1a938c"
   },
-
   beige: {
     light: "#fff3e0",
     normal: "#ffd7a0",
     dark: "#cfa272"
   },
-
   white: {
     light: "#ffffff",
     normal: "#f7f7f7",
     dark: "#e6e6e6"
   },
-
   black: {
     light: "#4a4a4a",
     normal: "#1f1f1f",
     dark: "#000000"
   },
-
   grey: {
     light: "#f1f1f1",
     normal: "#cfcfcf",
