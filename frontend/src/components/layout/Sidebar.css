@@ -159,16 +159,15 @@
     cursor: pointer;
 }
 
-/* --------------------------- MOBILE RESPONSIVE --------------------------- */
-
-@media (max-width: 900px) {
+/* --------------------------- MOBILE + TABLET (≤1350px) --------------------------- */
+@media (max-width: 1400px) {
     .sidebar {
-        transform: translateX(-100%);
+        transform: translateX(-100%); /* Hide sidebar */
     }
     .sidebar.open {
-        transform: translateX(0);
+        transform: translateX(0); /* Slide in when opened */
     }
     .sidebar-toggle {
-        display: block;
+        display: block; /* Show hamburger */
     }
 }

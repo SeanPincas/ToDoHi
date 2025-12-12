@@ -67,7 +67,9 @@ export const useTodo = () => {
     return ctx;
 };
 
-// ------------------------------ PROVIDER START --------------------------------------
+// ====================================================================================
+//                                   PROVIDER START                                    
+// ====================================================================================
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     // =================================================================================================
@@ -83,7 +85,10 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         data: null
     });
 
-    // -------------------------- OPEN MODAL ---------------------------
+    // =================================================================================================
+    //                                       MODAL CONTROL
+    // =================================================================================================
+
     const openModal = (type: ModalType, data: any = null) => {
         setModal({
             isOpen: true,
@@ -92,7 +97,6 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    // -------------------------- CLOSE MODAL --------------------------
     const closeModal = () => {
         setModal({
             isOpen: false,
@@ -163,6 +167,9 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
             setTasks(prev =>
                 prev.map(t => (t._id === taskId ? { ...t, ...updated } : t))
             );
+
+
+
         } catch (error) {
             console.error("[TodoContext] Error Updating Task:", error);
         }

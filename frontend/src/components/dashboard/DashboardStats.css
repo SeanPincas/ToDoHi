@@ -11,7 +11,6 @@
     border-radius: 14px;
 
     box-shadow: var(--shadow-soft);
-    margin-bottom: 25px;
 
     /* Removed padding & gap as requested */
     padding: 0;
@@ -28,7 +27,7 @@
     text-align: center;
 
     border-right: 2px solid var(--blue-dark);
-    padding: 14px 6px; /* minimal padding to keep inside spacing */
+    padding: 6px;
 }
 
 .stats-item:last-child {

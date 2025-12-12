@@ -11,8 +11,8 @@ import {
     type TaskCategory,
 } from "../../utils/taskUtils";
 
-import { Icons } from "../../utils/iconLibrary";
-import { modalOverlayStyle, modalCardBaseStyle } from "../../utils/modalStyles";
+import { Icons } from "../../styles/iconLibrary";
+import { modalOverlayStyle, modalCardBaseStyle } from "../../styles/modalStyles";
 
 import "./AddTaskModal.css";
 

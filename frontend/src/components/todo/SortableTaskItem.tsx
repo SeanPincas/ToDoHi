@@ -6,9 +6,9 @@ import "./TodoItems.css";
 import type { Task } from "../../api/taskApi";
 
 import { useSortable } from "@dnd-kit/sortable";
-import { getTaskItemStyle } from "../../utils/taskStyles";
+import { getTaskItemStyle } from "../../styles/taskStyles";
 
-import { Icons } from "../../utils/iconLibrary";
+import { Icons } from "../../styles/iconLibrary";
 
 interface SortableTaskProps {
     task: Task;
@@ -18,6 +18,8 @@ interface SortableTaskProps {
 
     toggleDeleteSelection: (taskId: string) => void;
     toggleCompletion: (task: Task) => void;
+
+    onOpenView: () => void;
 }
 
 // ------------------------------ COMPONENT START -----------------------------------
@@ -28,6 +30,7 @@ export const SortableTaskItem = ({
     selectedToDelete,
     toggleDeleteSelection,
     toggleCompletion,
+    onOpenView,
 }: SortableTaskProps) => {
 
     // =================================================================================================
@@ -60,6 +63,12 @@ export const SortableTaskItem = ({
             ref={setNodeRef}
             style={containerStyle}
             className={`task-item-container ${isDragging ? "dragging" : ""}`}
+            onClick={() => {
+                // Prevent opening ViewModal while in rearrange or delete mode
+                if (!isRearrangeMode && !isDeleteMode) {
+                    onOpenView();
+                }
+            }}
         >
             {/* ---------- LEFT SIDE: CHECKBOXES / DELETE SELECTOR ---------- */}
             <div className="task-left-section">
@@ -68,7 +77,10 @@ export const SortableTaskItem = ({
                 {!isDeleteMode && (
                     <div
                         className="task-checkbox"
-                        onClick={() => toggleCompletion(task)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleCompletion(task)
+                        }}
                     >
                         {task.status === "completed" ? (
                             <Icons.Check className="checkbox-icon completed" />
@@ -82,7 +94,10 @@ export const SortableTaskItem = ({
                 {isDeleteMode && (
                     <div
                         className={`delete-select-circle ${isSelectedForDelete ? "selected" : ""}`}
-                        onClick={() => toggleDeleteSelection(task._id)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleDeleteSelection(task._id)
+                        }}
                     >
                         {isSelectedForDelete ? (
                             <Icons.CheckboxDeleteTick className="delete-check-icon" />
