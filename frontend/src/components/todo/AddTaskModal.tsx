@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useTodo } from "../../context/TodoContext";
+import { useAuthContext } from "../../context/AuthContext";
 import {
     TASK_CATEGORIES,
     CATEGORY_LABELS,
@@ -11,6 +12,7 @@ import {
     type TaskCategory,
 } from "../../utils/taskUtils";
 
+import { computeDeadline } from "../../utils/computeDeadline";
 import { Icons } from "../../styles/iconLibrary";
 import { modalOverlayStyle, modalCardBaseStyle } from "../../styles/modalStyles";
 
@@ -18,6 +20,7 @@ import "./AddTaskModal.css";
 
 const AddTaskModal: React.FC = () => {
     const { modal, closeModal, addTask } = useTodo();
+    const { user } = useAuthContext();
 
     // ------------------ FORM FIELDS ------------------
     const [title, setTitle] = useState("");
@@ -62,11 +65,18 @@ const AddTaskModal: React.FC = () => {
         setLoading(true);
         setErrorMsg(null);
 
+        // READ User Preference ResetHour
+        const resetHour: number | null = user?.preference?.resetHour ?? null; 
+
+        // compute final deadline based on rules
+        const deadline = computeDeadline(resetHour);
+
         const payload = {
             title: title.trim(),
             description: description.trim(),
             category,
             containerColor,
+            deadline,
         };
 
         try {

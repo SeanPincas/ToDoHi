@@ -26,15 +26,16 @@
 }
 
 .sidebar-logo {
-    width: 120px;
-    margin: 0 auto 10px auto;
+    width: 200px;
+    margin: 0 auto 6px auto;
 }
 
 .sidebar-quote {
     font-size: 15px;
     font-style: italic;
-    color: var(--blue-dark);
-    opacity: 0.85;
+    color: #000000;
+    text-align: center;
+    margin-top: -4px;
 }
 
 /* --------------------------- GROUPED SECTIONS --------------------------- */
@@ -71,9 +72,9 @@
     font-weight: bold;
 }
 
-.sidebar-field select {
+.reset-hour-select,
+.quote-pref-select {
     width: 100%;
-    padding: 7px;
     border-radius: 8px;
     background: var(--white);
     border: 2px solid var(--blue-dark);
@@ -81,7 +82,7 @@
     box-shadow: var(--shadow-soft);
 }
 
-/* --------------------------- FAILED TASK LIST --------------------------- */
+----------------------- FAILED TASK LIST --------------------------- */
 
 .failed-task-list {
     list-style: none;
@@ -102,6 +103,12 @@
 
 /* --------------------------- PROFILE SECTION --------------------------- */
 
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .sidebar-profile-pic {
     width: 65px;
     height: 65px;
@@ -112,10 +119,10 @@
 }
 
 .profile-name {
-    text-align: center;
     font-weight: bold;
     font-size: 16px;
     color: var(--blue-dark);
+    text-align: left;
 }
 
 /* Logout button uses our danger color */

@@ -19,6 +19,23 @@ interface User {
     _id?: string;
     username?: string;
     email?: string;
+
+    preference?: {
+        resetHour: number;   // user's chosen reset hour
+        theme: "light" | "dark";
+    };
+
+    stats?: {
+        totalTasksCompleted: number;
+        totalMemosCreated: number;
+        totalDailyPlanCompleted: number;
+        dailyStreak: number;
+        longestStreak: number;
+        tasksCompletedToday: number;
+        tasksFailedYesterday: number;
+    };
+
+    profilePicture?: string;
 }
 
 // --------------------------- CONTEXT SHAPE ---------------------------
