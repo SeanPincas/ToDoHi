@@ -8,20 +8,28 @@
 }
 
 /* --------------------------- MAIN CONTENT AREA --------------------------- */
+/*
+   IMPORTANT FIX:
+   - remove forced centering (justify-content: center)
+   - instead allow fluid left/right margin from container styles
+*/
 .layout-content {
     flex: 1;
     padding: 10px;
 
     display: flex;
-    justify-content: center;
+    justify-content: center;  /* <-- allows natural left spacing */
     align-items: flex-start;
 }
 
-/* --------------------------- CONTENT CONTAINER (NO CARD STYLE) --------------------------- */
+/* --------------------------- CONTENT CONTAINER --------------------------- */
+/*
+   This is the actual page wrapper.
+   We give it FLEXIBLE max-width so dashboard can expand
+   and also retain breathing space on both sides.
+*/
 .content-container {
     width: 100%;
-    max-width: 1400px;  /* only width control */
-    /* No padding, no border, no background */
 }
 
 /* --------------------------- MOBILE --------------------------- */

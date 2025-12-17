@@ -2,6 +2,8 @@
 import axios from "axios";
 import { authHeaders } from "../utils/authHeaders";
 
+import type { TaskCategory, TaskStatus } from "../utils/taskUtils";
+
 const API_URL = "http://localhost:3500/api/tasks";
 
 // ------------------------------ TASK TYPE ------------------------------
@@ -10,8 +12,8 @@ export interface Task {
     userId: string;
     title: string;
     description: string;
-    category: string;
-    status: string;
+    category: TaskCategory | (string & {});
+    status: TaskStatus | (string & {});
     createdAt: string;
     deadline?: string | null;
     orderIndex: number;

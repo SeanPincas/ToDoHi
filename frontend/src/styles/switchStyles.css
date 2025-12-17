@@ -1,0 +1,67 @@
+/* ==========================================================================
+   SWITCH TOGGLE — REUSABLE CONTROL
+   ========================================================================== */
+
+.switch-container {
+    position: relative;
+    width: 58px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+/* When disabled (status = failed) */
+.switch-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* TRACK */
+.switch-track {
+    position: absolute;
+    inset: 0;
+
+    background: #cfcfcf;
+    border-radius: 30px;
+    transition: background-color 0.25s ease;
+}
+
+/* TRACK — ACTIVE COLOR = COMPLETED COLOR (green theme) */
+.switch-container.active .switch-track {
+    background: #4cd964; /* green.normal from palette */
+}
+
+/* HANDLE */
+.switch-handle {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+
+    width: 24px;
+    height: 24px;
+
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+
+    transition: transform 0.25s ease, background-color 0.2s ease;
+}
+
+/* HANDLE — MOVED TO RIGHT WHEN ACTIVE */
+.switch-container.active .switch-handle {
+    transform: translateX(28px);
+}
+
+/* FAIL-SAFE (disabled = failed) */
+.switch-container.disabled .switch-track {
+    background: #e1e1e1;
+}
+
+.switch-container.disabled .switch-handle {
+    background: #fafafa;
+    transform: translateX(0px);
+}
