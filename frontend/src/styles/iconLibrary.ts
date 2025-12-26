@@ -1,4 +1,3 @@
-
 import {
     RiAddFill,
     RiDeleteBin6Fill,
@@ -15,7 +14,8 @@ import {
     RiCheckboxFill,
     RiTodoFill,
     RiCalendarTodoFill,
-    RiBookOpenFill
+    RiBookOpenFill,
+    RiArrowDownSLine
 } from "react-icons/ri";
 
 export const Icons = {
@@ -34,8 +34,10 @@ export const Icons = {
     Lock: RiLockFill,
     Clock: RiTimeFill,
     Drag: RiDragMove2Fill,
-    
+
     Todo: RiTodoFill,
     Planner: RiCalendarTodoFill,
     Notebook: RiBookOpenFill,
+
+    DropdownArrow: RiArrowDownSLine
 };
