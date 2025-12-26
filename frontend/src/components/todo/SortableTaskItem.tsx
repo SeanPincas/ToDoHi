@@ -1,15 +1,14 @@
 // =====================================================================================================
 //                                     SORTABLE TASK ITEM (DND ITEM)
 // =====================================================================================================
+
 import "./TodoItems.css";
 import type { Task } from "../../api/taskApi";
 
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { getTaskItemStyle } from "../../styles/taskStyles";
 
-import { RiDragMove2Fill } from "react-icons/ri";
-import { RiCheckboxCircleFill, RiCheckboxBlankCircleLine } from "react-icons/ri";
-import { RiCheckboxFill } from "react-icons/ri";
+import { Icons } from "../../styles/iconLibrary";
 
 interface SortableTaskProps {
     task: Task;
@@ -19,6 +18,8 @@ interface SortableTaskProps {
 
     toggleDeleteSelection: (taskId: string) => void;
     toggleCompletion: (task: Task) => void;
+
+    onOpenView: () => void;
 }
 
 // ------------------------------ COMPONENT START -----------------------------------
@@ -29,15 +30,11 @@ export const SortableTaskItem = ({
     selectedToDelete,
     toggleDeleteSelection,
     toggleCompletion,
+    onOpenView,
 }: SortableTaskProps) => {
 
     // =================================================================================================
-    //                                 DND-KIT SORTABLE HOOK
-    // =================================================================================================
-    // useSortable handles:
-    // - position transforms
-    // - drag listeners
-    // - animation
+    //                                 DND-KIT HOOK
     // =================================================================================================
     const {
         attributes,
@@ -48,54 +45,64 @@ export const SortableTaskItem = ({
         isDragging,
     } = useSortable({ id: task._id });
 
-    // Convert transforms into style friendly values
-    const style = {
-        transform: CSS.Transform.toString(transform),
+    // Generate item style from centralized style helper
+    const containerStyle = getTaskItemStyle(
+        transform,
         transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
-    // =================================================================================================
-    //                                 DELETE MODE CHECK
-    // =================================================================================================
+        isDragging,
+        task.containerColor
+    );
+
     const isSelectedForDelete = selectedToDelete.includes(task._id);
 
     // =================================================================================================
-    //                                              UI RENDER
+    //                                          RENDER
     // =================================================================================================
     return (
         <div
             ref={setNodeRef}
-            style={style}
+            style={containerStyle}
             className={`task-item-container ${isDragging ? "dragging" : ""}`}
+            onClick={() => {
+                // Prevent opening ViewModal while in rearrange or delete mode
+                if (!isRearrangeMode && !isDeleteMode) {
+                    onOpenView();
+                }
+            }}
         >
-
-            {/* ---------- LEFT SIDE: CHECKBOX + DELETE MODE ---------- */}
+            {/* ---------- LEFT SIDE: CHECKBOXES / DELETE SELECTOR ---------- */}
             <div className="task-left-section">
 
-                {/* COMPLETION CHECKBOX */}
+                {/* COMPLETION CHECKBOX (normal mode) */}
                 {!isDeleteMode && (
                     <div
                         className="task-checkbox"
-                        onClick={() => toggleCompletion(task)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleCompletion(task)
+                        }}
                     >
                         {task.status === "completed" ? (
-                            <RiCheckboxCircleFill className="checkbox-icon completed" />
+                            <Icons.Check className="checkbox-icon completed" />
                         ) : (
-                            <RiCheckboxBlankCircleLine className="checkbox-icon" />
+                            <Icons.Uncheck className="checkbox-icon" />
                         )}
                     </div>
                 )}
 
-                {/* DELETE MODE CHECKMARK */}
+                {/* DELETE MODE SELECTOR */}
                 {isDeleteMode && (
                     <div
                         className={`delete-select-circle ${isSelectedForDelete ? "selected" : ""}`}
-                        onClick={() => toggleDeleteSelection(task._id)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            toggleDeleteSelection(task._id)
+                        }}
                     >
                         {isSelectedForDelete ? (
-                            <RiCheckboxFill className="delete-check-icon" />
+                            <Icons.CheckboxDeleteTick className="delete-check-icon" />
                         ) : (
-                            <RiCheckboxBlankCircleLine className="delete-check-icon" />
+                            <Icons.Uncheck className="delete-check-icon" />
                         )}
                     </div>
                 )}
@@ -103,13 +110,10 @@ export const SortableTaskItem = ({
 
             {/* ---------- MIDDLE: TASK BODY ---------- */}
             <div className="task-body">
-
-                {/* -------- TASK TITLE -------- */}
                 <p className={`task-title ${task.status}`}>
                     {task.title}
                 </p>
 
-                {/* -------- TASK CATEGORY OR STATUS -------- */}
                 <span className="task-subinfo">
                     {task.category} • {task.status}
                 </span>
@@ -117,15 +121,10 @@ export const SortableTaskItem = ({
 
             {/* ---------- RIGHT SIDE: DRAG HANDLE ---------- */}
             {isRearrangeMode && (
-                <div
-                    className="task-drag-handle"
-                    {...attributes}
-                    {...listeners}
-                >
-                    <RiDragMove2Fill />
+                <div className="task-drag-handle" {...attributes} {...listeners}>
+                    <Icons.Drag />
                 </div>
             )}
-
         </div>
     );
 };

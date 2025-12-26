@@ -16,6 +16,7 @@ import Layout from "../components/layout/Layout";
 import { AuthProvider } from "../context/AuthContext";
 import { TodoProvider } from "../context/TodoContext";
 import AddTaskModal from "../components/todo/AddTaskModal";
+import ViewTaskModal from "../components/todo/ViewTaskModal";
 
 const AppRouter: React.FC = () => {
     return (
@@ -58,7 +59,7 @@ const AppRouter: React.FC = () => {
                     {/* ===================================================== */}
                     <AddTaskModal />
                     {/*<EditTaskModal />*/}
-                    {/*<ViewTaskModal />*/}
+                    <ViewTaskModal />
                     {/*<VerificationModal />*/}
                 </TodoProvider>
             </AuthProvider>

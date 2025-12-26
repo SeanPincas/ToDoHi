@@ -47,7 +47,7 @@ interface TodoContextType {
 
     // Filters
     filterAll: Task[];
-    filterOngoing: Task[];
+    filterPending: Task[];
     filterCompleted: Task[];
     filterFailed: Task[];
 
@@ -67,7 +67,9 @@ export const useTodo = () => {
     return ctx;
 };
 
-// ------------------------------ PROVIDER START --------------------------------------
+// ====================================================================================
+//                                   PROVIDER START                                    
+// ====================================================================================
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     // =================================================================================================
@@ -83,7 +85,10 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         data: null
     });
 
-    // -------------------------- OPEN MODAL ---------------------------
+    // =================================================================================================
+    //                                       MODAL CONTROL
+    // =================================================================================================
+
     const openModal = (type: ModalType, data: any = null) => {
         setModal({
             isOpen: true,
@@ -92,7 +97,6 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
-    // -------------------------- CLOSE MODAL --------------------------
     const closeModal = () => {
         setModal({
             isOpen: false,
@@ -130,11 +134,11 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
 
     const todayTasks = tasks.filter(t => {
         const deadline = t.deadline ? t.deadline.split("T")[0] : null;
-        return deadline === todayString || t.status === "ongoing";
+        return deadline === todayString || t.status === "pending";
     });
 
     const filterAll = tasks;
-    const filterOngoing = tasks.filter(t => t.status === "ongoing");
+    const filterPending = tasks.filter(t => t.status === "pending");
     const filterCompleted = tasks.filter(t => t.status === "completed");
     const filterFailed = tasks.filter(t => t.status === "failed" || t.isExpired);
 
@@ -163,6 +167,9 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
             setTasks(prev =>
                 prev.map(t => (t._id === taskId ? { ...t, ...updated } : t))
             );
+
+
+
         } catch (error) {
             console.error("[TodoContext] Error Updating Task:", error);
         }
@@ -215,7 +222,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
                 reorderTasks,
 
                 filterAll,
-                filterOngoing,
+                filterPending,
                 filterCompleted,
                 filterFailed,
 

@@ -40,9 +40,9 @@ export const Sidebar = () => {
                 {/* ----- SECTION 3: USER PREFERENCES ----- */}
                 <div className="sidebar-section">
                     {/* Reset Hour */}
-                    <div className="sidebar-field">
+                    <div className="sidebar-field reset-hour-container">
                         <label>Reset Hour</label>
-                        <select>
+                        <select className="reset-hour-select" size={5}>
                             {Array.from({ length: 24 }).map((_, i) => (
                                 <option key={i} value={i}>
                                     {i}:00
@@ -52,9 +52,9 @@ export const Sidebar = () => {
                     </div>
 
                     {/* Quote Category Selector */}
-                    <div className="sidebar-field">
+                    <div className="sidebar-field quote-pref-container">
                         <label>Quote Preferences</label>
-                        <select multiple size={3}>
+                        <select className="quote-pref-select" multiple size={5}>
                             <option value="Motivation">Motivation</option>
                             <option value="Success">Success</option>
                             <option value="Life Lessons">Life Lessons</option>
@@ -82,9 +82,15 @@ export const Sidebar = () => {
                     </div>
 
                     {/* ----- SECTION 5: USER PROFILE & LOGOUT ----- */}
-                    <div className="sidebar-section profile-section">
-                        <img src="/default-profile.png" alt="User Profile Img" className="sidebar-profile-pic" />
-                        <p className="profile-name">Username</p>
+                    <div className="sidebar-section">
+                        <div className="profile-row">
+                            <img
+                                src="/default-profile.png"
+                                alt="User Profile Img"
+                                className="sidebar-profile-pic"
+                            />
+                            <p className="profile-name">Username</p>
+                        </div>
 
                         <button className="logout-btn">Logout</button>
 
@@ -94,12 +100,6 @@ export const Sidebar = () => {
                     </div>
                 </div>
             </aside>
-
-
-
-
-
-
         </>
     )
 }
