@@ -1,9 +1,8 @@
-// This context manages the global Authentication State of the frontend includes:
-//   • Storing JWT token
-//   • Providing login() and logout() functions
-//   • Persisting login via localStorage
-//   • Giving components access to auth status
 // ====================================================================
+// AuthContext.tsx
+// Manages Authentication + User Preferences (Theme)
+// ====================================================================
+
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +13,8 @@ import {
     getCurrentUserApi
 } from "../api/authApi";
 
+import { updateUserPreferences } from "../api/userApi";
+
 // --------------------------- TYPES ---------------------------
 interface User {
     _id?: string;
@@ -21,7 +22,7 @@ interface User {
     email?: string;
 
     preference?: {
-        resetHour: number;   // user's chosen reset hour
+        resetHour: number;
         theme: "light" | "dark";
     };
 
@@ -38,61 +39,66 @@ interface User {
     profilePicture?: string;
 }
 
-// --------------------------- CONTEXT SHAPE ---------------------------
-// What value will the entire app receive when it uses AuthContext?
-interface AuthContextType {
-    token: string | null;               // JWT token stored globally
-    user: User | null;                        // Full user object from backend
-    loading: boolean;                         // Loading state for app start
+type ThemeType = "light" | "dark";
 
-    // ------------- FUNCTIONS -------------
+// --------------------------- CONTEXT SHAPE ---------------------------
+interface AuthContextType {
+    token: string | null;
+    user: User | null;
+    loading: boolean;
+
+    theme: ThemeType;
+    toggleTheme: () => void;
+
     login: (email: string, password: string) => Promise<void>;
     register: (username: string, email: string, password: string) => Promise<void>;
     logout: () => void;
 
-    // ------------- BOOLEAN -------------
     isAuthenticated: boolean;
 }
 
-// --------------------------- DEFAULT CONTEXT --------------------------
-// These default values prevent React from crashing before Provider loads.
+// --------------------------- CONTEXT ---------------------------
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// --------------------------- CUSTOM HOOK --------------------------
+// --------------------------- HOOK ---------------------------
 export const useAuthContext = () => {
     const ctx = useContext(AuthContext);
     if (!ctx) throw new Error("useAuthContext must be used inside <AuthProvider>");
     return ctx;
 };
 
-// --------------------------- PROVIDER WRAPPER -------------------------
-// This component wraps the entire <App/> so all children can access auth.
+// --------------------------- PROVIDER ---------------------------
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
-    // ------------------ REACT STATES ------------------
-    // Load token from localStorage if it exists (user stays logged in)
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
+    const [theme, setTheme] = useState<ThemeType>("light");
+
     const navigate = useNavigate();
 
-    // ------------------ AUTO LOAD USER ON APP START (/auth/me) ------------------
+    // ---------------- APPLY THEME TO BODY ----------------
+    useEffect(() => {
+        document.body.setAttribute("data-theme", theme);
+    }, [theme]);
+
+    // ---------------- LOAD USER ON APP START ----------------
     useEffect(() => {
         const init = async () => {
-
-            // If no token → nothing to load 
             if (!token) {
                 setLoading(false);
                 return;
             }
 
             try {
-                // Fetch user from backend
                 const current = await getCurrentUserApi();
                 setUser(current);
-            } catch (error) {
-                // Token expired OR invalid → clear it
+
+                if (current?.preference?.theme) {
+                    setTheme(current.preference.theme);
+                }
+            } catch {
                 localStorage.removeItem("token");
                 setToken(null);
                 setUser(null);
@@ -102,42 +108,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
         init();
-    }, []);       // Runs only when the app loads fresh
+    }, []);
 
-    // =====================================================================
-    //                                 LOGIN
-    // =====================================================================
-    // Save token to localStorage
+    // ---------------- TOGGLE THEME ----------------
+    const toggleTheme = () => {
+        const next = theme === "light" ? "dark" : "light";
+        setTheme(next);
+
+        updateUserPreferences({ theme: next }).catch(console.error);
+    };
+
+    // ---------------- LOGIN ----------------
     const login = async (email: string, password: string) => {
-        // step 1: call backend
         const data = await loginApi(email, password);
 
-        // step 2: save token AND username to localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.username);
 
-        setToken(data.token);   // sets state → triggers rerender
+        setToken(data.token);
 
-        // step 3: load full user via /auth/me
         const currentUser = await getCurrentUserApi();
         setUser(currentUser);
+
+        if (currentUser?.preference?.theme) {
+            setTheme(currentUser.preference.theme);
+        }
 
         navigate("/", { replace: true });
     };
 
-    // =====================================================================
-    //                                  REGISTER
-    // =====================================================================
+    // ---------------- REGISTER ----------------
     const register = async (username: string, email: string, password: string) => {
-        // Backend does NOT return token → user must login manually later
         await registerApi(username, email, password);
-        // we do MOT log the user in automatimally (matches backend)
     };
 
-    // =====================================================================
-    //                                   LOGOUT
-    // =====================================================================
-    // Clear token and logs User out instantly
+    // ---------------- LOGOUT ----------------
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -146,21 +151,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         navigate("/login", { replace: true });
     };
 
-    // =====================================================================
-    //                            CONTENT PROVIDER
-    // =====================================================================
-    // Makes (token, login, logout) available to the whole application
     const value: AuthContextType = {
         token,
         user,
         loading,
+        theme,
+        toggleTheme,
         login,
         register,
         logout,
-        isAuthenticated: !!user,    // logged in if user object exists
+        isAuthenticated: !!user,
     };
 
-    return  <AuthContext.Provider value={value}>
-                {children}
-            </AuthContext.Provider>
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
