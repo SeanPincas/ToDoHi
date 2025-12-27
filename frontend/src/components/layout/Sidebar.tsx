@@ -1,25 +1,36 @@
 // ============================================================================
 // SIDEBAR COMPONENT
-// Fixed sidebar on desktop, drawer sidebar on mobile
-// Handles user preferences: Reset Hour, Quote Category, Theme Toggle
+// Stable version – preserves ALL existing features
+// Adds Reset Hour guide icon + modal (educational only)
+// FIX: Quote preference loading regression
 // ============================================================================
 
 import { useState, useEffect, useRef } from "react";
 import "./Sidebar.css";
 import { useNavigate } from "react-router-dom";
 
-import { DropdownMenu } from "../common/dropdownMenu";
-import type { DropdownOption } from "../common/dropdownMenu";
+import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
+import type { DropdownOption } from "../common/dropdownMenu/DropdownMenu";
 
-import { QUOTE_CATEGORIES } from "../../utils/quoteUtils";
+import {
+    QUOTE_CATEGORIES,
+    type QuoteCategory
+} from "../../utils/quoteUtils";
+
 import { useAuthContext } from "../../context/AuthContext";
 import { getMe, updateUserPreferences } from "../../api/userApi";
 
 import ThemeToggle from "../common/themeToggle/ThemeToggle";
 
-// --------------------------- OPTIONS ---------------------------
+// ---------------- NEW (UI ONLY) ----------------
+import ResetHourHelpIcon from "../common/icons/ResetHourHelpIcon";
+import ResetHourGuideModal from "../common/modals/ResetHourGuideModal";
 
-// Reset Hour options (00:00 → 23:00)
+// ============================================================================
+// OPTIONS
+// ============================================================================
+
+// Reset hour dropdown (00:00 → 23:00)
 const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map(
     (_, i) => ({
         value: String(i),
@@ -27,73 +38,82 @@ const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map(
     })
 );
 
-// Quote category options
+// Quote categories
 const QUOTE_OPTIONS: DropdownOption[] = QUOTE_CATEGORIES.map((cat) => ({
     value: cat,
     label: cat,
 }));
 
-// --------------------------- COMPONENT ---------------------------
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
-export const Sidebar = () => {
+const Sidebar = () => {
     const [open, setOpen] = useState(false);
 
-    // ---------------- USER IDENTITY STATE ----------------
-    const [username, setUsername] = useState<string>("Username");
+    // ---------------- USER STATE ----------------
+    const [username, setUsername] = useState("Username");
 
-    // ---------------- USER PREFERENCE STATE ----------------
+    // ---------------- PREFERENCES ----------------
     const [resetHour, setResetHour] = useState("0");
-    const [quotePref, setQuotePref] = useState("Motivation");
+    const [quotePref, setQuotePref] = useState<QuoteCategory>("Motivation");
+
+    // ---------------- UI STATE ----------------
+    const [showResetHourGuide, setShowResetHourGuide] = useState(false);
 
     const navigate = useNavigate();
-
-    // 🔑 Auth context (SINGLE SOURCE OF TRUTH)
     const { logout, theme, toggleTheme } = useAuthContext();
 
-    // Debounce timer (prevents API spam)
+    // Debounce API saves
     const saveTimeout = useRef<number | null>(null);
 
     const toggleSidebar = () => setOpen(!open);
 
-    // ---------------- LOAD USER DATA (NON-THEME) ----------------
+    // =====================================================================
+    // LOAD USER (SAFE · NON-DESTRUCTIVE)
+    // =====================================================================
     useEffect(() => {
-        const loadUserPreferences = async () => {
+        const loadUser = async () => {
             try {
                 const user = await getMe();
 
-                // ---------------- USERNAME ----------------
+                // Username
                 if (user?.username) {
                     setUsername(user.username);
                 }
 
-                // Load reset hour
-                if (user?.preference?.resetHour !== undefined) {
+                // Reset Hour
+                if (typeof user?.preference?.resetHour === "number") {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                // Load quote category (take first only for now)
-                if (
-                    Array.isArray(user?.quoteCategoryPreferences) &&
-                    user.quoteCategoryPreferences.length > 0
-                ) {
-                    setQuotePref(user.quoteCategoryPreferences[0]);
+                // ---------------- QUOTE PREFERENCE (FIXED) ----------------
+                // Backend supports up to 3 categories.
+                // Sidebar selector is single-choice, so we DISPLAY the first
+                // without mutating or overwriting stored preferences.
+                if (Array.isArray(user?.quoteCategoryPreferences)) {
+                    const preferred = user.quoteCategoryPreferences[0];
+                    if (preferred) {
+                        setQuotePref(preferred as QuoteCategory);
+                    }
                 }
 
-                // ⚠️ Theme is NOT handled here anymore
             } catch (err) {
-                console.error("Failed to load user preferences:", err);
+                console.error("Sidebar load failed:", err);
             }
         };
 
-        loadUserPreferences();
+        loadUser();
     }, []);
 
-    // ---------------- HANDLERS ----------------
+    // =====================================================================
+    // HANDLERS (DEBOUNCED · SAFE)
+    // =====================================================================
 
     const handleResetHourChange = (val: string) => {
         setResetHour(val);
 
-        if (saveTimeout.current !== null) {
+        if (saveTimeout.current) {
             clearTimeout(saveTimeout.current);
         }
 
@@ -105,20 +125,23 @@ export const Sidebar = () => {
     };
 
     const handleQuotePrefChange = (val: string) => {
-        setQuotePref(val);
+        setQuotePref(val as QuoteCategory);
 
-        if (saveTimeout.current !== null) {
+        if (saveTimeout.current) {
             clearTimeout(saveTimeout.current);
         }
 
         saveTimeout.current = window.setTimeout(() => {
             updateUserPreferences({
+                // UI sets ONE preference, backend still allows up to 3
                 quoteCategoryPreferences: [val],
             }).catch(console.error);
         }, 600);
     };
 
-    // ---------------- RENDER ----------------
+    // =====================================================================
+    // RENDER
+    // =====================================================================
 
     return (
         <>
@@ -129,7 +152,8 @@ export const Sidebar = () => {
 
             {/* ---------------- SIDEBAR ---------------- */}
             <aside className={`sidebar ${open ? "open" : ""}`}>
-                {/* ---------------- LOGO ---------------- */}
+
+                {/* LOGO */}
                 <div className="sidebar-section logo-section">
                     <img
                         src="/logo.png"
@@ -141,7 +165,7 @@ export const Sidebar = () => {
                     </p>
                 </div>
 
-                {/* ---------------- NAV ---------------- */}
+                {/* NAV */}
                 <div className="sidebar-section">
                     <button
                         className="sidebar-btn"
@@ -149,7 +173,6 @@ export const Sidebar = () => {
                     >
                         Dashboard
                     </button>
-
                     <button
                         className="sidebar-btn"
                         onClick={() => navigate("/memos")}
@@ -158,34 +181,56 @@ export const Sidebar = () => {
                     </button>
                 </div>
 
-                {/* ---------------- USER PREFERENCES ---------------- */}
+                {/* PREFERENCES */}
                 <div className="sidebar-section">
-                    <DropdownMenu
-                        label="Reset Hour"
-                        value={`${resetHour}:00`}
-                        options={RESET_HOUR_OPTIONS}
-                        onChange={handleResetHourChange}
-                        maxHeight={200}
-                    />
 
+                    {/* RESET HOUR (label from DropdownMenu, icon layered beside it) */}
+                    <div style={{ position: "relative" }}>
+                        <DropdownMenu
+                            label="Reset Hour"
+                            value={`${resetHour}:00`}
+                            options={RESET_HOUR_OPTIONS}
+                            onChange={handleResetHourChange}
+                            maxHeight={180}
+                        />
+
+                        {/* Help icon aligned with label */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: "2px",
+                                right: "4px",
+                            }}
+                        >
+                            <ResetHourHelpIcon
+                                onClick={() =>
+                                    setShowResetHourGuide(true)
+                                }
+                            />
+                        </div>
+                    </div>
+
+                    {/* QUOTE PREF */}
                     <DropdownMenu
                         label="Quote Preferences"
                         value={quotePref}
                         options={QUOTE_OPTIONS}
                         onChange={handleQuotePrefChange}
-                        maxHeight={250}
+                        maxHeight={240}
                     />
                 </div>
 
-                {/* ---------------- FAILED TASKS ---------------- */}
+                {/* FAILED TASKS */}
                 <div className="sidebar-section">
-                    <h4 className="section-title">Failed Tasks Yesterday</h4>
+                    <h4 className="section-title">
+                        Failed Tasks Yesterday
+                    </h4>
                     <ul className="failed-task-list">
                         <li>No Data Loaded Yet...</li>
                     </ul>
                 </div>
 
-                {/* ---------------- PROFILE ---------------- */}
+                {/* PROFILE */}
                 <div className="sidebar-section">
                     <div className="profile-row">
                         <img
@@ -200,12 +245,11 @@ export const Sidebar = () => {
                         Logout
                     </button>
 
-                    {/* ---------------- FOOTER + THEME TOGGLE ---------------- */}
+                    {/* FOOTER + THEME */}
                     <div className="sidebar-footer-row">
                         <footer className="sidebar-footer">
                             © 2025 ToDoHi
                         </footer>
-
                         <div className="sidebar-theme-toggle">
                             <ThemeToggle
                                 theme={theme}
@@ -214,7 +258,15 @@ export const Sidebar = () => {
                         </div>
                     </div>
                 </div>
+
             </aside>
+
+            {/* ---------------- RESET HOUR GUIDE MODAL ---------------- */}
+            {showResetHourGuide && (
+                <ResetHourGuideModal
+                    onClose={() => setShowResetHourGuide(false)}
+                />
+            )}
         </>
     );
 };

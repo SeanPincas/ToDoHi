@@ -1,108 +1,148 @@
 const cron = require("node-cron");
 const Task = require("../models/taskModel.js");
+const User = require("../models/userModel.js");
 const { runDailyStats } = require("./dailyStats.js");
 
-// --------------------------- EXPIRE TASKS (Every 5 mins) ---------------------------
-// Marks overdue tasks as failed
-async function markExpiredTasksNow() {
-    try {
-        const now = new Date();
+// ============================================================================
+// INTERNAL STATE (in-memory)
+// Tracks last reset cycle PER USER
+// NOTE: Resets on server restart — acceptable for now
+// ============================================================================
+const lastResetKeys = new Map();
 
-        const res = await Task.updateMany(
-            {
-                status: { $in: ["pending"] },
-                deadline: { $exists: true, $ne: null, $lte: now }
-            },
-            {
-                $set: { status: "failed", isExpired: true }
-            }
-        );
+// ============================================================================
+// HELPER: Compute reset-cycle key for a user
+//
+// Example outputs:
+//   "2025-01-15@9"
+//   "2025-01-15@0"
+//
+// Meaning:
+//   This uniquely identifies ONE reset window for ONE user
+// ============================================================================
+function getResetCycleKey(now, resetHour) {
+    const boundary = new Date(now);
+    boundary.setHours(resetHour, 0, 0, 0);
+
+    // If resetHour not reached yet today → cycle started yesterday
+    if (now < boundary) {
+        boundary.setDate(boundary.getDate() - 1);
+    }
+
+    const yyyy = boundary.getFullYear();
+    const mm = String(boundary.getMonth() + 1).padStart(2, "0");
+    const dd = String(boundary.getDate()).padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd}@${resetHour}`;
+}
+
+// ============================================================================
+// JOB #1: EXPIRE TASKS
+// Rule:
+//   - status === "pending"
+//   - deadline exists
+//   - deadline <= now
+// ============================================================================
+async function expireTasks(now) {
+    const res = await Task.updateMany(
+        {
+            status: "pending",
+            deadline: { $exists: true, $ne: null, $lte: now }
+        },
+        {
+            $set: { status: "failed", isExpired: true }
+        }
+    );
+
+    console.log(
+        `[Scheduler] Task Expiry @ ${now.toISOString()} | Updated: ${
+            res.modifiedCount ?? res.nModified
+        }`
+    );
+}
+
+// ============================================================================
+// JOB #2: PER-USER DAILY RESET
+// - Detects reset boundary crossing per user
+// - Runs dailyStats ONLY once per cycle per user
+// ============================================================================
+async function handleDailyReset(now) {
+    const users = await User.find({}, "_id preference.resetHour");
+
+    for (const user of users) {
+        const userId = user._id.toString();
+        const resetHour = user.preference?.resetHour ?? 0;
+
+        const currentResetKey = getResetCycleKey(now, resetHour);
+        const lastKey = lastResetKeys.get(userId);
+
+        // Already reset for this cycle → skip
+        if (lastKey === currentResetKey) continue;
 
         console.log(
-            `[Scheduler] Expired Tasks Check @ ${now.toISOString()} — updated: ${
-                res.modifiedCount ?? res.nModified
-            }`
+            `[Scheduler] Reset detected for user ${userId} → ${currentResetKey}`
         );
 
-        return res;
-    } catch (err) {
-        console.error("[Scheduler] Error in markExpiredTasksNow:", err);
+        // Run daily stats (already per-user internally)
+        await runDailyStats();
+
+        // Mark this reset cycle as processed for this user
+        lastResetKeys.set(userId, currentResetKey);
     }
 }
 
-// --------------------------- START SCHEDULER ---------------------------
-// Handles background jobs (task expiry + daily stats)
+// ============================================================================
+// MAIN SCHEDULER TICK
+// ============================================================================
+async function schedulerTick() {
+    try {
+        const now = new Date();
+
+        // 1️⃣ Expire overdue tasks
+        await expireTasks(now);
+
+        // 2️⃣ Handle per-user daily reset
+        await handleDailyReset(now);
+
+    } catch (err) {
+        console.error("[Scheduler] Error:", err);
+    }
+}
+
+// ============================================================================
+// START SCHEDULER
+// ============================================================================
 function startScheduler(options = {}) {
     const {
         enabled = true,
-
-        // Task Expiration → Runs every 5 minutes
-        expireSchedule = "*/5 * * * *",
-
-        // Daily Stats → Runs exactly at 00:00 (Midnight)
-        statsSchedule = "0 0 * * *"
+        schedule = "*/5 * * * *" // every 5 minutes
     } = options;
 
     if (!enabled) {
         console.log("[Scheduler] Disabled.");
-        return null;
+        return;
     }
 
-    console.log("[Scheduler] Starting Background Jobs...");
+    console.log("[Scheduler] Starting unified per-user scheduler...");
 
-    // --------------------------- RUN EXPIRY ON SERVER START ---------------------------
-    markExpiredTasksNow();
+    // Run immediately on server start
+    schedulerTick();
 
-    // ❌ Do not run runDailyStats() on startup — incorrect streak logic
-    // runDailyStats();   <-- removed
-
-    // --------------------------- JOB #1: EXPIRE OLD TASKS ---------------------------
     cron.schedule(
-        expireSchedule,
-        async () => {
-            try {
-                await markExpiredTasksNow();
-            } catch (err) {
-                console.error("[Scheduler] Error running expire job:", err);
-            }
-        },
+        schedule,
+        schedulerTick,
         {
             scheduled: true,
-            timezone: "Asia/Manila" // <-- correct for PH
+            timezone: "Asia/Manila"
         }
     );
 
-    console.log(`[Scheduler] Expire Job Running (${expireSchedule})`);
-
-    // --------------------------- JOB #2: DAILY STATS (MIDNIGHT) ---------------------------
-    cron.schedule(
-        statsSchedule,
-        async () => {
-            try {
-                console.log("[Scheduler] Running Daily Stats...");
-                await runDailyStats();
-            } catch (err) {
-                console.error("[Scheduler] Error running daily stats:", err);
-            }
-        },
-        {
-            scheduled: true,
-            timezone: "Asia/Manila" // <-- correct timezone
-        }
-    );
-
-    console.log(`[Scheduler] Daily Stats Running (${statsSchedule})`);
+    console.log(`[Scheduler] Running every ${schedule}`);
 }
 
-// --------------------------- MANUAL TRIGGER ---------------------------
-// Useful for debugging
-async function manualTrigger() {
-    await markExpiredTasksNow();
-    await runDailyStats();
-}
-
-// --------------------------- EXPORTS ---------------------------
+// ============================================================================
+// EXPORTS
+// ============================================================================
 module.exports = {
-    startScheduler,
-    manualTrigger
+    startScheduler
 };

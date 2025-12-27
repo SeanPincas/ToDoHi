@@ -1,0 +1,31 @@
+/* ============================================================================
+   Reset Hour Help Icon
+   Small passive question mark icon
+   ============================================================================ */
+
+.reset-hour-help-icon {
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+    border: 1px solid var(--blue-dark);
+
+    background: transparent;
+    color: rgba(0, 0, 0, 0.35); /* passive */
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.reset-hour-help-icon:hover {
+    color: var(--blue-dark);
+    background: rgba(0, 0, 0, 0.04);
+}

@@ -1,25 +1,27 @@
 // ============================================================================
-// computeDeadline.ts — Calculates the correct expiration datetime for a task
+// computeDeadline.ts — FINAL FIX
+// ResetHour is interpreted in USER LOCAL TIME (Asia/Manila)
+// Browser already handles timezone correctly
 // ============================================================================
 
-export function computeDeadline(resetHour: number | null): string {
+export function computeDeadline(resetHour: number): string {
+    const hour =
+        typeof resetHour === "number" && resetHour >= 0 && resetHour <= 23
+            ? resetHour
+            : 0;
+
+    // Local time (already Asia/Manila in browser)
     const now = new Date();
 
-    // ========================== CASE 1: USE MIDNIGHT ==========================
-    if (resetHour === null || resetHour === undefined) {
-        const midnight = new Date(now);
-        midnight.setHours(24, 0, 0, 0);         // next 00:00
-        return midnight.toISOString();
-    }
-
-    // ========================== CASE 1: USE MIDNIGHT ==========================
+    // Build reset boundary in LOCAL time
     const deadline = new Date(now);
-    deadline.setHours(resetHour, 0, 0, 0);      // set time today at resetHour
+    deadline.setHours(hour, 0, 0, 0);
 
-    // if resetHour already passed today => move to tomorrow
+    // If reset hour already passed → move to next day
     if (deadline <= now) {
         deadline.setDate(deadline.getDate() + 1);
     }
 
+    // Store as UTC ISO (MongoDB standard)
     return deadline.toISOString();
 }
