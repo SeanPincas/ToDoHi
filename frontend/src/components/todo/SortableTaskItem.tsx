@@ -2,7 +2,7 @@
 //                                     SORTABLE TASK ITEM (DND ITEM)
 // =====================================================================================================
 
-import "./TodoItems.css";
+import "./SortableTaskItem.css";
 import type { Task } from "../../api/taskApi";
 
 import { useSortable } from "@dnd-kit/sortable";

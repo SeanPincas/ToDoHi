@@ -169,10 +169,10 @@
 .todo-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 
+    max-height: 475px;
     overflow-y: auto;
-    flex: 1;
 }
 
 .todo-list::-webkit-scrollbar {
@@ -180,9 +180,38 @@
 }
 
 /* ========================================================================== */
-/* ADD TASK BUTTON (REFINED USING btn-primary-rect)                           */
+/* MODE VISUAL CUES (ADDED — DOES NOT AFFECT EXISTING STYLES)                */
 /* ========================================================================== */
 
-.add-task-btn {
-    margin-top: 10px;
+/* --- Mode label beside "To-Do List" title --- */
+.todo-preview-title .mode-label {
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.todo-preview-title .mode-label.delete {
+    color: #e74c3c; /* delete mode */
+}
+
+.todo-preview-title .mode-label.rearrange {
+    color: #00bcd4; /* rearrange mode */
+}
+
+/* --- Slight emphasis on active mode button --- */
+.icon-btn-square.active {
+    transform: scale(1.30);
+    transition: transform 0.15s ease;
+}
+
+/* --- Very subtle background context per mode --- */
+.todo-preview-container.delete-mode {
+    background: rgba(231, 76, 60, 0.10); /* stronger tint */
+    box-shadow: inset 4px 0 0 rgba(231, 76, 60, 0.55);
+}
+
+.todo-preview-container.rearrange-mode {
+    background: rgba(0, 188, 212, 0.10); /* stronger tint */
+    box-shadow: inset 4px 0 0 rgba(0, 188, 212, 0.55);
 }

@@ -9,7 +9,7 @@ import {
     modalCardBaseStyle,
 } from "../../../styles/modalStyles";
 
-import "../../common/modals/resetHourGuideModal.css";
+import "../../common/modals/ResetHourGuideModal.css";
 
 interface Props {
     onClose: () => void;

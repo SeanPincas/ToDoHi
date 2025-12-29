@@ -1,6 +1,5 @@
-/* ========================================================================== */
-/*                       RECTANGLE ACTION BUTTONS                             */
-/* ========================================================================== */
+
+/* RECTANGLE ACTION BUTTONS */
 .btn-primary-rect {
     width: 100%;
     padding: 12px 18px;
@@ -31,9 +30,69 @@
     transform: scale(0.98);
 }
 
-/* ---------------------------------------
-   SECONDARY RECTANGLE BUTTON
-   --------------------------------------- */
+/* DANGER / DELETE RECTANGLE BUTTON */
+.btn-danger-rect {
+    width: 100%;
+    padding: 12px 18px;
+
+    background: var(--btn-danger);
+    border: 2px solid var(--blue-dark);
+    border-radius: 12px;
+
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--white);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-danger-rect:hover {
+    background: var(--btn-danger-hover);
+}
+
+.btn-danger-rect:active {
+    transform: scale(0.98);
+}
+
+/* INFO / REARRANGE RECTANGLE BUTTON */
+.btn-info-rect {
+    width: 100%;
+    padding: 12px 18px;
+
+    background: var(--info-accent);
+    border: 2px solid var(--info-border);
+    border-radius: 12px;
+
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-main);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-info-rect:hover {
+    background: var(--info-accent-hover);
+}
+
+.btn-info-rect:active {
+    transform: scale(0.98);
+}
+
+/* SECONDARY RECTANGLE BUTTON */
 .btn-secondary-rect {
     width: 100%;
     padding: 12px 18px;

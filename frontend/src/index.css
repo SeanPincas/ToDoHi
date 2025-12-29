@@ -13,9 +13,18 @@
     /* PRIMARY PALETTE FROM LOGO */
     --blue-dark: #0e2d55;
     --blue-light: #5bb7ff;
-    
+
     /* ACCENT COLORS */
     --red-accent: #ff3b30;
+
+    /* EDIT INTENT */
+    --info-accent: #22d3ee;
+    --info-accent-hover: #06b6d4;
+    --info-border: #0ea5e9;
+
+    /* GUIDE ICONS */
+    --guide-accent: #94a3b8;
+    --guide-accent-hover: var(--blue-dark);
 
     /* BACKGROUND COLORS */
     --paper-bg: #f7f3e9;
@@ -31,7 +40,7 @@
     --btn-danger-hover: #d93228;
 
     /* COMMON SHADOW */
-    --shadow-soft: 0px 2px 5px rgba(0,0,0,0.15);
+    --shadow-soft: 0px 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 /* Apply font and general body styling */
@@ -105,6 +114,15 @@ body[data-theme="dark"] {
     /* ACCENT COLORS */
     --red-accent: #ff6b6b;
 
+    /* EDIT INTENT */
+    --info-accent: #38bdf8;
+    --info-accent-hover: #0ea5e9;
+    --info-border: #7dd3fc;
+
+    /* GUIDE ICONS */
+    --guide-accent: #64748b;
+    --guide-accent-hover: #e5e7eb;
+
     /* BACKGROUND COLORS */
     --paper-bg: #0b1220;
     --white: #0f172a;
@@ -119,5 +137,5 @@ body[data-theme="dark"] {
     --btn-danger-hover: #dc2626;
 
     /* SHADOW */
-    --shadow-soft: 0px 2px 8px rgba(0,0,0,0.6);
+    --shadow-soft: 0px 2px 8px rgba(0, 0, 0, 0.6);
 }

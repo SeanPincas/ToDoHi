@@ -185,7 +185,7 @@ const Sidebar = () => {
                 <div className="sidebar-section">
 
                     {/* RESET HOUR (label from DropdownMenu, icon layered beside it) */}
-                    <div style={{ position: "relative" }}>
+                    <div className="reset-hour-wrapper">
                         <DropdownMenu
                             label="Reset Hour"
                             value={`${resetHour}:00`}
@@ -195,13 +195,7 @@ const Sidebar = () => {
                         />
 
                         {/* Help icon aligned with label */}
-                        <div
-                            style={{
-                                position: "absolute",
-                                top: "2px",
-                                right: "4px",
-                            }}
-                        >
+                        <div className="reset-hour-help">
                             <ResetHourHelpIcon
                                 onClick={() =>
                                     setShowResetHourGuide(true)
