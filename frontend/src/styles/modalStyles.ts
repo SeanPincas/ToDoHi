@@ -10,7 +10,7 @@ export const modalOverlayStyle: React.CSSProperties = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 40,
+    zIndex: 999,
 };
 
 export const modalCardBaseStyle: React.CSSProperties = {

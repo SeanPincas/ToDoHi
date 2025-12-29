@@ -2,7 +2,7 @@
 //                                     SORTABLE TASK ITEM (DND ITEM)
 // =====================================================================================================
 
-import "./TodoItems.css";
+import "./SortableTaskItem.css";
 import type { Task } from "../../api/taskApi";
 
 import { useSortable } from "@dnd-kit/sortable";
@@ -64,8 +64,13 @@ export const SortableTaskItem = ({
             style={containerStyle}
             className={`task-item-container ${isDragging ? "dragging" : ""}`}
             onClick={() => {
-                // Prevent opening ViewModal while in rearrange or delete mode
-                if (!isRearrangeMode && !isDeleteMode) {
+                // Prevent opening ViewModal while in delete mode instead its for delete selection
+                if (isDeleteMode) {
+                    toggleDeleteSelection(task._id);
+                    return;
+                }
+                // Prevent opening ViewModal while in rearrange
+                if (!isDeleteMode) {
                     onOpenView();
                 }
             }}

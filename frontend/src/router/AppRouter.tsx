@@ -17,6 +17,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { TodoProvider } from "../context/TodoContext";
 import AddTaskModal from "../components/todo/AddTaskModal";
 import ViewTaskModal from "../components/todo/ViewTaskModal";
+import DeleteConfirmModal from "../components/common/modals/DeleteConfirmModal";
 
 const AppRouter: React.FC = () => {
     return (
@@ -60,6 +61,7 @@ const AppRouter: React.FC = () => {
                     <AddTaskModal />
                     {/*<EditTaskModal />*/}
                     <ViewTaskModal />
+                    <DeleteConfirmModal />
                     {/*<VerificationModal />*/}
                 </TodoProvider>
             </AuthProvider>

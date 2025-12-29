@@ -26,6 +26,8 @@ interface User {
         theme: "light" | "dark";
     };
 
+    quoteCategoryPreferences?: string[];
+
     stats?: {
         totalTasksCompleted: number;
         totalMemosCreated: number;

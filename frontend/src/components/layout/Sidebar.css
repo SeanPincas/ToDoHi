@@ -92,16 +92,33 @@
     color: var(--blue-dark);
 }
 
-/* ===== RESET HOUR VALUE ===== */
-.reset-hour-select {
-    width: 100%;
-    padding: 7px 10px;
-    border-radius: 8px;
-    background: var(--white);
-    border: 2px solid var(--blue-dark);
-    font-family: inherit;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+/* ===== RESET HOUR HELPER ===== */
+.reset-hour-wrapper {
+    position: relative;
+}
+
+.reset-hour-help {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reset-hour-help svg {
+    width: 14px;
+    height: 14px;
     cursor: pointer;
+
+    color: var(--guide-accent);
+    transition: color 0.2s ease, transform 0.15s ease;
+}
+
+.reset-hour-help svg:hover {
+    color: var(--guide-accent-hover);
+    transform: scale(1.1);
 }
 
 /* ===== QUOTE PREFERENCES VALUE ===== */
