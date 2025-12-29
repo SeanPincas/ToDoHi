@@ -66,7 +66,10 @@ const AddTaskModal: React.FC = () => {
         setErrorMsg(null);
 
         // READ User Preference ResetHour
-        const resetHour: number | null = user?.preference?.resetHour ?? null; 
+        const resetHour =
+            typeof user?.preference?.resetHour === "number"
+                ? user.preference.resetHour
+                : 0; // default midnight
 
         // compute final deadline based on rules
         const deadline = computeDeadline(resetHour);

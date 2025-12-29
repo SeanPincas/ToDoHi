@@ -37,7 +37,7 @@
 /* --------------------------- TEXT STYLING --------------------------- */
 
 .stats-label {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.85;
     color: var(--blue-dark);
     min-height: 18px;
@@ -48,10 +48,15 @@
 }
 
 .stats-value {
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
     color: var(--blue-dark);
-    margin-top: 4px;
+    margin-top: 3px;
+}
+
+.stats-bar,
+.stats-item {
+    box-sizing: border-box;
 }
 
 /* ------------------------------ RESPONSIVE -------------------------------- */

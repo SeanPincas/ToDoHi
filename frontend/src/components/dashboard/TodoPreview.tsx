@@ -37,8 +37,7 @@ import {
     type TaskTab,
 } from "../../utils/taskUtils";
 
-// NEW Shared Styles
-import "../../styles/buttonStyles.css"; // <-- NEW BUTTON STYLE IMPORT
+import "../../styles/buttonStyles.css"
 
 // ------------------------------ COMPONENT START ------------------------------
 const TodoPreview: React.FC = () => {
@@ -49,7 +48,9 @@ const TodoPreview: React.FC = () => {
         filterFailed,
         reorderTasks,
         updateTask,
+        deleteTask,
         openModal,
+        closeModal,
     } = useTodo();
 
     // =====================================================================
@@ -116,6 +117,33 @@ const TodoPreview: React.FC = () => {
     };
 
     // =====================================================================
+    //                        OPEN DELETE CONFIRM MODAL
+    // =====================================================================
+    const openDeleteConfirm = () => {
+        if (selectedToDelete.length === 0) return;
+
+        openModal("deleteConfirm", {
+            taskIds: selectedToDelete,
+            onConfirm: handleConfirmDelete,
+        });
+    };
+
+    const handleConfirmDelete = async (taskIds: string[]) => {
+        try {
+            for (const id of taskIds) {
+                await deleteTask(id)
+            }
+
+            // EXIT delete mode 
+            setIsDeleteMode(false);
+
+            closeModal();
+        } catch (err) {
+            console.error("Bulk delete Failed: ", err)
+        }
+    }
+
+    // =====================================================================
     //                        OPEN VIEW TASK MODAL
     // =====================================================================
     const openViewTask = (task: Task) => {
@@ -127,19 +155,41 @@ const TodoPreview: React.FC = () => {
     //                                 RENDER
     // =====================================================================
     return (
-        <div className="todo-preview-container">
-
+        <div
+            className={`todo-preview-container
+            ${isDeleteMode ? "delete-mode" : ""}
+            ${isRearrangeMode ? "rearrange-mode" : ""}
+            `}
+        >
             {/* =============================================================== */}
             {/*                          HEADER                                 */}
             {/* =============================================================== */}
             <div className="todo-preview-header">
-                <h2 className="todo-preview-title">To-Do List</h2>
+                <h2 className="todo-preview-title">
+                    To-Do List
+                    {isDeleteMode && <span className="mode-label delete">(Delete Mode)</span>}
+                    {isRearrangeMode && <span className="mode-label rearrange">(Rearrange Mode)</span>}
+                </h2>
 
                 <div className="todo-preview-actions">
+
                     {/* REARRANGE BUTTON */}
                     <button
                         className={`icon-btn-square ${isRearrangeMode ? "active" : ""}`}
-                        onClick={() => setIsRearrangeMode(prev => !prev)}
+                        onClick={() => {
+                            setIsRearrangeMode(prev => {
+                                const next = !prev;
+
+                                // If turning rearrange mode ON → force delete OFF
+                                if (next) {
+                                    setIsDeleteMode(false);
+                                }
+
+                                return next;
+                            });
+
+                            setSelectedToDelete([]);
+                        }}
                     >
                         <Icons.Drag />
                     </button>
@@ -147,7 +197,20 @@ const TodoPreview: React.FC = () => {
                     {/* DELETE BUTTON */}
                     <button
                         className={`icon-btn-square delete ${isDeleteMode ? "active" : ""}`}
-                        onClick={() => setIsDeleteMode(prev => !prev)}
+                        onClick={() => {
+                            setIsDeleteMode(prev => {
+                                const next = !prev;
+
+                                // if Turning Delete Mode On > force Rearrange Off
+                                if (next) {
+                                    setIsRearrangeMode(false);
+                                }
+
+                                return next;
+                            });
+
+                            setSelectedToDelete([]);
+                        }}
                     >
                         <Icons.Delete />
                     </button>
@@ -198,17 +261,46 @@ const TodoPreview: React.FC = () => {
                 </SortableContext>
             </DndContext>
 
-            {/* =============================================================== */}
-            {/*                      ADD TASK BUTTON (REFINED)                  */}
-            {/* =============================================================== */}
-            <button
-                className="btn-primary-rect add-task-btn"
-                onClick={() => openModal("add")}
-            >
-                <Icons.Add /> Add Task
-            </button>
+            {/* ================= DELETE MODE ACTION ================= */}
 
-        </div>
+            {isDeleteMode && (
+                <button
+                    className="btn-danger-rect primary-btn"
+                    disabled={selectedToDelete.length === 0}
+                    onClick={openDeleteConfirm}
+                >
+                    <Icons.Delete />
+                    Delete Selected ({selectedToDelete.length})
+                </button>
+            )}
+
+            {/* ================= REARRANGE MODE ACTION ================= */}
+
+            {!isDeleteMode && isRearrangeMode && (
+                <button
+                    className="btn-info-rect primary-btn"
+                    onClick={() => {
+                        // Exit Rearrange Mode
+                        setIsRearrangeMode(false)
+                    }}
+                >
+                    <Icons.Check />
+                    Confirm Arrangment
+                </button>
+            )}
+
+            {/* ==================== ADD TASK ===================== */}
+            {!isDeleteMode && !isRearrangeMode && (
+                <button
+                    className="btn-primary-rect primary-btn"
+                    onClick={() => openModal("add")}
+                >
+                    <Icons.Add />
+                    Add Task
+                </button>
+            )}
+
+        </div >
     );
 };
 

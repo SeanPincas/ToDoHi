@@ -26,7 +26,7 @@ export const getTaskItemStyle = (
         border: "2px solid var(--blue-dark)",
         borderRadius: "10px",
 
-        padding: "10px",
+        padding: "5px 8px",
         display: "flex",
         alignItems: "center",
         gap: "10px",

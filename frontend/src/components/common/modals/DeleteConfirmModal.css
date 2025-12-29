@@ -1,0 +1,83 @@
+/* ============================================================================
+   DeleteConfirmModal.css
+
+   PURPOSE:
+   - Style the delete confirmation modal
+   - Match existing modal look & feel
+   - Emphasize "danger" action without being noisy
+   ============================================================================ */
+
+
+/* ---------------- OVERLAY ---------------- */
+/* Uses shared modalOverlayStyle for layout.
+   We only reinforce stacking here. */
+.delete-confirm-overlay {
+    z-index: 9999; /* Must be above sidebar + other modals */
+}
+
+
+/* ---------------- CARD ---------------- */
+/* The base shape comes from modalCardBaseStyle.
+   These styles refine spacing and alignment. */
+.delete-confirm-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+
+/* ---------------- HEADER ---------------- */
+/* Icon + title aligned horizontally */
+.delete-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Warning icon should stand out, but not scream */
+.warning-icon {
+    color: var(--danger, #e74c3c);
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+/* Title styling consistent with other modals */
+.delete-confirm-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* ---------------- MESSAGE ---------------- */
+/* Main explanatory text */
+.delete-confirm-message {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text-main, #333);
+    margin: 0;
+}
+
+/* Emphasize irreversible action */
+.delete-confirm-message strong {
+    color: var(--danger, #e74c3c);
+    font-weight: 600;
+}
+
+
+/* ---------------- ACTION BUTTONS ---------------- */
+/* Right-aligned buttons, consistent with other modals */
+.delete-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+
+/* ---------------- BUTTON SAFETY ---------------- */
+/* Prevent weird hover/click states while loading */
+.delete-confirm-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

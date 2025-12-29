@@ -1,0 +1,57 @@
+/* ============================================================================
+   Reset Hour Guide Modal Styles
+   ============================================================================ */
+
+.reset-hour-guide {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.reset-hour-guide h3 {
+    margin-bottom: 10px;
+}
+
+.reset-hour-guide p {
+    margin-bottom: 8px;
+}
+
+.reset-hour-guide ul {
+    padding-left: 18px;
+    margin-bottom: 10px;
+}
+
+.reset-hour-guide li {
+    margin-bottom: 4px;
+}
+
+.reset-hour-guide hr {
+    margin: 12px 0;
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.reset-hour-guide .note {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-top: 8px;
+}
+
+.reset-hour-guide .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.reset-hour-guide .close-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--blue-dark);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.reset-hour-guide .close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}

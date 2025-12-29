@@ -1,0 +1,43 @@
+/* ============================================================================
+   ThemeToggle.css
+   Circular light / dark toggle button
+   ============================================================================ */
+
+.theme-toggle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--blue-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: background 0.25s ease, transform 0.15s ease;
+}
+
+/* --------------------------- LIGHT MODE --------------------------- */
+
+.theme-toggle-btn.light {
+    background: var(--white);
+}
+
+/* --------------------------- DARK MODE --------------------------- */
+
+.theme-toggle-btn.dark {
+    background: #0f172a; /* midnight blue, NOT pure black */
+}
+
+/* --------------------------- ICON --------------------------- */
+
+.theme-icon {
+    font-size: 18px;
+    color: #facc15; /* yellow */
+    line-height: 1;
+}
+
+/* --------------------------- HOVER --------------------------- */
+
+.theme-toggle-btn:hover {
+    transform: translateY(-1px);
+}

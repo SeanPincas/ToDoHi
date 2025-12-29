@@ -1,0 +1,78 @@
+/* ============================================================================
+   DropdownMenu.css
+   Custom dropdown with fixed-height scrollable menu
+   ============================================================================ */
+
+/* --------------------------- WRAPPER --------------------------- */
+
+.dropdown-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* --------------------------- LABEL --------------------------- */
+
+.dropdown-label {
+    font-weight: bold;
+    color: var(--blue-dark);
+}
+
+/* --------------------------- TRIGGER --------------------------- */
+
+.dropdown-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 13px;
+    background: var(--white);
+    border: 2px solid var(--blue-dark);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: var(--shadow-soft);
+}
+
+/* --------------------------- ARROW --------------------------- */
+
+.dropdown-arrow {
+    transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+/* --------------------------- MENU --------------------------- */
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    font-size: 13px;
+    background: var(--white);
+    border: 2px solid var(--blue-dark);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+/* --------------------------- ITEM --------------------------- */
+
+.dropdown-item {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: var(--blue-light);
+}
+
+.dropdown-item.active {
+    background: var(--btn-primary-hover);
+    font-weight: bold;
+}

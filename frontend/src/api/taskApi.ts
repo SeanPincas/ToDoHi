@@ -54,11 +54,10 @@ export const markTaskComplete = async (taskId: string): Promise<Task> => {
 };
 
 // REORDER tasks  <-- FIXED (correct URL + correct body key)
-export const reorderTaskPositions = async (updatedTasks: Task[]): Promise<void> => {
-    const payload = updatedTasks.map(t => ({
-        _id: t._id,
-        orderIndex: t.orderIndex,
-    }));
-
-    await axios.put(`${API_URL}/reorder`, { tasks: payload }, authHeaders());
+export const reorderTaskPositions = async (orderIds: string[]): Promise<void> => {
+    await axios.put(
+        `${API_URL}/reorder`,
+        { orderIds },
+        authHeaders()
+    );
 };
