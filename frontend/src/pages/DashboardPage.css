@@ -6,7 +6,7 @@
     background: var(--white);
     border: 3px solid var(--blue-dark);
     border-radius: 18px;
-    padding: 22px;
+    padding: 18px;
     box-shadow: var(--shadow-soft);
 
     /* Fluid max-width to prevent squeezing when sidebar appears */
@@ -231,7 +231,7 @@
 /* ========================================================================== */
 
 @media (max-width: 1250px) {
-    .dashboard-container {
+    .greeting-left {
         padding-left: clamp(15px, 5vw, 45px);
     }
 }
