@@ -7,19 +7,27 @@ import "./DeleteConfirmModal.css";
 
 // ------------------------------ COMPONENT ------------------------------
 const DeleteConfirmModal: React.FC = () => {
-    const { modal, closeModal } = useTodo();
+    const { modal, closeModal, deleteTask } = useTodo();
 
     // ------------------ GUARD ------------------
     if (!modal.isOpen || modal.type !== "deleteConfirm") return null;
 
-    const { taskIds = [], onConfirm } = modal.data || {};
+    const { taskIds = [], } = modal.data || {};
     const count = taskIds.length;
 
     // ------------------ CONFIRM DELETE ------------------
     const handleConfirmDelete = async () => {
         if (count === 0) return;
 
-        onConfirm?.(taskIds);
+        try {
+            for (const id of taskIds) {
+                await deleteTask(id);
+            }
+
+            closeModal();
+        } catch (err) {
+            console.error("[DeleteConfirmModal] Failed to delete tasks:", err);
+        }
     };
 
     // ------------------ RENDER  ------------------

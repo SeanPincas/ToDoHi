@@ -191,19 +191,42 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     // =================================================================================================
     //                                   REORDER TASKS
     // =================================================================================================
-    const reorderTasks = async (orderedList: Task[]) => {
-        try {
-            const updatedOrder = orderedList.map((task, index) => ({
+    const reorderTasks = async (reorderedSubset: Task[]) => {
+
+        // Build a map from reordered subset
+        const reorderedMap = new Map(
+            reorderedSubset.map((task, index) => [task._id, index])
+        );
+
+        // Rebuild Full task list order
+        const fullOrderedTasks = [...tasks].sort((a, b) => {
+            const aIndex = reorderedMap.get(a._id);
+            const bIndex = reorderedMap.get(b._id);
+
+            // Tasks in the active filter come first, reordered
+            if (aIndex !== undefined && bIndex !== undefined) {
+                return aIndex - bIndex;
+            }
+
+            // which ever comes first
+            if (aIndex !== undefined) return -1;
+            if (bIndex !== undefined) return 1;
+
+            // Tasks not in filter keep relative order
+            return a.orderIndex - b.orderIndex;
+        });
+
+        // Extract Full orderIds
+        const orderIds = fullOrderedTasks.map(task => task._id);
+        // persist order
+        await reorderTaskPositions(orderIds);
+        // update local state
+        setTasks(
+           fullOrderedTasks.map((task, index) => ({
                 ...task,
                 orderIndex: index,
-            }));
-
-            await reorderTaskPositions(updatedOrder);
-
-            setTasks(updatedOrder);
-        } catch (error) {
-            console.error("[TodoContext] Error Reordering Tasks:", error);
-        }
+            }))
+        );
     };
 
     // =================================================================================================

@@ -116,7 +116,9 @@ const ViewTaskModal = () => {
                     {/* DELETE BUTTON */}
                     <button
                         className="icon-btn-square delete"
-                        onClick={() => openModal("deleteConfirm", task)}
+                        onClick={() => openModal("deleteConfirm", {
+                            taskIds: [task._id],
+                        })}
                     >
                         <Icons.Delete className="view-btn-icon" />
                     </button>
