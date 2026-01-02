@@ -1,13 +1,13 @@
 // ============================================================================
 //                         VIEW TASK MODAL (VIEW-ONLY)
 // ============================================================================
-
+import { useEffect, useState } from "react";
 import "./ViewTaskModal.css";
 import { useTodo } from "../../context/TodoContext";
 
 // Reusable icons + switch component + button styles
 import { Icons } from "../../styles/iconLibrary";
-import { Switch } from "../../styles/Switch";
+import { Switch } from "../common/switch/Switch";
 import "../../styles/ButtonStyles.css";
 
 // Utilities
@@ -17,30 +17,46 @@ import {
     safeStatusLabel,
     toggleStatus,
     createStatusLock,
+    type TaskStatus,
 } from "../../utils/taskUtils";
+
 
 const ViewTaskModal = () => {
 
     const { modal, closeModal, updateTask, openModal } = useTodo();
-
-    // Only show when modal is open + type is "view"
-    if (!modal.isOpen || modal.type !== "view") return null;
-
-    const task = modal.data;
-    if (!task) return null;
+    // ====================== 1️⃣ EXTRACT DATA (NO RETURNS) ======================
+    const task = modal?.data ?? null;
+    // ====================== 2️⃣ HOOKS (SAFE DEFAULTS) ==========================
+    const [localStatus, setLocalStatus] = useState<TaskStatus>("pending");
 
     // Anti-spam lock (prevents rapid status toggling)
     const lock = createStatusLock(300);
 
-    const handleToggleStatus = async () => {
-        if (lock()) return;
+    // ====================== 3️⃣ SYNC EFFECT ===================================
+    useEffect(() => {
+        if (!task) return;
+        setLocalStatus(task.status);
+    }, [task?.status])
 
-        const newStatus = toggleStatus(task.status);
-        await updateTask(task._id, { status: newStatus });
-    };
+    // ====================== 4️⃣ GUARD (RETURNS ALLOWED HERE) ====================
+    if (!modal.isOpen || modal.type !== "view" || !task) return null;
+
+    const isFailed = localStatus === "failed";
+    const failedReason = "Failed tasks are locked.";
 
     // Border color uses the task's saved containerColor
     const borderColor = task.containerColor ?? "#000000";
+
+    // ====================== HANDLERS ==========================================
+    const handleToggleStatus = async () => {
+        if (!lock()) return;
+
+        const newStatus = toggleStatus(localStatus);
+
+        setLocalStatus(newStatus);
+
+        await updateTask(task._id, { status: newStatus });
+    };
 
     return (
         <div
@@ -76,14 +92,20 @@ const ViewTaskModal = () => {
                     ></span>
                 </div>
 
-                {/* CREATED AT + STATUS (LABEL ONLY) */}
+                {/* CREATED AT + EDITEDAT + STATUS (LABEL ONLY) */}
                 <div className="view-row">
                     <span className="view-created">
                         Created: {formatDate(task.createdAt)}
                     </span>
 
-                    <span className={`view-status ${task.status}`}>
-                        {safeStatusLabel(task.status)}
+                    {task.editedAt && (
+                        <span className="view-edited">
+                            Edited: {formatDate(task.editedAt)}
+                        </span>
+                    )}
+                    {/* STATUS */}
+                    <span className={`view-status ${localStatus}`}>
+                        {safeStatusLabel(localStatus)}
                     </span>
                 </div>
 
@@ -98,33 +120,43 @@ const ViewTaskModal = () => {
                 {/* ACTIONS ROW (SWITCH + EDIT + DELETE) */}
                 <div className="view-actions">
 
-                    {/* STATUS SWITCH */}
-                    <Switch
-                        checked={task.status === "completed"}
-                        disabled={task.status === "failed"}
-                        onToggle={handleToggleStatus}
-                    />
+                    <div className="view-actions-left">
+                        {/* STATUS SWITCH */}
+                        <Switch
+                            checked={localStatus === "completed"}
+                            disabled={isFailed}
+                            disabledReason={failedReason}
+                            onToggle={handleToggleStatus}
+                        />
+                    </div>
 
-                    {/* EDIT BUTTON */}
-                    <button
-                        className="icon-btn-square"
-                        onClick={() => openModal("edit", task)}
-                    >
-                        <Icons.Edit className="view-btn-icon" />
-                    </button>
+                    <div className="view-actions-right">
+                        {/* EDIT BUTTON */}
+                        <button
+                            className="icon-btn-square"
+                            onClick={() =>
+                                openModal("edit", {
+                                    task,
+                                    returnTo: "view",
+                                })
+                            }
+                        >
+                            <Icons.Edit className="view-btn-icon" />
+                        </button>
 
-                    {/* DELETE BUTTON */}
-                    <button
-                        className="icon-btn-square delete"
-                        onClick={() => openModal("deleteConfirm", {
-                            taskIds: [task._id],
-                        })}
-                    >
-                        <Icons.Delete className="view-btn-icon" />
-                    </button>
+                        {/* DELETE BUTTON */}
+                        <button
+                            className="icon-btn-square delete"
+                            onClick={() => openModal("deleteConfirm", {
+                                taskIds: [task._id]
+                            })}
+                        >
+                            <Icons.Delete className="view-btn-icon" />
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

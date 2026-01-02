@@ -1,0 +1,123 @@
+
+/* --------------------------- CARD ------------------------------------- */
+
+.edit-modal-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    background: var(--paper-bg);
+    color: var(--text-main);
+
+    border-radius: 16px;
+}
+
+/* --------------------------- HEADER ----------------------------------- */
+.edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 2px dashed var(--blue-dark);
+    padding-bottom: 3px;
+}
+
+.edit-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+}
+
+/* --------------------------- FORM FIELDS ------------------------------ */
+
+.edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.edit-field label {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+/* INPUT + TEXTAREA */
+.edit-field input,
+.edit-field textarea {
+    font-family: inherit;
+    font-size: 15px;
+
+    padding: 8px 10px;
+    border-radius: 8px;
+
+    border: 2px solid var(--blue-dark);
+    background: var(--white);
+    color: var(--text-main);
+
+    outline: none;
+    resize: none;
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background-color 0.25s ease;
+}
+
+/* Focus state (edit intent) */
+.edit-field input:focus,
+.edit-field textarea:focus {
+    border-color: var(--info-border);
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.25);
+}
+
+/* --------------------------- DROPDOWNS -------------------------------- */
+
+.edit-field .dropdown-wrapper {
+    margin-top: 2px;
+}
+
+/* --------------------------- ACTIONS ---------------------------------- */
+
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Override buttons slightly for modal context */
+.edit-actions .btn-primary {
+    min-width: 120px;
+}
+
+.edit-actions .btn-cancel {
+    background: transparent;
+    border: 2px dashed var(--blue-dark);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.edit-actions .btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* --------------------------- DARK MODE TWEAKS -------------------------- */
+
+body[data-theme="dark"] .edit-field input,
+body[data-theme="dark"] .edit-field textarea {
+    background: var(--white);
+}
+
+
+
+
+
+
+

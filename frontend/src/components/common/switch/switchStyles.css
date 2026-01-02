@@ -2,6 +2,11 @@
    SWITCH TOGGLE — REUSABLE CONTROL
    ========================================================================== */
 
+.switch-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
 .switch-container {
     position: relative;
     width: 58px;
@@ -35,6 +40,8 @@
     background: #4cd964; /* green.normal from palette */
 }
 
+
+
 /* HANDLE */
 .switch-handle {
     position: absolute;
@@ -51,17 +58,46 @@
     transition: transform 0.25s ease, background-color 0.2s ease;
 }
 
+.switch-tooltip {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translate(-50%);
+
+    background: var(--paper-bg);
+    color: var(--text-main);
+    border: 2px solid var(--red-accent);
+    border-radius: 10px;
+
+    padding: 6px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+
+    box-shadow: var(--shadow-soft);
+    z-index: 10;
+}
+
 /* HANDLE — MOVED TO RIGHT WHEN ACTIVE */
 .switch-container.active .switch-handle {
     transform: translateX(28px);
 }
 
+/* HANDLE — MOVED TO RIGHT WHEN ACTIVE */
+.switch-container.active .switch-handle {
+    transform: translateX(28px);
+}
+
+/* TRACK — FAILED STATE (RED) */
+.switch-container.danger .switch-track {
+    background: var(--red-accent);
+}
+
 /* FAIL-SAFE (disabled = failed) */
 .switch-container.disabled .switch-track {
-    background: #e1e1e1;
+    background: #dc2626; /* deeper, aggressive red */
 }
 
 .switch-container.disabled .switch-handle {
-    background: #fafafa;
+    background: #ffffff;
     transform: translateX(0px);
 }
