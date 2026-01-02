@@ -198,13 +198,14 @@
     /* Square auto-resizing behavior */
     grid-auto-columns: minmax(22px, 34px);
 
-    column-gap: 9.5px;
+    column-gap: 6px;
     row-gap: 6px;
 
     width: 100%;
-    padding: 4px;
+    padding: 6px 6px 6px 0px;
     /* ✅ NEW: inner spacing */
     margin-top: 6px;
+    margin-bottom: 6px;
     /* ✅ NEW: spacing above the grid */
     overflow: hidden;
 }
@@ -255,9 +256,9 @@
 /* ---------------- MOBILE ---------------- */
 @media (max-width: 480px) {
     .todo-color-grid {
-        grid-auto-columns: minmax(18px, 26px);
+        grid-auto-columns: minmax(18px, 2px);
         /* slightly smaller to fit */
-        column-gap: 5px;
+        column-gap: 3px;
     }
 }
 
