@@ -1,10 +1,12 @@
 // ============================================================================
-// taskUtils.ts — COMPLETE VERSION (NO DUPLICATION + ALL HELPERS INCLUDED)
+// taskUtils.ts — ORGANIZED & CLEAN VERSION
 // ============================================================================
 
-// ============================================================================
-// TASK CATEGORIES
-// ============================================================================
+/* ============================================================================
+   1. TASK DOMAIN CONSTANTS
+============================================================================ */
+
+// ---------------- TASK CATEGORIES ----------------
 export const TASK_CATEGORIES = [
     "cleaning", "work", "study", "fitness", "health", "cooking",
     "relax", "praying", "hobby", "social", "self-care", "finance",
@@ -12,20 +14,16 @@ export const TASK_CATEGORIES = [
     "shopping", "travel", "others"
 ] as const;
 
-// Literal type
 export type TaskCategory = (typeof TASK_CATEGORIES)[number];
 
-// ============================================================================
-// TASK STATUSES — SINGLE SOURCE OF TRUTH
-// ============================================================================
+// ---------------- TASK STATUSES ----------------
 export const TASK_STATUSES = ["pending", "completed", "failed"] as const;
-
-// Literal type
 export type TaskStatus = (typeof TASK_STATUSES)[number];
 
-// ============================================================================
-// LABELS (AUTO-MAPPED)
-// ============================================================================
+/* ============================================================================
+   2. LABELS & SAFE LOOKUPS
+============================================================================ */
+
 export const CATEGORY_LABELS: Record<TaskCategory, string> = {
     cleaning: "Cleaning",
     work: "Work",
@@ -55,32 +53,25 @@ export const STATUS_LABELS: Record<TaskStatus, string> = {
     failed: "Failed"
 };
 
-// ============================================================================
-// SAFE LOOKUP HELPERS (Fix for implicit 'any' index error)
-// ============================================================================
+// ---------------- TYPE GUARDS ----------------
+export const isTaskCategory = (v: string): v is TaskCategory =>
+    TASK_CATEGORIES.includes(v as TaskCategory);
 
-// Check if value is a valid TaskCategory literal
-export const isTaskCategory = (value: string): value is TaskCategory =>
-    TASK_CATEGORIES.includes(value as TaskCategory);
+export const isTaskStatus = (v: string): v is TaskStatus =>
+    TASK_STATUSES.includes(v as TaskStatus);
 
-// Check if value is a valid TaskStatus literal
-export const isTaskStatus = (value: string): value is TaskStatus =>
-    TASK_STATUSES.includes(value as TaskStatus);
+// ---------------- SAFE LABEL HELPERS ----------------
+export const safeCategoryLabel = (c: string) =>
+    isTaskCategory(c) ? CATEGORY_LABELS[c] : c;
 
-// Safe label lookup (prevents TypeScript index errors)
-export const safeCategoryLabel = (category: string): string =>
-    isTaskCategory(category) ? CATEGORY_LABELS[category] : category;
+export const safeStatusLabel = (s: string) =>
+    isTaskStatus(s) ? STATUS_LABELS[s] : s;
 
-// Safe status lookup
-export const safeStatusLabel = (status: string): string =>
-    isTaskStatus(status) ? STATUS_LABELS[status] : status;
+/* ============================================================================
+   3. TABS & FILTERING
+============================================================================ */
 
-// ============================================================================
-// TASK TABS (ALL + STATUSES)
-// ============================================================================
 export const TASK_TABS = ["all", ...TASK_STATUSES] as const;
-
-// Literal type
 export type TaskTab = (typeof TASK_TABS)[number];
 
 export const TASK_TAB_LABELS: Record<TaskTab, string> = {
@@ -90,32 +81,31 @@ export const TASK_TAB_LABELS: Record<TaskTab, string> = {
     failed: "Failed"
 };
 
-// ============================================================================
-// HELPER: Format Date (used by ViewTaskModal, EditTaskModal, etc.)
-// ============================================================================
+/* ============================================================================
+   4. DATE & VALIDATION HELPERS
+============================================================================ */
+
 export const formatDate = (date: Date | string | null): string => {
-    if (!date) return "No deadline";
-    const d = new Date(date);
-    return d.toLocaleDateString("en-US", {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
-        day: "numeric"
+        day: "numeric",
     });
 };
 
-// ============================================================================
-// HELPER: Validate required fields
-// ============================================================================
 export const validateTaskPayload = (payload: any): string | null => {
-    if (!payload.title || payload.title.trim().length === 0) {
+    if (!payload.title || payload.title.trim() === "") {
         return "Task title is required.";
     }
     return null;
 };
 
-// ============================================================================
-// COLOR PALETTE
-// ============================================================================
+/* ============================================================================
+   5. COLOR SYSTEM (ORGANIZED)
+============================================================================ */
+
+// ---------------- RAW PALETTE ----------------
 export const TASK_COLORS = {
     blue: { light: "#cfe7ff", normal: "#4a90e2", dark: "#1f5fa1" },
     red: { light: "#ffdad6", normal: "#ff6b6b", dark: "#c73838" },
@@ -128,53 +118,52 @@ export const TASK_COLORS = {
     beige: { light: "#fff3e0", normal: "#ffd7a0", dark: "#cfa272" },
     white: { light: "#ffffff", normal: "#f7f7f7", dark: "#e6e6e6" },
     black: { light: "#4a4a4a", normal: "#1f1f1f", dark: "#000000" },
-    grey: { light: "#f1f1f1", normal: "#cfcfcf", dark: "#8c8c8c" }
-};
+    grey: { light: "#f1f1f1", normal: "#cfcfcf", dark: "#8c8c8c" },
+} as const;
 
-// ============================================================================
-// FLATTENED COLOR OPTIONS (Used in AddTaskModal, EditTaskModal)
-// ============================================================================
+// ---------------- FLATTENED OPTIONS ----------------
 export const TASK_COLOR_OPTIONS = Object.entries(TASK_COLORS).flatMap(
-    ([colorName, shades]) => [
-        { name: `${colorName}-light`, hex: shades.light },
-        { name: `${colorName}-normal`, hex: shades.normal },
-        { name: `${colorName}-dark`, hex: shades.dark }
+    ([name, shades]) => [
+        { name: `${name}-light`, hex: shades.light },
+        { name: `${name}-normal`, hex: shades.normal },
+        { name: `${name}-dark`, hex: shades.dark },
     ]
 );
 
-// ============================================================================
-// SELECT OPTION HELPERS
-// ============================================================================
+// ---------------- COLOR HELPERS ----------------
+export const getContainerColors = () => TASK_COLOR_OPTIONS;
+
+export const safeContainerColor = (color: string): string => {
+    const valid = TASK_COLOR_OPTIONS.some(c => c.hex === color);
+    return valid ? color : "#ffffff";
+};
+
+/* ============================================================================
+   6. SELECT OPTIONS (DROPDOWNS)
+============================================================================ */
+
 export const getCategoryOptions = () =>
-    TASK_CATEGORIES.map((c) => ({
-        value: c,
-        label: CATEGORY_LABELS[c]
-    }));
+    TASK_CATEGORIES.map(c => ({ value: c, label: CATEGORY_LABELS[c] }));
 
 export const getStatusOptions = () =>
-    TASK_STATUSES.map((s) => ({
-        value: s,
-        label: STATUS_LABELS[s]
-    }));
+    TASK_STATUSES.map(s => ({ value: s, label: STATUS_LABELS[s] }));
 
-// ============================================================================
-// STATUS TOGGLE HELPER (Used for EditTaskModal, ViewTaskModal)
-// ============================================================================
+/* ============================================================================
+   7. STATUS HELPERS
+============================================================================ */
+
 export const toggleStatus = (status: TaskStatus): TaskStatus => {
-    //  Pending <-> Completed
     if (status === "pending") return "completed";
     if (status === "completed") return "pending";
-
-    // Failed is NOT reversible by toggle
     return "failed";
 };
 
-// ============================================================================
-// SPAM PREVENTION LOCK FOR STATUS SWITCH
-// ============================================================================
+/* ============================================================================
+   8. UX UTILITIES
+============================================================================ */
+
 export const createStatusLock = (ms: number) => {
     let locked = false;
-
     return () => {
         if (locked) return false;
         locked = true;
@@ -182,7 +171,6 @@ export const createStatusLock = (ms: number) => {
         return true;
     };
 };
-
 
 
 

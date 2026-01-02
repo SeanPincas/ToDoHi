@@ -88,6 +88,12 @@
     color: #666;
 }
 
+/* Created At label */
+.view-edited {
+    font-size: 0.9rem;
+    color: #666;
+}
+
 /* Status label */
 .view-status {
     font-size: 0.9rem;
@@ -132,14 +138,22 @@
 
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 12px;
 }
 
-/* Square buttons use global reusable class:
-   .icon-btn-square 
-   (already exists from shared system)
-*/
+/* LEFT SIDE (Switch) */
+.view-actions-left {
+    display: flex;
+    align-items: center;
+}
+
+/* RIGHT SIDE (Edit + Delete) */
+.view-actions-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
 .icon-btn-square.delete {
     background: #ff5a5a;
