@@ -50,7 +50,8 @@ export const SortableTaskItem = ({
         transform,
         transition,
         isDragging,
-        task.containerColor
+        task.containerColor,
+        task.status,
     );
 
     const isSelectedForDelete = selectedToDelete.includes(task._id);

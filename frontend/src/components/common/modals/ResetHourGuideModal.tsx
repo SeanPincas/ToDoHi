@@ -46,9 +46,8 @@ const ResetHourGuideModal: React.FC<Props> = ({ onClose }) => {
                 <ul>
                     <li>Tasks create <strong>BEFORE</strong> 10:00 PM || 22:00 belong to today</li>
                     <li>Tasks create <strong>AFTER</strong> 10:00 PM || 22:00 belong to tomorrow</li>
-                    <li>At 10:00 PM, the day resets</li>
-                    <li>Tasks created before 10:00 PM || 22:00 will be <strong>marked as FAILED</strong></li>
-                    <li></li>
+                    <li>At 10:00 PM, the day resets; and</li>
+                    <li>All Uncompleted Tasks will be <strong>marked as FAILED</strong></li>
                 </ul>
 
                 <p className="note">
