@@ -118,7 +118,7 @@ export const TASK_COLORS = {
     beige: { light: "#fff3e0", normal: "#ffd7a0", dark: "#cfa272" },
     white: { light: "#ffffff", normal: "#f7f7f7", dark: "#e6e6e6" },
     black: { light: "#4a4a4a", normal: "#1f1f1f", dark: "#000000" },
-    grey: { light: "#f1f1f1", normal: "#cfcfcf", dark: "#8c8c8c" },
+    grey: { light: "#e0e0e0", normal: "#a6a6a6", dark: "#5a5a5a" },
 } as const;
 
 // ---------------- FLATTENED OPTIONS ----------------
@@ -137,6 +137,38 @@ export const safeContainerColor = (color: string): string => {
     const valid = TASK_COLOR_OPTIONS.some(c => c.hex === color);
     return valid ? color : "#ffffff";
 };
+
+export const getColorNameFromHex = (hex: string): string => {
+    const found = TASK_COLOR_OPTIONS.find(c => c.hex === hex);
+    return found ? found.name : "white-light";
+};
+// ---------------- COLOR CONTRASTING FOR FONT COLOR ----------------
+export const getContainerHex = (colorName: string): string => {
+    const found = TASK_COLOR_OPTIONS.find(c => c.name === colorName);
+    return found ? found.hex : TASK_COLORS.white.light
+}
+
+export const getTaskTextColor = (containerColor: string): string => {
+    const [base, shade] = containerColor.split("-");
+
+    if (base === "black") return "#ffffff";
+    if (base === "white") return "#000000";
+    if (base === "grey") return shade === "dark" ? "#ffffff" : "#000000";
+    if (shade === "dark") return "#ffffff";
+
+    return "#000000";
+}
+
+// ------------------ TASK TITLE FAILED FONT COLOR ------------------------
+export const getFailedTextColor = (containerColorName: string): string => {
+    const [base, shade] = containerColorName.split("-");
+
+    if (base === "red") return shade === "dark" ? "#5f0000ff" : "#7a1c1c";
+
+    if (shade === "dark" || base === "black") return "#f32323ff";
+
+    return "#b60000"
+}
 
 /* ============================================================================
    6. SELECT OPTIONS (DROPDOWNS)

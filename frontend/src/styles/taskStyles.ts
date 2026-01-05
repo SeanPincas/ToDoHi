@@ -6,13 +6,35 @@
 
 import { CSS } from "@dnd-kit/utilities";
 import type { Transform } from "@dnd-kit/utilities";
+import type { CSSProperties } from "react";
+
+import {
+    getContainerHex,
+    getTaskTextColor,
+    getColorNameFromHex,
+    getFailedTextColor,
+} from "../utils/taskUtils"
 
 export const getTaskItemStyle = (
     transform: Transform | null,
     transition: string | undefined,
     isDragging: boolean,
-    containerColor: string
-): React.CSSProperties => {
+    containerColor: string,
+    status?: string,
+): CSSProperties => {
+
+    const colorName = containerColor.startsWith("#")
+        ? getColorNameFromHex(containerColor)
+        : containerColor;
+
+    const backgroundColor = getContainerHex(colorName);
+    let textColor = getTaskTextColor(colorName)
+
+    // FAILED TASK STATE OVERRIDE
+    if (status === "failed") {
+        textColor = getFailedTextColor(colorName);
+    }
+
     return {
         // DnD transform + animation
         transform: CSS.Transform.toString(transform),
@@ -20,7 +42,8 @@ export const getTaskItemStyle = (
         opacity: isDragging ? 0.5 : 1,
 
         // ⭐ Task color (from AddTaskModal)
-        backgroundColor: containerColor || "var(--white)",
+        backgroundColor,
+        color: textColor,
 
         // Notebook theme
         border: "2px solid var(--blue-dark)",

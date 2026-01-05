@@ -11,7 +11,7 @@
     font-size: 1rem;
     font-weight: 600;
     text-align: center;
-    color: #1f1f1f;
+    color: var(--text-main);
 
     display: flex;
     align-items: center;
