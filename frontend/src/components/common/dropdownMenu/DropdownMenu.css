@@ -27,6 +27,7 @@
     align-items: center;
     padding: 8px 10px;
     font-size: 13px;
+    color: var(--text-main);
     background: var(--white);
     border: 2px solid var(--blue-dark);
     border-radius: 8px;

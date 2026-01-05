@@ -295,8 +295,7 @@ const TodoPreview: React.FC = () => {
                     className="btn-primary-rect primary-btn"
                     onClick={() => openModal("add")}
                 >
-                    <Icons.Add />
-                    Add Task
+                    <Icons.Add /> Add Task
                 </button>
             )}
 

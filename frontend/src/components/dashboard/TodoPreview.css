@@ -61,10 +61,11 @@
     padding: 6px 10px;
     border-radius: 8px;
     border: 2px solid var(--blue-dark);
-    background: white;
+    background: var(--white);
     cursor: pointer;
 
     font-size: 12px;
+    color: var(--text-main);
     font-weight: 600;
 
     white-space: nowrap;
