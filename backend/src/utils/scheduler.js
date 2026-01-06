@@ -55,8 +55,7 @@ async function expireTasks(now) {
     );
 
     console.log(
-        `[Scheduler] Task Expiry @ ${now.toISOString()} | Updated: ${
-            res.modifiedCount ?? res.nModified
+        `[Scheduler] Task Expiry @ ${now.toISOString()} | Updated: ${res.modifiedCount ?? res.nModified
         }`
     );
 }
@@ -85,6 +84,45 @@ async function handleDailyReset(now) {
 
         // Run daily stats (already per-user internally)
         await runDailyStats();
+
+        // Failed Tasks Snapshot Logic
+        const failedTasks = await Task.find(
+            {
+                userId: user._id,
+                status: "failed"
+            },
+            "title status" // projection: only fields we care about
+        );
+
+        if (failedTasks.length === 0) {
+            // If no failed tasks: remove snapshot / "undefined"
+            await User.findByIdAndUpdate(user._id, {
+                $unset: { failedTaskSnapshot: "" }
+            });
+
+            console.log(
+                `[Scheduler] No Failed Tasks for user ${userId} → snapshot cleared`
+            );
+
+        } else {
+            // Failed Tasks found: get Title, Status
+            const snapshotTasks = failedTasks.map(task => ({
+                _id: task._id,
+                title: task.title,
+                status: task.status
+            }));
+
+            await User.findByIdAndUpdate(user._id, {
+                failedTaskSnapshot: {
+                    resetAt: now,
+                    tasks: snapshotTasks
+                }
+            });
+
+            console.log(
+                `[Scheduler] Failed task snapshot created for user ${userId} | Count: ${snapshotTasks.length}`
+            );
+        }
 
         // Mark this reset cycle as processed for this user
         lastResetKeys.set(userId, currentResetKey);

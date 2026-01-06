@@ -24,25 +24,20 @@ const ResetHourGuideModal: React.FC<Props> = ({ onClose }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <h3>How Reset Hour Works</h3>
-
                 <p>
                     <strong>Reset Hour</strong> defines when your day ends
                     and a new day begins.
                 </p>
-
                 <ul>
                     <li>It is <strong>not</strong> a task timer</li>
                     <li>It does <strong>not</strong> auto-delete tasks</li>
                     <li>It controls daily boundaries and statistics</li>
                 </ul>
-
                 <hr />
-
                 <p>
                     <strong>Example:</strong><br />
                     If Reset Hour is set to <strong>10:00 PM</strong>:
                 </p>
-
                 <ul>
                     <li>Tasks create <strong>BEFORE</strong> 10:00 PM || 22:00 belong to today</li>
                     <li>Tasks create <strong>AFTER</strong> 10:00 PM || 22:00 belong to tomorrow</li>
