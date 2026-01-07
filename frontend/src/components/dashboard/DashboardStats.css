@@ -61,7 +61,7 @@
 
 /* ------------------------------ RESPONSIVE -------------------------------- */
 /* ---------------- MOBILE (List mode) ------------- */
-@media (max-width: 426px) {
+@media (max-width: 640px) {
     .stats-bar {
         flex-direction: column;    /* vertical list */
     }
@@ -84,7 +84,7 @@
 
     /* Label left */
     .stats-label {
-        font-size: 15px;
+        font-size: 12px;
         opacity: 0.9;
         justify-content: flex-start;
         align-items: center;
@@ -94,14 +94,7 @@
 
     /* Value right */
     .stats-value {
-        font-size: 24px;
+        font-size: 15px;
         margin-top: 0;
-    }
-}
-
-/* ----------------- TABLET ----------------- */
-@media (min-width: 427px) and (max-width: 768px) {
-    .stats-value {
-        font-size: 26px;
     }
 }
