@@ -45,11 +45,14 @@
 
 /* Apply font and general body styling */
 body {
+    min-width: 0;
     margin: 0;
     padding: 0;
     background: var(--paper-bg);
     font-family: 'Kalam', sans-serif;
     color: var(--text-main);
+
+    overflow-x: hidden;
 
     /* ---------------- SMOOTH THEME TRANSITION ---------------- */
     transition:

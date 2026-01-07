@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema({
     },
     stats: {
         totalTasksCreated: { type: Number, default: 0 },
+        totalTasksCreatedToday: { type: Number, default: 0},
         totalTasksCompleted: { type: Number, default: 0 },
         totalMemosCreated: { type: Number, default: 0 },
         totalDailyPlanCompleted: { type: Number, default: 0 },
@@ -60,10 +61,6 @@ const userSchema = new mongoose.Schema({
         // streak tracking
         dailyStreak: { type: Number, default: 0 },
         longestStreak: { type: Number, default: 0 },
-
-        // optional helpful stats
-        tasksCompletedToday: { type: Number, default: 0 },
-        tasksFailedYesterday: { type: Number, default: 0 }
     },
     failedTaskSnapshot: {
         resetAt: {

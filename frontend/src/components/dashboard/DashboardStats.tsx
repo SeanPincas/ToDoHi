@@ -6,6 +6,7 @@ const DashboardStats: React.FC = () => {
     // --------------------------- PLACEHOLDER DATA ---------------------------
     const stats = [
         { label: "Total Tasks Created", value: 100 },
+        { label: "Total Task Created Today", value: 25 },
         { label: "Total Task Completed", value: 75 },
         { label: "Total Tasks Today", value: 10 },
         { label: "Ongoing Tasks Today", value: 7 },
