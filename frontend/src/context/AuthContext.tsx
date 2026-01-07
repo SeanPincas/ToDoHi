@@ -29,6 +29,7 @@ interface User {
     quoteCategoryPreferences?: string[];
 
     stats?: {
+        totalTasksCreated: number;
         totalTasksCompleted: number;
         totalMemosCreated: number;
         totalDailyPlanCompleted: number;
@@ -39,6 +40,7 @@ interface User {
     };
 
     profilePicture?: string;
+    repeatCycleAcknowledged: string;
 }
 
 type ThemeType = "light" | "dark";

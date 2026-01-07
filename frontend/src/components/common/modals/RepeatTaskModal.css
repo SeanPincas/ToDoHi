@@ -1,0 +1,232 @@
+/* =======================================================================
+   RepeatTaskModal.css
+   Styling for daily repeat / cleanup modal
+   ======================================================================= */
+
+/* ==========================================================================
+   REPEAT TASK MODAL
+   ========================================================================== */
+
+.repeat-modal-overlay {
+    z-index: 999;
+    /* same as other modals */
+}
+
+/* ---------------- CARD ---------------- */
+
+.repeat-modal-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.repeat-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    /* tighter header */
+    font-size: 20px;
+    font-weight: 700;
+
+    margin-bottom: -6px;
+    /* reduce vertical space */
+}
+
+.repeat-modal-header h3 {
+    margin: 0;
+    /* REMOVE default top/bottom margin */
+}
+
+.repeat-modal-header svg {
+    font-size: 25px;
+    /* bigger */
+    color: #03680c;
+    /* green */
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.15));
+}
+
+/* ---------------- DESCRIPTION ---------------- */
+
+.repeat-modal-description {
+    font-size: 14px;
+    /* slightly bigger */
+    line-height: 1.45;
+
+    margin: 0;
+    /* REMOVE top & bottom margins */
+    padding: 2px 0 6px 0;
+    /* controlled spacing instead */
+
+    color: var(--text-main);
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   FILTER TABS (MATCH TODO PREVIEW)
+   ========================================================================== */
+
+.repeat-filter-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: -8px;
+}
+
+.repeat-filter-tabs button {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--blue-dark);
+    background: var(--white);
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+
+    transition: all 0.15s ease-in-out;
+}
+
+.repeat-filter-tabs button.active {
+    background: var(--blue-light);
+}
+
+/* ==========================================================================
+   TASK LIST
+   ========================================================================== */
+
+.repeat-task-list-wrapper {
+    /* Prevent modal collapse even if list is empty */
+    min-height: 300px;
+
+    /* Visual separation from description & buttons */
+    padding: 6px;
+    border-radius: 12px;
+
+    /* Subtle frame */
+    background: rgba(0, 0, 0, 0.03);
+    border: 3px dashed var(--blue-dark);
+}
+
+.repeat-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Hide scrollbar but keep scroll */
+.repeat-task-list::-webkit-scrollbar {
+    width: 0;
+}
+
+/* ---------------- TASK ITEM ---------------- */
+
+.repeat-task-item {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 2px solid var(--blue-dark);
+    background: var(--white);
+
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+
+.repeat-task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.repeat-task-checkbox {
+    display: flex;
+    align-items: center;
+    /* ✅ vertical center */
+    justify-content: center;
+}
+
+/* COMPLETED (GREEN) */
+/* COMPLETED (NEON GREEN) */
+.repeat-task-item.completed {
+    background: rgba(46, 204, 113, 0.22); /* brighter, true green */
+    border-color: rgba(13, 189, 13, 0.85);
+}
+
+/* FAILED (RED) */
+.repeat-task-item.failed {
+    background: rgba(255, 59, 48, 0.18);
+    border-color: rgba(255, 59, 48, 0.9);
+}
+
+/* SELECTED EMPHASIS */
+.repeat-task-item input:checked+.task-info,
+.repeat-task-item.selected {
+    box-shadow: inset 3px 0 0 var(--blue-dark);
+}
+
+/* ---------------- CHECKBOX ---------------- */
+
+.repeat-task-item input[type="checkbox"] {
+    margin-top: 3px;
+    pointer-events: none;
+}
+
+/* ---------------- TASK INFO ---------------- */
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.task-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.repeat-task-meta {
+    font-size: 11px;
+    opacity: 0.75;
+}
+
+/* ==========================================================================
+   ACTION BUTTONS
+   ========================================================================== */
+
+.repeat-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+/* ==========================================================================
+   RESPONSIVE (MATCH TODO PREVIEW BREAKPOINTS)
+   ========================================================================== */
+
+@media (max-width: 360px) {
+    .repeat-filter-tabs button {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+    .repeat-filter-tabs button {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 1351px) {
+    .repeat-filter-tabs {
+        grid-template-columns: repeat(3, auto);
+        justify-content: center;
+    }
+}

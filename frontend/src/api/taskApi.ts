@@ -53,11 +53,21 @@ export const markTaskComplete = async (taskId: string): Promise<Task> => {
     return res.data.task;
 };
 
-// REORDER tasks  <-- FIXED (correct URL + correct body key)
+// REORDER
 export const reorderTaskPositions = async (orderIds: string[]): Promise<void> => {
     await axios.put(
         `${API_URL}/reorder`,
         { orderIds },
         authHeaders()
     );
+};
+
+// REPEAT TASKS
+export const repeatTaskApi = async (repeatTaskIds: string[]) => {
+    const res = await axios.post(
+        `${API_URL}/repeat`,
+        { repeatTaskIds },
+        authHeaders()
+    );
+    return res.data;
 };

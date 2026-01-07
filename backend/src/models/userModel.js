@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    repeatCycleAcknowledged: {
+        type: String,
+        default: null
+    },
     stats: {
         totalTasksCreated: { type: Number, default: 0 },
         totalTasksCompleted: { type: Number, default: 0 },

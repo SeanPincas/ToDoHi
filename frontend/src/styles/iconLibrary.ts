@@ -25,6 +25,7 @@ import {
     RiTodoFill,
     RiCalendarTodoFill,
     RiBookOpenFill,
+    RiRepeat2Fill,
 
     // ---------------- FEEDBACK / ALERT ----------------
     RiErrorWarningFill,     // ⚠️ warning / danger / confirm delete
@@ -65,6 +66,7 @@ export const Icons = {
     Todo: RiTodoFill,
     Planner: RiCalendarTodoFill,
     Notebook: RiBookOpenFill,
+    Repeat: RiRepeat2Fill,
 
     // ---------------- ALERTS / FEEDBACK ----------------
     Warning: RiErrorWarningFill,     // used in DeleteConfirmModal

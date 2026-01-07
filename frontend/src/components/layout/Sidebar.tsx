@@ -247,8 +247,6 @@ const Sidebar = () => {
                                     {task.title}
                                 </li>
                             ))}
-
-
                         </ul>
                     </div>
                 </div>
