@@ -146,11 +146,12 @@
     position: absolute;
     top: calc(100% + 6px);
     left: 0;
+    font-size: 16px;
     width: 100%;
     background: white;
     border: 2px solid var(--blue-dark);
     border-radius: 10px;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
     /* prevent horizontal overflow */
@@ -171,7 +172,7 @@
 }
 
 .todo-dropdown-item {
-    padding: 10px 12px;
+    padding: 6px 15px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }

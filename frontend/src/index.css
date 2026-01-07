@@ -11,7 +11,7 @@
     --text-main: #000000;
 
     /* PRIMARY PALETTE FROM LOGO */
-    --blue-dark: #0e2d55;
+    --blue-dark: #0e2544;
     --blue-light: #5bb7ff;
 
     /* ACCENT COLORS */
@@ -24,7 +24,7 @@
 
     /* GUIDE ICONS */
     --guide-accent: #94a3b8;
-    --guide-accent-hover: var(--blue-dark);
+    --guide-accent-hover: #0e2544;
 
     /* BACKGROUND COLORS */
     --paper-bg: #f7f3e9;
@@ -120,8 +120,8 @@ body[data-theme="dark"] {
     --info-border: #7dd3fc;
 
     /* GUIDE ICONS */
-    --guide-accent: #64748b;
-    --guide-accent-hover: #e5e7eb;
+    --guide-accent: #ffffff;
+    --guide-accent-hover: #60a5fa;
 
     /* BACKGROUND COLORS */
     --paper-bg: #0b1220;

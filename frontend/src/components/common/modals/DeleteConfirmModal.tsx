@@ -7,7 +7,7 @@ import "./DeleteConfirmModal.css";
 
 // ------------------------------ COMPONENT ------------------------------
 const DeleteConfirmModal: React.FC = () => {
-    const { modal, closeModal, deleteTask } = useTodo();
+    const { modal, openModal, closeModal, deleteTask, fetchTasks } = useTodo();
 
     // ------------------ GUARD ------------------
     if (!modal.isOpen || modal.type !== "deleteConfirm") return null;
@@ -23,6 +23,8 @@ const DeleteConfirmModal: React.FC = () => {
             for (const id of taskIds) {
                 await deleteTask(id);
             }
+
+            await fetchTasks();
 
             closeModal();
         } catch (err) {
@@ -66,7 +68,13 @@ const DeleteConfirmModal: React.FC = () => {
                     {/* Cancel = just close modal */}
                     <button
                         className="btn-cancel"
-                        onClick={closeModal}
+                        onClick={() => {
+                            if (modal.data?.returnContext) {
+                                openModal("repeat", modal.data.returnContext);
+                            } else {
+                                closeModal();
+                            }
+                        }}
                     >
                         Cancel
                     </button>

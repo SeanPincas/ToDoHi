@@ -47,7 +47,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    repeatCycleAcknowledged: {
+        type: String,
+        default: null
+    },
     stats: {
+        totalTasksCreated: { type: Number, default: 0 },
         totalTasksCompleted: { type: Number, default: 0 },
         totalMemosCreated: { type: Number, default: 0 },
         totalDailyPlanCompleted: { type: Number, default: 0 },
@@ -59,6 +64,28 @@ const userSchema = new mongoose.Schema({
         // optional helpful stats
         tasksCompletedToday: { type: Number, default: 0 },
         tasksFailedYesterday: { type: Number, default: 0 }
+    },
+    failedTaskSnapshot: {
+        resetAt: {
+            type: Date
+        },
+        tasks: [
+            {
+                _id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    required: true
+                },
+                title: {
+                    type: String,
+                    required: true
+                },
+                status: {
+                    type: String,
+                    enum: ["failed"],
+                    required: true
+                }
+            }
+        ]
     },
     createdAt: {
         type: Date,

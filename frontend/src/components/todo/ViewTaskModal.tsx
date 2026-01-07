@@ -25,7 +25,9 @@ const ViewTaskModal = () => {
 
     const { modal, closeModal, updateTask, openModal } = useTodo();
     // ====================== 1️⃣ EXTRACT DATA (NO RETURNS) ======================
-    const task = modal?.data ?? null;
+    const task = modal?.data?.task ?? null;
+    const returnTo = modal?.data?.returnTo ?? null;
+    const returnContext = modal?.data?.returnContext ?? null;
     // ====================== 2️⃣ HOOKS (SAFE DEFAULTS) ==========================
     const [localStatus, setLocalStatus] = useState<TaskStatus>("pending");
 
@@ -42,6 +44,7 @@ const ViewTaskModal = () => {
     if (!modal.isOpen || modal.type !== "view" || !task) return null;
 
     const isFailed = localStatus === "failed";
+    const isFromRepeat = returnTo === "repeat";
     const failedReason = "Failed tasks are locked.";
 
     // Border color uses the task's saved containerColor
@@ -58,10 +61,18 @@ const ViewTaskModal = () => {
         await updateTask(task._id, { status: newStatus });
     };
 
+    const handleClose = () => {
+        if (returnTo === "repeat") {
+            openModal("repeat", returnContext);
+        } else {
+            closeModal();
+        }
+    };
+
     return (
         <div
             className="view-modal-overlay"
-            onMouseDown={closeModal} // click outside = close
+            onMouseDown={handleClose} // click outside = close
         >
             <div
                 className="view-modal-card"
@@ -74,7 +85,7 @@ const ViewTaskModal = () => {
 
                     <button
                         className="icon-btn-square"
-                        onClick={closeModal}
+                        onClick={handleClose}
                     >
                         <Icons.Close className="view-btn-icon" />
                     </button>
@@ -118,45 +129,47 @@ const ViewTaskModal = () => {
                 </div>
 
                 {/* ACTIONS ROW (SWITCH + EDIT + DELETE) */}
-                <div className="view-actions">
+                {!isFromRepeat && (
+                    <div className="view-actions">
 
-                    <div className="view-actions-left">
-                        {/* STATUS SWITCH */}
-                        <Switch
-                            checked={localStatus === "completed"}
-                            disabled={isFailed}
-                            disabledReason={failedReason}
-                            onToggle={handleToggleStatus}
-                        />
+                        <div className="view-actions-left">
+                            {/* STATUS SWITCH */}
+                            <Switch
+                                checked={localStatus === "completed"}
+                                disabled={isFailed}
+                                disabledReason={failedReason}
+                                onToggle={handleToggleStatus}
+                            />
+                        </div>
+
+                        <div className="view-actions-right">
+                            {/* EDIT BUTTON */}
+                            <button
+                                className="icon-btn-square"
+                                onClick={() =>
+                                    openModal("edit", {
+                                        task,
+                                        returnTo: "view",
+                                    })
+                                }
+                            >
+                                <Icons.Edit className="view-btn-icon" />
+                            </button>
+
+                            {/* DELETE BUTTON */}
+                            <button
+                                className="icon-btn-square delete"
+                                onClick={() => openModal("deleteConfirm", {
+                                    taskIds: [task._id]
+                                })}
+                            >
+                                <Icons.Delete className="view-btn-icon" />
+                            </button>
+                        </div>
                     </div>
-
-                    <div className="view-actions-right">
-                        {/* EDIT BUTTON */}
-                        <button
-                            className="icon-btn-square"
-                            onClick={() =>
-                                openModal("edit", {
-                                    task,
-                                    returnTo: "view",
-                                })
-                            }
-                        >
-                            <Icons.Edit className="view-btn-icon" />
-                        </button>
-
-                        {/* DELETE BUTTON */}
-                        <button
-                            className="icon-btn-square delete"
-                            onClick={() => openModal("deleteConfirm", {
-                                taskIds: [task._id]
-                            })}
-                        >
-                            <Icons.Delete className="view-btn-icon" />
-                        </button>
-                    </div>
-                </div>
+                )}
             </div>
-        </div >
+        </div>
     );
 };
 
