@@ -147,12 +147,15 @@
 }
 
 .repeat-task-checkbox {
+    width: 24px;
+    height: 24px;
+
     display: flex;
     align-items: center;
-    /* ✅ vertical center */
     justify-content: center;
-}
 
+    flex-shrink: 0;   /* ❗ prevents overlay / dead zones */
+}
 /* COMPLETED (GREEN) */
 /* COMPLETED (NEON GREEN) */
 .repeat-task-item.completed {

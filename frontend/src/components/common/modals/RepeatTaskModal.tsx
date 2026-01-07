@@ -33,7 +33,7 @@ const RepeatTaskModal: React.FC = () => {
         return tasks.filter(t => t.status === filter);
     }, [tasks, filter]);
 
-        // ------------------ GUARD ------------------
+    // ------------------ GUARD ------------------
     if (!modal.isOpen || modal.type !== "repeat") return null;
 
     // ------------------ TOGGLES -----------------
@@ -42,6 +42,15 @@ const RepeatTaskModal: React.FC = () => {
             const next = new Set(prev);
             next.has(taskId) ? next.delete(taskId) : next.add(taskId);
             return next;
+        });
+    };
+
+    // ------------------ VIEW TASK ------------------
+    const handleViewTask = (task: Task) => {
+        openModal("view", {
+            task,
+            returnTo: "repeat",
+            returnContext: modal.data
         });
     };
 
@@ -99,9 +108,11 @@ const RepeatTaskModal: React.FC = () => {
                 <p className="repeat-modal-description">
                     These are your <strong>Completed </strong>and <strong>Failed </strong>tasks from the previous day.
                     <br />
-                    Choose which task/s you would like to repeat for today.
+                    <strong>Choose </strong>which task/s you would like to repeat for <strong>Today</strong>.
                     <br />
-                    The <strong>UNSELECTED </strong>tasks will be permanently deleted.
+                    The <strong>UNSELECTED </strong>tasks will be <strong>Permanently Deleted</strong>.
+                    <br />
+                    Cannot move to the Main Page, without taking <strong>ACTION</strong>.
                 </p>
 
                 {/* ================= FILTER TABS ================= */}
@@ -121,35 +132,42 @@ const RepeatTaskModal: React.FC = () => {
                 {/* ================= TASK LIST ================= */}
                 <div className="repeat-task-list-wrapper">
                     <div className="repeat-task-list">
-                    {visibleTasks.map((task: Task) => {
-                        const isSelected = selected.has(task._id);
+                        {visibleTasks.map((task: Task) => {
+                            const isSelected = selected.has(task._id);
 
-                        return (
-                            <div
-                                key={task._id}
-                                className={`repeat-task-item ${task.status}`}
-                                onClick={() => toggleTask(task._id)}
-                            >
-                                <div className="repeat-task-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={isSelected}
-                                        readOnly
-                                    />
-                                </div>
+                            return (
+                                <div
+                                    key={task._id}
+                                    className={`repeat-task-item ${task.status}`}
+                                    onClick={() => handleViewTask(task)}
+                                >
+                                    {/* CHECKBOX — selection only */}
+                                    <div
+                                        className="repeat-task-checkbox"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // ❗ stops view modal
+                                            toggleTask(task._id);
+                                        }}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            readOnly
+                                        />
+                                    </div>
 
-                                <div className="task-info">
-                                    <span className="task-title">
-                                        {task.title}
-                                    </span>
-                                    <span className="repeat-task-meta">
-                                        {task.category} * {task.status}
-                                    </span>
+                                    <div className="task-info">
+                                        <span className="task-title">
+                                            {task.title}
+                                        </span>
+                                        <span className="repeat-task-meta">
+                                            {task.category} * {task.status}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* ================= ACTIONS ================= */}
