@@ -111,3 +111,23 @@
 .btn-secondary-rect:hover {
     background: #ebebeb;
 }
+
+/* GREEN RECTANGLE BUTTON */
+.btn-green-rect {
+    width: 100%;
+    padding: 12px 18px;
+
+    background: #02bd21;
+    border: 2px solid var(--blue-dark);
+    border-radius: 12px;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-green-rect:hover {
+    background: #058a17;
+}

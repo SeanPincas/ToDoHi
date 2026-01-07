@@ -82,6 +82,11 @@ async function handleDailyReset(now) {
             `[Scheduler] Reset detected for user ${userId} → ${currentResetKey}`
         );
 
+        // New reset cycle → user must handle repeat tasks again
+        await User.findByIdAndUpdate(user._id, {
+            repeatCycleAcknowledged: null
+        });
+
         // Run daily stats (already per-user internally)
         await runDailyStats();
 
