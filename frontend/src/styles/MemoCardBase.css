@@ -1,0 +1,76 @@
+/* ============================================================================
+   memoCardBase.css
+   Standard memo card base styling
+   Fixed size, no layout shift
+   ============================================================================ */
+
+.memo-card {
+    position: absolute;
+
+    width: 220px;
+    height: 160px;
+
+    border-radius: 10px;
+    padding: 10px 12px;
+
+    box-shadow:
+        0 8px 16px rgba(0, 0, 0, 0.25);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.memo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.memo-card-category {
+    font-size: 1.2rem;
+}
+
+.memo-card-pin {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* ---------------- CONTENT ---------------- */
+
+.memo-card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+
+.memo-card-content {
+    font-size: 0.85rem;
+    margin-top: 4px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    /* -------- STANDARD (future-proof) -------- */
+    display: box;
+    line-clamp: 3;
+    box-orient: vertical;
+
+    /* -------- WEBKIT FALLBACK -------- */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* ---------------- FOOTER ---------------- */
+
+.memo-card-footer {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}

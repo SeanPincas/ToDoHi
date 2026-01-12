@@ -39,6 +39,11 @@ const memoSchema = new mongoose.Schema({
         default: '#ffffff', // fallback color
         match: /^#([0-9A-F]{3}){1,2}$/i
     },
+    pinColor: {
+        type: String,
+        default: "#d32f2f",
+        match: /^#([0-9A-F]{3}){1,2}$/i
+    },
     position: {
         x: { type: Number, default: 0 },
         y: { type: Number, default: 0 },
@@ -48,7 +53,7 @@ const memoSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    updateAt: {
+    updatedAt: {
         type: Date,
         default: Date.now
     }

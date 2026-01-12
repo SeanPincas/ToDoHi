@@ -17,6 +17,40 @@
     box-shadow: 3px 0px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* ---------------- DESKTOP COLLAPSE BUTTON ---------------- */
+
+.sidebar-collapse-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--white);
+    border: 2px solid var(--blue-dark);
+    border-radius: 8px;
+
+    cursor: pointer;
+    z-index: 1001;
+
+    box-shadow: var(--shadow-soft);
+}
+
+.sidebar-collapse-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sidebar-collapse-btn:hover {
+    background: var(--paper-bg);
+}
+
+
 /* --------------------------- LOGO & QUOTE --------------------------- */
 
 .logo-section {

@@ -2,10 +2,12 @@ const Memo = require("../models/memoModel.js");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 
+const { getNextZIndex, bringMemoToFront, sendMemoToBack } = require("../utils/memoboard")
+
 // --------------------------- CREATE MEMO MANUALLY ---------------------------
 exports.createMemo = async (req, res) => {
     try {
-        const { title, content, category, containerColor, position } = req.body
+        const { title, content, category, containerColor, pinColor, position } = req.body
 
         const validCategories = [
             'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
@@ -14,14 +16,21 @@ exports.createMemo = async (req, res) => {
             'shopping', 'travel', 'others'
         ];
 
+        const nextZ = await getNextZIndex(req.user._id);
+
         const newMemo = await Memo.create({
             userId: req.user._id,
             title,
             content,
             category: validCategories.includes(category) ? category : "others",
             containerColor: containerColor || "#ffffff",
-            position: position || { x: 0, y: 0, z: 1 }
-        })
+            pinColor: pinColor || "#d32f2f",
+            position: {
+                x: position?.x ?? 0,
+                y: position?.y ?? 0,
+                z: nextZ
+            }
+        });
 
         // ---------------- STATS: increment totalMemosCreated ----------------
         await User.findByIdAndUpdate(
@@ -38,7 +47,7 @@ exports.createMemo = async (req, res) => {
 // --------------------------- CREATE MEMO FROM TASK ---------------------------
 exports.createMemoFromTask = async (req, res) => {
     try {
-        const { taskId } = req.body;
+        const { taskId, pinColor } = req.body;
 
         const validCategories = [
             'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
@@ -47,30 +56,41 @@ exports.createMemoFromTask = async (req, res) => {
             'shopping', 'travel', 'others'
         ];
 
-        const task = await Task.findOne({ _id: taskId, userId: req.user._id });
+        const task = await Task.findOne({
+            _id: taskId,
+            userId: req.user._id
+        });
+
         if (!task) return res.status(404).json({ message: "Task Not Found" });
 
         const category = validCategories.includes(task.category)
             ? task.category
             : "others";
 
+        // Determine next zIndex
+        const nextZ = await getNextZIndex(req.user._id);
+
         // Copy the Task data into the Memo
-        const memoData = {
+        const newMemo = await Memo.create({
             userId: req.user._id,
+            taskSourceId: task._id,
             title: task.title,
             content: task.description || "",
             category: category,
             containerColor: task.containerColor || "#ffffff",
-            taskSourceId: task._id
-        };
+            pinColor: pinColor || "#d32f2f",
+            position: {
+                x: 0,
+                y: 0,
+                z: nextZ
+            }
+        });
 
         // ---------------- STATS: increment totalMemosCreated ----------------
         await User.findByIdAndUpdate(
             req.user._id,
             { $inc: { "stats.totalMemosCreated": 1 } }
         );
-
-        const newMemo = await Memo.create(memoData);
 
         res.status(201).json({ message: "Memo Created From Task", memo: newMemo });
     } catch (err) {
@@ -93,11 +113,24 @@ exports.getAllMemos = async (req, res) => {
 exports.updateMemo = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+
+        const {
+            title,
+            content,
+            category,
+            containerColor,
+            pinColor
+        } = req.body
 
         const updateMemo = await Memo.findOneAndUpdate(
             { _id: id, userId: req.user._id },
-            updates,
+            {
+                title,
+                content,
+                category,
+                containerColor,
+                pinColor
+            },
             { new: true }
         )
 
@@ -113,20 +146,51 @@ exports.updateMemo = async (req, res) => {
 exports.updateMemoPosition = async (req, res) => {
     try {
         const { id } = req.params;
-        const { x, y, z } = req.body;
+        const { x, y } = req.body;
 
         const updateMemo = await Memo.findOneAndUpdate(
             { _id: id, userId: req.user._id },
-            { "position.x": x, "position.y": y, "position.z": z },
+            { "position.x": x, "position.y": y },
             { new: true }
         );
-
 
         if (!updateMemo) return res.status(404).json({ message: "Memo Not Found" });
 
         res.json({ message: "Memo Position Updated", memo: updateMemo });
     } catch (err) {
         res.status(500).json({ message: "Error Updating Memo Position", error: err.message })
+    }
+};
+
+// -------------------------- BRING MEMO TO FRONT ------------------------------
+exports.bringMemoToFront = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedMemo = await bringMemoToFront(id, req.res._id);
+
+        if (!updatedMemo) {
+            return res.status(404).json({ message: "Memo Not Found" });
+        }
+
+        res.json({ message: "Memo brought to front", memo: updatedMemo });
+    } catch (err) {
+        res.status(500).json({ message: "Error bringing memo to front",error: err.message })
+    }
+}
+
+// -------------------------- SEND MEMO TO BACK -------------------------------
+exports.sendMemoToBack = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedMemo = await sendMemoToBack(id, req.user._id);
+
+        if (!updatedMemo) {
+            return res.status(404).json({ message: "Memo Not Found" });
+        }
+
+        res.json({ message: "Memo brought to front", memo: updatedMemo });
+    } catch (err) {
+        res.status(500).json({ message: "Error bringing memo to front", error: err.message });
     }
 };
 

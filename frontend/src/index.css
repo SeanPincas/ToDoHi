@@ -41,6 +41,18 @@
 
     /* COMMON SHADOW */
     --shadow-soft: 0px 2px 5px rgba(0, 0, 0, 0.15);
+
+    /* ===================== MEMO BOARD THEME ===================== */
+
+    /* Wooden Frame (Light Birch) */
+    --memo-frame-bg-1: #e8d7b9;
+    --memo-frame-bg-2: #d9c4a3;
+
+    /* Frame Header Overlay */
+    --memo-frame-header-bg: rgba(255, 255, 255, 0.35);
+
+    /* Cork Board */
+    --memo-cork-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
 }
 
 /* Apply font and general body styling */
@@ -141,4 +153,16 @@ body[data-theme="dark"] {
 
     /* SHADOW */
     --shadow-soft: 0px 2px 8px rgba(0, 0, 0, 0.6);
+
+    /* ----------------------- MEMO BOARD (DARK) ----------------------------- */
+
+    /* Wooden Frame (Dark Oak) */
+    --memo-frame-bg-1: #4b3621;
+    --memo-frame-bg-2: #2f1e12;
+
+    /* Frame Header Overlay */
+    --memo-frame-header-bg: rgba(0, 0, 0, 0.35);
+
+    /* Cork Board */
+    --memo-cork-shadow: inset 0 0 14px rgba(0, 0, 0, 0.55);
 }

@@ -13,6 +13,7 @@ import {
     // ---------------- NAV / MENU ----------------
     RiMenuFill,
     RiArrowDownSLine,
+    RiArrowLeftSLine,
     RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------
@@ -54,6 +55,7 @@ export const Icons = {
     // ---------------- NAVIGATION ----------------
     Menu: RiMenuFill,
     DropdownArrow: RiArrowDownSLine,
+    SidebarCollapse: RiArrowLeftSLine,
     Drag: RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------

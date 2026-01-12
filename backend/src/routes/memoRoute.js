@@ -5,9 +5,15 @@ const authMiddleware = require("../middleware/authMiddleware.js");
 
 router.post("/", authMiddleware, memoController.createMemo);
 router.post("/from-task", authMiddleware, memoController.createMemoFromTask);
+
 router.get("/", authMiddleware, memoController.getAllMemos);
+
 router.put("/:id", authMiddleware, memoController.updateMemo);
 router.put("/:id/position", authMiddleware, memoController.updateMemoPosition);
+
+router.put("/:id/bring-to-front", authMiddleware, memoController.bringMemoToFront);
+router.put("/:id/send-to-back", authMiddleware, memoController.sendMemoToBack);
+
 router.delete("/:id", authMiddleware, memoController.deleteMemo);
 
 module.exports = router;
