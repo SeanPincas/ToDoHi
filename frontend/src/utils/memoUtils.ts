@@ -44,37 +44,80 @@ export function getMemoCategoryEmoji(category?: string): string {
 }
 
 // ============================================================================
-// 2. MEMO CONTAINER COLOR (LIGHT SHADE ONLY)
+// 2. MEMO CONTAINER COLORS (LIGHT SHADES ONLY)
+// COPY-PASTE SNAPSHOT FROM TASK COLORS (DECOUPLED)
 // ============================================================================
 
-/**
- * Converts a task container color into a memo-friendly light shade.
- * Memo cards should ALWAYS be light for readability.
- */
-export function getMemoContainerColor(taskColor?: string): string {
-    if (!taskColor || !/^#([0-9A-F]{3}){1,2}$/i.test(taskColor)) {
-        return "#ffffff"; // default memo paper
+export const MEMO_CONTAINER_COLORS = {
+    blue: "#cfe7ff",
+    red: "#ffdad6",
+    yellow: "#fff2b3",
+    green: "#d3f8df",
+    orange: "#ffe1c4",
+    purple: "#e4d6ff",
+    pink: "#ffd6ec",
+    teal: "#c8f7f4",
+    beige: "#fff3e0",
+    white: "#ffffff",
+    grey: "#e0e0e0",
+    black: "#4a4a4a",
+} as const;
+
+export type MemoContainerColorKey = keyof typeof MEMO_CONTAINER_COLORS;
+
+const TASK_COLOR_GROUPS: Record<MemoContainerColorKey, string[]> = {
+    blue: ["#cfe7ff", "#4a90e2", "#1f5fa1"],
+    red: ["#ffdad6", "#ff6b6b", "#c73838"],
+    yellow: ["#fff2b3", "#ffd93b", "#c9a41c"],
+    green: ["#d3f8df", "#4cd964", "#2f9e45"],
+    orange: ["#ffe1c4", "#ff9f43", "#cc6b14"],
+    purple: ["#e4d6ff", "#9c6bff", "#6e3acb"],
+    pink: ["#ffd6ec", "#ff6fb5", "#d14a87"],
+    teal: ["#c8f7f4", "#32d1c6", "#1a938c"],
+    beige: ["#fff3e0", "#ffd7a0", "#cfa272"],
+    white: ["#ffffff", "#f7f7f7", "#e6e6e6"],
+    grey: ["#e0e0e0", "#a6a6a6", "#5a5a5a"],
+    black: ["#4a4a4a", "#1f1f1f", "#000000"],
+};
+
+// ============================================================================
+// RESOLVER: TASK HEX → MEMO LIGHT COLOR
+// ============================================================================
+
+export function resolveMemoContainerColor (
+    taskContainerColor?: string
+): string {
+    if (!taskContainerColor) {
+        return MEMO_CONTAINER_COLORS.white;
     }
 
-    const hex = taskColor.replace("#", "");
-    const fullHex =
-        hex.length === 3
-            ? hex.split("").map(c => c + c).join("")
-            : hex;
+    const normalized = taskContainerColor.toLowerCase();
 
-    const num = parseInt(fullHex, 16);
+    for (const key in TASK_COLOR_GROUPS) {
+        const shades = TASK_COLOR_GROUPS[key as MemoContainerColorKey];
 
-    let r = (num >> 16) & 255;
-    let g = (num >> 8) & 255;
-    let b = num & 255;
+        if (shades.includes(normalized)) {
+            return MEMO_CONTAINER_COLORS[key as MemoContainerColorKey];
+        }
+    }
 
-    // Lighten the color significantly
-    r = Math.min(255, Math.floor(r + (255 - r) * 0.6));
-    g = Math.min(255, Math.floor(g + (255 - g) * 0.6));
-    b = Math.min(255, Math.floor(b + (255 - b) * 0.6));
-
-    return `rgb(${r}, ${g}, ${b})`;
+    return MEMO_CONTAINER_COLORS.white;
 }
+
+export function getMemoContainerColorByKey(
+    taskColorKey?: MemoContainerColorKey
+): string {
+    if (!taskColorKey) {
+        return MEMO_CONTAINER_COLORS.white;
+    }
+
+    return (
+        MEMO_CONTAINER_COLORS[taskColorKey] ??
+        MEMO_CONTAINER_COLORS.white
+    );
+}
+
+
 
 // ============================================================================
 // 3. MEMO PIN COLORS (ONE TRUTH)

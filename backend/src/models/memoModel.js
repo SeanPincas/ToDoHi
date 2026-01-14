@@ -59,9 +59,4 @@ const memoSchema = new mongoose.Schema({
     }
 });
 
-memoSchema.pre("save", function (next) {
-    this.updateAt = new Date();
-    next();
-});
-
 module.exports = mongoose.model("Memo", memoSchema);

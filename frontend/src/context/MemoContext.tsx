@@ -26,10 +26,26 @@ import {
 // ------------------------------------ TYPES ------------------------------------
 type BoardMode = "view" | "edit";
 
+/** Modal types for Memo Board */
+export type MemoModalType =
+    | "add"
+    | "edit"
+    | "view"
+    | "deleteConfirm"
+    | null;
+
 interface MemoContextType {
     memos: Memo[];
     loading: boolean;
     boardMode: BoardMode;
+
+    // ---------------- MODAL STATE ----------------
+    activeModal: MemoModalType;
+    activeMemo: Memo | null;
+
+    // ---------------- SELECTION STATE ----------------
+    activeMemoId: string | null;
+    setActiveMemoId: (id: string | null) => void;
 
     // actions
     loadMemos: () => Promise<void>;
@@ -40,6 +56,10 @@ interface MemoContextType {
     bringMemoForward: (id: string) => Promise<void>;
     sendMemoBackward: (id: string) => Promise<void>;
     removeMemo: (id: string) => Promise<void>;
+
+    // ---------------- MODAL ACTIONS ----------------
+    openModal: (type: MemoModalType, memo?: Memo | null) => void;
+    closeModal: () => void;
 
     setBoardMode: (mode: BoardMode) => void;
 }
@@ -63,6 +83,34 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [memos, setMemos] = useState<Memo[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [boardMode, setBoardMode] = useState<BoardMode>("view");
+
+    // ---------------- MODAL STATE ----------------
+    const [activeModal, setActiveModal] = useState<MemoModalType>(null);
+    const [activeMemo, setActiveMemo] = useState<Memo | null>(null);
+
+    // ---------------- SELECTION STATE ----------------
+    const [activeMemoId, setActiveMemoId] = useState<string | null>(null);
+
+    // -------------------------------------------------------------------------
+    // AUTO BRING MEMO TO FRONT WHEN SELECTED
+    // -------------------------------------------------------------------------
+    useEffect(() => {
+        if (!activeMemoId) return;
+
+        // Find the selected memo
+        const target = memos.find(m => m._id === activeMemoId);
+        if (!target) return;
+
+        // Find current highest z-index
+        const highestZ = Math.max(
+            ...memos.map(m => m.position?.z ?? 0)
+        );
+
+        // Only bring forward IF it's not already on top
+        if ((target.position?.z ?? 0) < highestZ) {
+            bringMemoForward(activeMemoId);
+        }
+    }, [activeMemoId]); // ← IMPORTANT: ONLY reacts to selection
 
     // -------------------------------------------------------------------------
     //                              LOAD ALL MEMOS
@@ -139,6 +187,19 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // -------------------------------------------------------------------------
+    //                               MODAL CONTROL
+    // -------------------------------------------------------------------------
+    const openModal = (type: MemoModalType, memo: Memo | null = null) => {
+        setActiveModal(type);
+        setActiveMemo(memo);
+    };
+
+    const closeModal = () => {
+        setActiveModal(null);
+        setActiveMemo(null);
+    };
+
+    // -------------------------------------------------------------------------
     //                               INITIAL LOAD
     // -------------------------------------------------------------------------
     useEffect(() => {
@@ -155,6 +216,12 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 loading,
                 boardMode,
 
+                activeModal,
+                activeMemo,
+
+                activeMemoId,
+                setActiveMemoId,
+
                 loadMemos,
                 addMemo,
                 addMemoFromTask,
@@ -163,6 +230,9 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 bringMemoForward,
                 sendMemoBackward,
                 removeMemo,
+
+                openModal,
+                closeModal,
 
                 setBoardMode
             }}

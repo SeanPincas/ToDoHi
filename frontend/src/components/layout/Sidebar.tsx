@@ -91,7 +91,7 @@ const Sidebar = () => {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                // ---------------- QUOTE PREFERENCE (FIXED) ----------------
+                // ---------------- QUOTE PREFERENCE  ----------------
                 if (Array.isArray(user?.quoteCategoryPreferences)) {
                     const preferred = user.quoteCategoryPreferences[0];
                     if (preferred) {
