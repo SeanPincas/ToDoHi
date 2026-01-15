@@ -10,23 +10,32 @@
     padding: 20px;
 }
 
+/* MATCH DASHBOARD OFFSET BEHAVIOR */
+@media (min-width: 1400px) {
+    .memo-board-page {
+        padding-left: clamp(0px, 18vw, 300px);
+    }
+}
+
 /* ============================ FRAME ============================ */
 
 .memo-board-frame {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 1400px;
-    height: 100%;
 
-    padding: 18px;
+    width: 100%;
+    max-width: 1550px;
+    /* ⬅️ EXPANDED (was 1400px) */
+    min-height: 820px;
+    /* ⬅️ FIXED BOARD PRESENCE */
+
+    padding: 22px;
+    /* ⬅️ slightly roomier */
     border-radius: 18px;
 
-    background: linear-gradient(
-        135deg,
-        var(--memo-frame-bg-1),
-        var(--memo-frame-bg-2)
-    );
+    background: linear-gradient(135deg,
+            var(--memo-frame-bg-1),
+            var(--memo-frame-bg-2));
 
     box-shadow:
         inset 0 0 0 4px rgba(0, 0, 0, 0.12),
@@ -37,20 +46,47 @@
 
 .memo-board-topbar {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
 
-    padding: 10px 14px;
-    margin-bottom: 12px;
+    padding: 14px 18px;
+    /* ⬅️ taller header */
+    margin-bottom: 14px;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
     background: var(--memo-frame-header-bg);
+}
+
+/* ============================ TITLE ============================ */
+.memo-board-title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: center; /* ⬅️ THIS IS THE KEY */
+    text-align: center;
+    line-height: 1.1;
+    gap: 4px;
+}
+
+.memo-board-title {
+    font-size: 2.3rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--blue-dark);
+}
+
+.memo-board-edit-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--info-accent);
 }
 
 /* ============================ NAV ============================ */
 
 .memo-nav-btn {
+    justify-self: start;
     background: none;
     border: none;
     font-size: 0.9rem;
@@ -61,15 +97,25 @@
 /* ============================ TOOLBAR ============================ */
 
 .memo-board-toolbar {
+    justify-self: end;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-.memo-edit-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--info-accent);
+.memo-toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-green-rect svg,
+.btn-primary-rect svg,
+.btn-info-rect svg,
+.btn-secondary-rect svg {
+    font-size: 1.25rem;
+    /* ⬅️ increase icon size */
 }
 
 /* ============================ CORK BOARD ============================ */
@@ -78,13 +124,19 @@
     flex: 1;
     position: relative;
 
-    border-radius: 12px;
-    padding: 18px;
+    min-height: 620px;
+    /* ⬅️ EXPANDED CORK AREA */
+    padding: 24px;
+    /* ⬅️ board breathing space */
 
-    /* ✅ YOUR CORK TEXTURE */
+    border-radius: 14px;
+
+    /* CORK TEXTURE */
     background-image: url("../assets/cork-board.jpg");
     background-size: cover;
-    background-repeat: repeat;
+    /* stretch proportionally */
+    background-repeat: no-repeat;
+    /* SINGLE image */
     background-position: center;
 
     box-shadow: var(--memo-cork-shadow);
@@ -96,4 +148,10 @@
 .memo-board-empty {
     color: var(--text-main);
     opacity: 0.75;
+}
+
+@media (max-width: 1024px) {
+    .memo-toolbar-text {
+        display: none;
+    }
 }

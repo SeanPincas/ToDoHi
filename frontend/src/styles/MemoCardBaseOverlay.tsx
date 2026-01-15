@@ -1,66 +1,54 @@
 // ============================================================================
 // MemoCardBaseOverlay.tsx
-// Enforces standard memo card shape and preview rules
 // ============================================================================
 
-import React from "react";
-import "../styles/memoCardBase.css";
+import "./MemoCardBaseOverlay.css";
 
-interface Props {
-    containerColor: string;
-    textColor: string;
-    categoryEmoji: string;
-    pinColor: string;
+interface MemoCardBaseOverlayProps {
     title: string;
-    previewText: string;
-    zIndex: number;
-    x: number;
-    y: number;
-    onClick?: () => void;
+    content?: string;
+    categoryEmoji?: string;
+    containerColor: string;
+    pinColor: string;
+    isActive?: boolean;
 }
 
-const MemoCardBaseOverlay: React.FC<Props> = ({
-    containerColor,
-    textColor,
-    categoryEmoji,
-    pinColor,
+const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     title,
-    previewText,
-    zIndex,
-    x,
-    y,
-    onClick
+    content,
+    categoryEmoji,
+    containerColor,
+    pinColor,
+    isActive = false,
 }) => {
     return (
         <div
-            className="memo-card"
-            style={{
-                backgroundColor: containerColor,
-                color: textColor,
-                zIndex,
-                transform: `translate(${x}px, ${y}px)`
-            }}
-            onClick={onClick}
+            className={`memo-card-overlay ${isActive ? "active" : ""}`}
+            style={{ backgroundColor: containerColor }}
         >
-            <div className="memo-card-header">
-                <span className="memo-card-category">
-                    {categoryEmoji}
-                </span>
-                <span
-                    className="memo-card-pin"
-                    style={{ backgroundColor: pinColor }}
-                />
-            </div>
 
-            <div>
-                <div className="memo-card-title">{title}</div>
-                <div className="memo-card-content">
-                    {previewText}
+            {/* ---------------- PIN ---------------- */}
+            <div
+                className="memo-pin"
+                style={{ backgroundColor: pinColor }}
+            />
+
+            {/* ---------------- CONTENT ---------------- */}
+            <div className="memo-card-paper">
+                <div className="memo-header">
+                    <h4 className="memo-title">
+                        {title}
+                    </h4>
+                    {categoryEmoji && (
+                        <span className="memo-category">
+                            {categoryEmoji}
+                        </span>
+                    )}
                 </div>
-            </div>
+                <p className="memo-content">
+                    {content || "No content"}
+                </p>
 
-            <div className="memo-card-footer">
-                Memo
             </div>
         </div>
     );

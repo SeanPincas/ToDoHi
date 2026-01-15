@@ -11,6 +11,10 @@ import { Icons } from "../styles/iconLibrary";
 
 import "./MemoBoardPage.css";
 
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { restrictToParentElement } from "@dnd-kit/modifiers";
+import DraggableMemoItem from "../components/memo/DraggableMemoItem";
+
 // ----------------------------------------------------------------------------
 // PAGE COMPONENT
 // ----------------------------------------------------------------------------
@@ -21,7 +25,8 @@ const MemoBoardPage: React.FC = () => {
         loading,
         boardMode,
         setBoardMode,
-        addMemo
+        openModal,
+        moveMemo
     } = useMemoContext();
 
     const navigate = useNavigate();
@@ -31,12 +36,23 @@ const MemoBoardPage: React.FC = () => {
     // -------------------------------------------------------------------------
 
     const handleAddMemo = async () => {
-        await addMemo({
-            title: "New Memo",
-            content: "",
-            containerColor: "#ffffff",
-            pinColor: "#cc0000"
-        });
+        openModal("add");
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, delta } = event;
+
+        if (!active || !delta) return;
+
+        const memoId = active.id as string;
+        const memo = memos.find(m => m._id === memoId);
+
+        if (!memo) return;
+
+        const newX = memo.position.x + delta.x;
+        const newY = memo.position.y + delta.y;
+
+        moveMemo(memoId, newX, newY);
     };
 
     // -------------------------------------------------------------------------
@@ -59,8 +75,15 @@ const MemoBoardPage: React.FC = () => {
                     </button>
 
                     {/* -------- CENTER -------- */}
-                    <div className="memo-board-title">
-                        Memo Board
+                    <div className="memo-title-group">
+                        <div className="memo-board-title">
+                            Memo Board
+                        </div>
+                        {boardMode === "edit" && (
+                            <div className="memo-board-edit-label">
+                                EDIT MODE
+                            </div>
+                        )}
                     </div>
 
                     {/* -------- RIGHT -------- */}
@@ -74,7 +97,7 @@ const MemoBoardPage: React.FC = () => {
                                     onClick={handleAddMemo}
                                 >
                                     <Icons.Add />
-                                    Add
+                                    <span className="memo-toolbar-text">Add</span>
                                 </button>
 
                                 <button
@@ -82,7 +105,7 @@ const MemoBoardPage: React.FC = () => {
                                     onClick={() => setBoardMode("edit")}
                                 >
                                     <Icons.Drag />
-                                    Rearrange
+                                    <span className="memo-toolbar-text">Rearrange</span>
                                 </button>
                             </>
                         )}
@@ -90,23 +113,21 @@ const MemoBoardPage: React.FC = () => {
                         {/* ---------------- EDIT MODE ---------------- */}
                         {boardMode === "edit" && (
                             <>
-                                <span className="memo-edit-label">
-                                    EDIT MODE
-                                </span>
-
-                                <button className="btn-secondary-rect">
-                                    Send to Back
+                                <button className="btn-secondary-rect memo-toolbar-btn">
+                                    <Icons.DropdownArrow />
+                                    <span className="memo-toolbar-text">Send to Back</span>
                                 </button>
-
-                                <button className="btn-secondary-rect">
-                                    Bring to Front
+                                <button className="btn-secondary-rect memo-toolbar-btn">
+                                    <Icons.ArrowUp />
+                                    <span className="memo-toolbar-text">Bring to Front</span>
                                 </button>
 
                                 <button
-                                    className="btn-green-rect"
+                                    className="btn-green-rect memo-toolbar-btn"
                                     onClick={() => setBoardMode("view")}
                                 >
-                                    Done
+                                    <Icons.Confirm />
+                                    <span className="memo-toolbar-text">Done</span>
                                 </button>
                             </>
                         )}
@@ -114,21 +135,32 @@ const MemoBoardPage: React.FC = () => {
                 </div>
 
                 {/* ======================= CORK BOARD ======================= */}
-                <div className="memo-board-canvas">
-                    {loading && (
-                        <div className="memo-board-loading">
-                            Loading memos…
-                        </div>
-                    )}
+                <DndContext
+                    onDragEnd={handleDragEnd}
+                    modifiers={[restrictToParentElement]}
+                >
+                    <div className="memo-board-canvas">
+                        {loading && (
+                            <div className="memo-board-loading">
+                                Loading memos…
+                            </div>
+                        )}
 
-                    {!loading && memos.length === 0 && (
-                        <div className="memo-board-empty">
-                            No memos yet. Click “Add” to get started.
-                        </div>
-                    )}
+                        {!loading && memos.length === 0 && (
+                            <div className="memo-board-empty">
+                                No memos yet. Click “Add” to get started.
+                            </div>
+                        )}
 
-                    {/* MemoCardBaseOverlay will be rendered here next */}
-                </div>
+                        {!loading && memos.map((memo) => (
+                            <DraggableMemoItem
+                                key={memo._id}
+                                memo={memo}
+                                isEditMode={boardMode === "edit"}
+                            />
+                        ))}
+                    </div>
+                </DndContext>
             </div>
         </div>
     );

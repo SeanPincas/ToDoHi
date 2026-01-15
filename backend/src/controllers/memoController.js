@@ -77,7 +77,7 @@ exports.createMemoFromTask = async (req, res) => {
             title: task.title,
             content: task.description || "",
             category: category,
-            containerColor: task.containerColor || "#ffffff",
+            containerColor: task.containerColor || "#fff2b3",
             pinColor: pinColor || "#d32f2f",
             position: {
                 x: 0,
@@ -166,7 +166,7 @@ exports.updateMemoPosition = async (req, res) => {
 exports.bringMemoToFront = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedMemo = await bringMemoToFront(id, req.res._id);
+        const updatedMemo = await bringMemoToFront(id, req.user._id);
 
         if (!updatedMemo) {
             return res.status(404).json({ message: "Memo Not Found" });

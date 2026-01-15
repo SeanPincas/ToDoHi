@@ -1,0 +1,166 @@
+/* ================== MemoCardBaseOverlay.css =========================== */
+
+.memo-card-overlay {
+    position: relative;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+
+    /* ---------------- FIXED SIZE ---------------- */
+    width: 220px;
+    height: 180px;
+
+    background: transparent;
+    /* sticky-note yellow */
+    border-radius: 6px;
+
+    box-shadow:
+        0 6px 12px rgba(0, 0, 0, 10);
+
+    padding: 14px 12px 12px;
+
+    font-family: "Kalam", cursive;
+
+    /* Prevent content from breaking layout */
+    overflow: hidden;
+}
+
+.memo-card-overlay.active {
+    box-shadow:
+        0 0 0 2px var(--info-accent),
+        0 0 12px rgba(0, 150, 255, 0.45);
+    transform: scale(1.01);
+}
+
+/* ============================ PIN ============================ */
+
+.memo-pin {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 10);
+}
+
+/* ============================ CONTENT ============================ */
+
+.memo-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ============================ HEADER ============================ */
+.memo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* LEFT title, RIGHT emoji */
+    gap: 6px;
+}
+
+
+/* ============================ TITLE ============================ */
+
+.memo-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 6px 0 0 0;
+
+    /* Clamp title */
+    line-clamp: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ============================ CATEGORY ============================ */
+
+.memo-category {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* ============================ DESCRIPTION ============================ */
+
+.memo-content {
+    font-size: 0.85rem;
+    line-height: 1.2;
+
+    /* HARD CLAMP (LOCKED STANDARD) */
+    line-clamp: 4;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --------------------------- TABLET --------------------------- */
+@media (max-width: 1024px) {
+    .memo-card-overlay {
+        width: 190px;
+        height: 155px;
+        padding: 12px 10px 10px;
+    }
+
+    .memo-pin {
+        width: 12px;
+        height: 12px;
+        top: 4px;
+    }
+
+    .memo-title {
+        font-size: 0.95rem;
+    }
+
+    .memo-category {
+        font-size: 1rem;
+    }
+
+    .memo-content {
+        line-clamp: 3;
+        font-size: 0.8rem;
+        -webkit-line-clamp: 3;
+    }
+}
+
+/* --------------------------- MOBILE --------------------------- */
+@media (max-width: 600px) {
+    .memo-card-overlay {
+        width: 160px;
+        height: 130px;
+        padding: 10px 8px 8px;
+        border-radius: 5px;
+    }
+
+    .memo-pin {
+        width: 10px;
+        height: 10px;
+        top: 3px;
+    }
+
+    .memo-header {
+        gap: 4px;
+    }
+
+    .memo-title {
+        font-size: 0.85rem;
+    }
+
+    .memo-category {
+        font-size: 0.9rem;
+    }
+
+    .memo-content {
+        line-clamp: 3;
+        font-size: 0.75rem;
+        line-height: 1.15;
+        -webkit-line-clamp: 3;
+    }
+}
