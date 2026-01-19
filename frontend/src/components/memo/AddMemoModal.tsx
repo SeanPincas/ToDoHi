@@ -10,7 +10,7 @@ import "../../styles/ButtonStyles.css"
 
 import {
     memoPinColors,
-    getRandomMemoPinColor,
+    getDefaultMemoPinColor,
     memoCategoryEmojiMap,
     resolveMemoContainerColor,
     MEMO_CONTAINER_COLORS
@@ -33,7 +33,7 @@ const AddMemoModal: React.FC = () => {
     const [content, setContent] = useState("");
     const [category, setCategory] = useState<string>("others");
     const [containerColor, setContainerColor] = useState<string>(resolveMemoContainerColor());
-    const [pinColor, setPinColor] = useState<string>(getRandomMemoPinColor());
+    const [pinColor, setPinColor] = useState<string>(getDefaultMemoPinColor());
 
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -45,7 +45,7 @@ const AddMemoModal: React.FC = () => {
                 setContent(""),
                 setCategory("others"),
                 setContainerColor(resolveMemoContainerColor());
-            setPinColor(getRandomMemoPinColor());
+            setPinColor(getDefaultMemoPinColor());
             setErrorMsg(null);
             setLoading(false);
         }

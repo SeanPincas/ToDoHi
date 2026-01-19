@@ -88,7 +88,7 @@ export function resolveMemoContainerColor (
     taskContainerColor?: string
 ): string {
     if (!taskContainerColor) {
-        return MEMO_CONTAINER_COLORS.white;
+        return MEMO_CONTAINER_COLORS.yellow;
     }
 
     const normalized = taskContainerColor.toLowerCase();
@@ -101,19 +101,19 @@ export function resolveMemoContainerColor (
         }
     }
 
-    return MEMO_CONTAINER_COLORS.white;
+    return MEMO_CONTAINER_COLORS.yellow;
 }
 
 export function getMemoContainerColorByKey(
     taskColorKey?: MemoContainerColorKey
 ): string {
     if (!taskColorKey) {
-        return MEMO_CONTAINER_COLORS.white;
+        return MEMO_CONTAINER_COLORS.yellow;
     }
 
     return (
         MEMO_CONTAINER_COLORS[taskColorKey] ??
-        MEMO_CONTAINER_COLORS.white
+        MEMO_CONTAINER_COLORS.yellow
     );
 }
 
@@ -142,7 +142,6 @@ export const memoPinColors = [
 
 export type MemoPinColor = typeof memoPinColors[number];
 
-export function getRandomMemoPinColor(): MemoPinColor {
-    const index = Math.floor(Math.random() * memoPinColors.length);
-    return memoPinColors[index];
+export function getDefaultMemoPinColor(): MemoPinColor {
+    return "#d32f2f";
 }

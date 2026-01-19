@@ -1,6 +1,12 @@
 // ============================================================================
 // MemoContext.tsx
 // State authority for Memo Board feature
+//
+// OPTION A ARCHITECTURE:
+// - Edit mode = frontend-only mutations
+// - Dragging updates memory only
+// - Z-index is derived from array order
+// - Backend sync happens ONLY on explicit "Done" (future step)
 // ============================================================================
 
 import React, {
@@ -15,24 +21,34 @@ import {
     createMemo,
     createMemoFromTask,
     updateMemo,
-    updateMemoPosition,
-    bringMemoToFront,
-    sendMemoToBack,
     deleteMemo,
     type Memo
 } from "../api/memoApi";
 
+import {
+    bringForward,
+    sendBackward,
+    bringToTop,
+} from "../utils/memoZOrder";
 
 // ------------------------------------ TYPES ------------------------------------
+
 type BoardMode = "view" | "edit";
 
-/** Modal types for Memo Board */
 export type MemoModalType =
     | "add"
     | "edit"
     | "view"
     | "deleteConfirm"
     | null;
+
+// ---------------- LAYOUT PAYLOAD ----------------
+export interface MemoLayoutPayload {
+    id: string;
+    xPct: number;
+    yPct: number;
+    z: number;
+}
 
 interface MemoContextType {
     memos: Memo[];
@@ -41,33 +57,35 @@ interface MemoContextType {
 
     // ---------------- MODAL STATE ----------------
     activeModal: MemoModalType;
-    activeMemo: Memo | null;
 
-    // ---------------- SELECTION STATE ----------------
+    // ---------------- SELECTION ----------------
     activeMemoId: string | null;
     setActiveMemoId: (id: string | null) => void;
 
-    // actions
+    // ---------------- ACTIONS ----------------
     loadMemos: () => Promise<void>;
     addMemo: (data: Partial<Memo>) => Promise<void>;
     addMemoFromTask: (taskId: string, pinColor?: string) => Promise<void>;
     updateMemoContent: (id: string, data: Partial<Memo>) => Promise<void>;
-    moveMemo: (id: string, x: number, y: number) => Promise<void>;
-    bringMemoForward: (id: string) => Promise<void>;
-    sendMemoBackward: (id: string) => Promise<void>;
+    moveMemo: (id: string, xPct: number, yPct: number) => void;
+    bringMemoForward: (id: string) => void;
+    sendMemoBackward: (id: string) => void;
+    bringMemoToTop: (id: string) => void;
     removeMemo: (id: string) => Promise<void>;
 
+    buildLayoutPayload: () => MemoLayoutPayload[];
+
     // ---------------- MODAL ACTIONS ----------------
-    openModal: (type: MemoModalType, memo?: Memo | null) => void;
+    openModal: (type: MemoModalType, memoId?: string | null) => void;
     closeModal: () => void;
 
     setBoardMode: (mode: BoardMode) => void;
 }
 
-// -------------------------------- CONTEXT CREATION -------------------------------
+// -------------------------------- CONTEXT ------------------------------------
+
 const MemoContext = createContext<MemoContextType | null>(null);
 
-// ------------------------------ CUSTOM HOOK ----------------------------------------
 export const useMemoContext = () => {
     const ctx = useContext(MemoContext);
     if (!ctx) {
@@ -77,48 +95,33 @@ export const useMemoContext = () => {
 };
 
 // ====================================================================================
-//                                   PROVIDER START                                    
+//                                   PROVIDER
 // ====================================================================================
+
 export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [memos, setMemos] = useState<Memo[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const [boardMode, setBoardMode] = useState<BoardMode>("view");
 
     // ---------------- MODAL STATE ----------------
     const [activeModal, setActiveModal] = useState<MemoModalType>(null);
-    const [activeMemo, setActiveMemo] = useState<Memo | null>(null);
 
-    // ---------------- SELECTION STATE ----------------
+    // ---------------- SELECTION ----------------
     const [activeMemoId, setActiveMemoId] = useState<string | null>(null);
 
     // -------------------------------------------------------------------------
-    // AUTO BRING MEMO TO FRONT WHEN SELECTED
-    // -------------------------------------------------------------------------
-    useEffect(() => {
-        if (!activeMemoId) return;
-
-        // Find the selected memo
-        const target = memos.find(m => m._id === activeMemoId);
-        if (!target) return;
-
-        // Find current highest z-index
-        const highestZ = Math.max(
-            ...memos.map(m => m.position?.z ?? 0)
-        );
-
-        // Only bring forward IF it's not already on top
-        if ((target.position?.z ?? 0) < highestZ) {
-            bringMemoForward(activeMemoId);
-        }
-    }, [activeMemoId]); // ← IMPORTANT: ONLY reacts to selection
-
-    // -------------------------------------------------------------------------
-    //                              LOAD ALL MEMOS
+    // LOAD MEMOS (BACKEND → FRONTEND)
     // -------------------------------------------------------------------------
     const loadMemos = async () => {
         setLoading(true);
         try {
             const data = await getAllMemos();
+
+            /**
+             * IMPORTANT:
+             * We trust backend ordering on initial load.
+             * Z-index will be derived from array order.
+             */
             setMemos(data);
         } finally {
             setLoading(false);
@@ -126,23 +129,25 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // -------------------------------------------------------------------------
-    //                            CREATE MEMO (MANUAL)
+    // CREATE MEMO
     // -------------------------------------------------------------------------
     const addMemo = async (data: Partial<Memo>) => {
         const memo = await createMemo(data);
+
+        /**
+         * New memo goes to the TOP visually.
+         * Array order = stacking order.
+         */
         setMemos(prev => [...prev, memo]);
     };
 
-    // -------------------------------------------------------------------------
-    //                           CREATE MEMO FROM TASK
-    // -------------------------------------------------------------------------
     const addMemoFromTask = async (taskId: string, pinColor?: string) => {
         const memo = await createMemoFromTask({ taskId, pinColor });
         setMemos(prev => [...prev, memo]);
     };
 
     // -------------------------------------------------------------------------
-    //                             UPDATE MEMO CONTENT
+    // UPDATE MEMO CONTENT (NOT POSITION)
     // -------------------------------------------------------------------------
     const updateMemoContent = async (id: string, data: Partial<Memo>) => {
         const updated = await updateMemo(id, data);
@@ -152,34 +157,63 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // -------------------------------------------------------------------------
-    //                       MOVE MEMO (DRAGGING X/Y ONLY)
+    // MOVE MEMO (FRONTEND ONLY)
     // -------------------------------------------------------------------------
-    const moveMemo = async (id: string, x: number, y: number) => {
-        const updated = await updateMemoPosition(id, { x, y });
+    const moveMemo = (id: string, xPct: number, yPct: number) => {
+        /**
+         * FRONTEND-ONLY POSITION UPDATE
+         * No backend calls here.
+         */
         setMemos(prev =>
-            prev.map(m => (m._id === id ? updated : m))
+            prev.map(m =>
+                m._id === id
+                    ? {
+                        ...m,
+                        position: {
+                            ...m.position,
+                            xPct,
+                            yPct
+                        }
+                    }
+                    : m
+            )
         );
     };
 
     // -------------------------------------------------------------------------
-    //                              STACKING INTENT
+    // Z-ORDER (FRONTEND ONLY)
     // -------------------------------------------------------------------------
-    const bringMemoForward = async (id: string) => {
-        const updated = await bringMemoToFront(id);
-        setMemos(prev =>
-            prev.map(m => (m._id === id ? updated : m))
-        );
+
+    const bringMemoForward = (id: string) => {
+        setMemos(prev => bringForward(prev, id));
     };
 
-    const sendMemoBackward = async (id: string) => {
-        const updated = await sendMemoToBack(id);
-        setMemos(prev =>
-            prev.map(m => (m._id === id ? updated : m))
-        );
+    const sendMemoBackward = (id: string) => {
+        setMemos(prev => sendBackward(prev, id));
+    };
+
+    const bringMemoToTop = (id: string) => {
+        setMemos(prev => bringToTop(prev, id));
     };
 
     // -------------------------------------------------------------------------
-    //                                DELETE MEMO
+    // BUILD FINAL BOARD LAYOUT PAYLOAD
+    // -------------------------------------------------------------------------
+    const buildLayoutPayload = (): MemoLayoutPayload[] => {
+        /**
+         * Array order IS z-order.
+         * index === z
+         */
+        return memos.map((memo, index) => ({
+            id: memo._id,
+            xPct: memo.position.xPct,
+            yPct: memo.position.yPct,
+            z: index,
+        }));
+    };
+
+    // -------------------------------------------------------------------------
+    // DELETE MEMO
     // -------------------------------------------------------------------------
     const removeMemo = async (id: string) => {
         await deleteMemo(id);
@@ -187,27 +221,27 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // -------------------------------------------------------------------------
-    //                               MODAL CONTROL
+    // MODAL CONTROL
     // -------------------------------------------------------------------------
-    const openModal = (type: MemoModalType, memo: Memo | null = null) => {
+    const openModal = (type: MemoModalType, memoId?: string | null) => {
         setActiveModal(type);
-        setActiveMemo(memo);
+        setActiveMemoId(memoId ?? null);
     };
 
     const closeModal = () => {
         setActiveModal(null);
-        setActiveMemo(null);
+        setActiveMemoId(null);
     };
 
     // -------------------------------------------------------------------------
-    //                               INITIAL LOAD
+    // INITIAL LOAD
     // -------------------------------------------------------------------------
     useEffect(() => {
         loadMemos();
     }, []);
 
     // -------------------------------------------------------------------------
-    //                              PROVIDER VALUE
+    // PROVIDER VALUE
     // -------------------------------------------------------------------------
     return (
         <MemoContext.Provider
@@ -217,7 +251,6 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 boardMode,
 
                 activeModal,
-                activeMemo,
 
                 activeMemoId,
                 setActiveMemoId,
@@ -229,7 +262,10 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 moveMemo,
                 bringMemoForward,
                 sendMemoBackward,
+                bringMemoToTop,
                 removeMemo,
+
+                buildLayoutPayload,
 
                 openModal,
                 closeModal,

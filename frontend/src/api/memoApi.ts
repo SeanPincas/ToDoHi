@@ -6,8 +6,8 @@ const API_URL = "http://localhost:3500/api/memoboard";
 
 // ------------------------------ TYPES ------------------------------
 export interface MemoPosition {
-    x: number;
-    y: number;
+    xPct: number;
+    yPct: number;
     z: number;
 }
 
@@ -39,7 +39,10 @@ export const createMemo = async (data: {
     category?: string;
     containerColor?: string;
     pinColor?: string;
-    position?: { x: number; y: number };
+    position?: {
+        xPct: number;
+        yPct: number;
+    };
 }): Promise<Memo> => {
     const res = await axios.post(API_URL, data, authHeaders());
 
@@ -72,36 +75,20 @@ export const updateMemo = async (
     return res.data.memo;
 };
 
-// UPDATE MEMO POSITION (DRAGGING)
-export const updateMemoPosition = async (
-    memoId: string,
-    position: { x: number; y: number }
-): Promise<Memo> => {
-    const res = await axios.put(`${API_URL}/${memoId}/position`, position, authHeaders());
-
-    return res.data.memo;
-};
-
-// STACKING: bring to front
-export const bringMemoToFront = async (memoId: string): Promise<Memo> => {
-    const res = await axios.put(
-        `${API_URL}/${memoId}/bring-to-front`,
-        {},
+// UPDATE MEMO BOARD LAYOUT (BATCH) -------
+export const updateMemoLayout = async (
+    layout: {
+        id: string;
+        xPct: number;
+        yPct: number;
+        z: number;
+    }[]
+): Promise<void> => {
+    await axios.patch(
+        `${API_URL}/layout`,
+        { layout },
         authHeaders()
     );
-
-    return res.data.memo;
-};
-
-// STACKING: send to back
-export const sendMemoToBack = async (memoId: string): Promise<Memo> => {
-    const res = await axios.put(
-        `${API_URL}/${memoId}/send-to-back`,
-        {},
-        authHeaders()
-    );
-
-    return res.data.memo;
 };
 
 // DELETE MEMO
