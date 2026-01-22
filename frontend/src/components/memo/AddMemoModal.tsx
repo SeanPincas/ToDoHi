@@ -14,7 +14,7 @@ import {
     memoCategoryEmojiMap,
     resolveMemoContainerColor,
     MEMO_CONTAINER_COLORS
-} from "../../utils/memoUtils";
+} from "../../utils/memoUtils/memoUtils";
 
 import { Icons } from "../../styles/iconLibrary";
 

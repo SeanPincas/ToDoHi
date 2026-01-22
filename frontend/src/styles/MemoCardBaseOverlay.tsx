@@ -11,6 +11,7 @@ interface MemoCardBaseOverlayProps {
     containerColor: string;
     pinColor: string;
     isActive?: boolean;
+    isAtEdge?: boolean,
 }
 
 const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
@@ -20,10 +21,14 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     containerColor,
     pinColor,
     isActive = false,
+    isAtEdge = false,
 }) => {
     return (
         <div
-            className={`memo-card-overlay ${isActive ? "active" : ""}`}
+            className={`memo-card-overlay 
+                ${isActive ? "active" : ""}
+                ${isAtEdge ? "edge-warning" : ""}
+            `}
             style={{ backgroundColor: containerColor }}
         >
 

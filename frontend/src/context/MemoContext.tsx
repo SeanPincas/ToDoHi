@@ -29,7 +29,7 @@ import {
     bringForward,
     sendBackward,
     bringToTop,
-} from "../utils/memoZOrder";
+} from "../utils/memoUtils/memoZOrder";
 
 // ------------------------------------ TYPES ------------------------------------
 
@@ -61,6 +61,10 @@ interface MemoContextType {
     // ---------------- SELECTION ----------------
     activeMemoId: string | null;
     setActiveMemoId: (id: string | null) => void;
+
+    isMemoAtEdge: boolean;
+    setIsMemoAtEdge: (value: boolean) => void;
+
 
     // ---------------- ACTIONS ----------------
     loadMemos: () => Promise<void>;
@@ -108,6 +112,9 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // ---------------- SELECTION ----------------
     const [activeMemoId, setActiveMemoId] = useState<string | null>(null);
+
+    // ---------------- BOUNDARY STATE ----------------
+    const [isMemoAtEdge, setIsMemoAtEdge] = useState(false);
 
     // -------------------------------------------------------------------------
     // LOAD MEMOS (BACKEND → FRONTEND)
@@ -254,6 +261,10 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 activeMemoId,
                 setActiveMemoId,
+
+                isMemoAtEdge,
+                setIsMemoAtEdge,
+
 
                 loadMemos,
                 addMemo,

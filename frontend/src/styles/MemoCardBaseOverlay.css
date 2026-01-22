@@ -30,6 +30,13 @@
     transform: scale(1.01);
 }
 
+.memo-card-overlay.edge-warning {
+    box-shadow:
+        0 0 0 2px rgba(255, 0, 0, 0.5),
+        0 0 12px rgba(255, 0, 0, 0.6);
+    transition: box-shadow 0.15s ease;
+}
+
 /* ============================ PIN ============================ */
 
 .memo-pin {

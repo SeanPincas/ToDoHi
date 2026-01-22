@@ -3,7 +3,7 @@
 // Pure frontend helpers for memo Z-order manipulation
 // ============================================================================
 
-import type { Memo } from "../api/memoApi";
+import type { Memo } from "../../api/memoApi";
 
 // Helper: find index of memo by id
 function findIndex(memos: Memo[], memoId: string): number {

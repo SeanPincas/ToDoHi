@@ -1,11 +1,5 @@
 // ============================================================================
 // MemoBoardPage.tsx
-// Memo Board layout with mode-aware toolbars
-//
-// RESPONSIBILITIES:
-// - Measure cork board size
-// - Handle drag end math (delta → %)
-// - Frontend-only movement (no backend calls)
 // ============================================================================
 
 import React, { useRef, useLayoutEffect, useState } from "react";
@@ -19,7 +13,7 @@ import "./MemoBoardPage.css";
 
 import { DndContext, type DragStartEvent, type DragEndEvent } from "@dnd-kit/core";
 import DraggableMemoItem from "../components/memo/DraggableMemoItem";
-import { computeNewPinPct } from "../utils/memoPosition";
+import { computeNewPinPct } from "../utils/memoUtils/memoPosition";
 
 // ----------------------------------------------------------------------------
 // PAGE COMPONENT
@@ -34,6 +28,8 @@ const MemoBoardPage: React.FC = () => {
         openModal,
         moveMemo,
         setActiveMemoId,
+
+        isMemoAtEdge,
 
         bringMemoForward,
         sendMemoBackward,
@@ -62,12 +58,30 @@ const MemoBoardPage: React.FC = () => {
     useLayoutEffect(() => {
         if (!boardRef.current) return;
 
-        const rect = boardRef.current.getBoundingClientRect();
+        // ------------------------------
+        // Measure board size
+        // ------------------------------
+        const measureBoard = () => {
+            if (!boardRef.current) return;
 
-        setBoardSize({
-            width: rect.width,
-            height: rect.height,
-        });
+            const rect = boardRef.current.getBoundingClientRect();
+
+            setBoardSize({
+                width: rect.width,
+                height: rect.height,
+            });
+        };
+
+        // Initial measurement (on mount)
+        measureBoard();
+
+        // Re-measure on window resize
+        window.addEventListener("resize", measureBoard);
+
+        // Cleanup on unmount
+        return () => {
+            window.removeEventListener("resize", measureBoard);
+        };
     }, []);
 
     // -------------------------------------------------------------------------
@@ -122,7 +136,7 @@ const MemoBoardPage: React.FC = () => {
             // Build final layout snapshot
             const payload = buildLayoutPayload();
 
-            console.log("[FINAL LAYOUT PAYLOAD]",payload);
+            console.log("[FINAL LAYOUT PAYLOAD]", payload);
 
             // 2Persist once (no spam, no debounce)
             await updateMemoLayout(payload);
@@ -159,11 +173,14 @@ const MemoBoardPage: React.FC = () => {
                         <div className="memo-board-title">
                             Memo Board
                         </div>
-                        {boardMode === "edit" && (
-                            <div className="memo-board-edit-label">
-                                EDIT MODE
-                            </div>
-                        )}
+                        <div
+                            className={`memo-board-edit-label ${boardMode === "edit"
+                                    ? "visible"
+                                    : ""
+                                }`}
+                        >
+                            ( EDIT MODE )
+                        </div>
                     </div>
 
                     {/* RIGHT */}
@@ -245,6 +262,10 @@ const MemoBoardPage: React.FC = () => {
                         className="memo-board-canvas"
                         ref={boardRef}
                     >
+                        {isMemoAtEdge && (
+                            <div className="memo-board-boundary-shield" />
+                        )}
+
                         {loading && (
                             <div className="memo-board-loading">
                                 Loading memos…
