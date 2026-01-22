@@ -7,9 +7,10 @@ import React from "react";
 import { useDraggable } from "@dnd-kit/core";
 
 import type { Memo } from "../../api/memoApi";
-import { getMemoCategoryEmoji } from "../../utils/memoUtils";
+import { getMemoCategoryEmoji } from "../../utils/memoUtils/memoUtils";
 import MemoCardBaseOverlay from "../../styles/MemoCardBaseOverlay";
 import { useMemoContext } from "../../context/MemoContext";
+import { clampPinTransform } from "../../utils/memoUtils/clampPinTransform";
 
 // ------------------------------ TYPES ---------------------------------------
 interface DraggableMemoItemProps {
@@ -23,7 +24,6 @@ interface DraggableMemoItemProps {
 // ============================================================================
 // COMPONENT
 // ============================================================================
-
 const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     memo,
     zIndex,
@@ -31,7 +31,10 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     boardWidth,
     boardHeight,
 }) => {
-    const { activeMemoId, setActiveMemoId } = useMemoContext();
+    const { activeMemoId,
+        setActiveMemoId,
+        setIsMemoAtEdge
+    } = useMemoContext();
 
     // ------------------------------------------------------------------------
     // DND-KIT HOOK
@@ -71,6 +74,31 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     const topPx = pinY - PIN_OFFSET_Y;
 
     // ------------------------------------------------------------------------
+    // LIVE DRAG CLAMP (PIN-BASED, FRONTEND ONLY)
+    // ------------------------------------------------------------------------
+    let clampedTransform = transform;
+    let isAtEdge = false;
+
+    if (transform) {
+        const result = clampPinTransform({
+            transformX: transform.x,
+            transformY: transform.y,
+            pinX,
+            pinY,
+            boardWidth,
+            boardHeight,
+        });
+
+        clampedTransform = result.transform;
+        isAtEdge = result.isClamped;
+    }
+
+    React.useEffect(() => {
+        if (!isEditMode) return;
+        setIsMemoAtEdge(isAtEdge);
+    }, [isAtEdge, isEditMode, setIsMemoAtEdge]);
+
+    // ------------------------------------------------------------------------
     // STYLE
     // ------------------------------------------------------------------------
     const style: React.CSSProperties = {
@@ -78,8 +106,8 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
         left: leftPx,
         top: topPx,
         zIndex,
-        transform: transform
-            ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+        transform: clampedTransform
+            ? `translate3d(${clampedTransform.x}px, ${clampedTransform.y}px, 0)`
             : undefined,
     };
 
@@ -106,6 +134,7 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
                 containerColor={memo.containerColor}
                 pinColor={memo.pinColor}
                 isActive={activeMemoId === memo._id}
+                isAtEdge={isEditMode && isAtEdge}
             />
         </div>
     );

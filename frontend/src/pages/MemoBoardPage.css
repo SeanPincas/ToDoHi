@@ -62,11 +62,10 @@
 .memo-board-title-group {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-self: center; /* ⬅️ THIS IS THE KEY */
-    text-align: center;
-    line-height: 1.1;
-    gap: 4px;
+    align-items: center;      /* horizontal centering */
+    justify-content: center;
+
+    min-height: 64px;        /* LOCK vertical space so edit mode doesn't push layout */
 }
 
 .memo-board-title {
@@ -77,10 +76,26 @@
 }
 
 .memo-board-edit-label {
-    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;             /* span same width as title */
+
+    visibility: hidden;
+    text-align: center;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--info-accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c62828;
+    margin-top: 4px;
+}
+
+.memo-board-edit-label.visible {
+    opacity: 1;
+    color: var(--blue-dark);
+    visibility: visible;
 }
 
 /* ============================ NAV ============================ */
@@ -140,6 +155,24 @@
     background-position: center;
 
     box-shadow: var(--memo-cork-shadow);
+}
+
+/* Red Boundary */
+.memo-board-boundary-shield {
+    position: absolute;
+    inset: 0;
+
+    border: 4px solid rgba(255, 0, 0, 0.6);
+    border-radius: 14px;
+
+    pointer-events: none;
+
+    /* Must be under memos but above background */
+    z-index: 1;
+
+    box-shadow:
+        inset 0 0 0 2px rgba(255, 0, 0, 0.35),
+        0 0 14px rgba(255, 0, 0, 0.45);
 }
 
 /* ============================ EMPTY / LOADING ============================ */
