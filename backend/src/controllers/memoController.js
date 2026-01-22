@@ -2,19 +2,13 @@ const Memo = require("../models/memoModel.js");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 
-const { getNextZIndex, bringMemoToFront, sendMemoToBack } = require("../utils/memoboard")
+const { getNextZIndex } = require("../utils/memoboard");
+const { validCategories } = require("../utils/helpers");
 
 // --------------------------- CREATE MEMO MANUALLY ---------------------------
 exports.createMemo = async (req, res) => {
     try {
         const { title, content, category, containerColor, pinColor, position } = req.body
-
-        const validCategories = [
-            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
-            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance',
-            'errands', 'pet-care', 'learning', 'creative', 'maintenance',
-            'shopping', 'travel', 'others'
-        ];
 
         const nextZ = await getNextZIndex(req.user._id);
 
@@ -26,8 +20,8 @@ exports.createMemo = async (req, res) => {
             containerColor: containerColor || "#ffffff",
             pinColor: pinColor || "#d32f2f",
             position: {
-                x: position?.x ?? 0,
-                y: position?.y ?? 0,
+                xPct: position?.xPct ?? 50,
+                yPct: position?.yPct ?? 50,
                 z: nextZ
             }
         });
@@ -48,13 +42,6 @@ exports.createMemo = async (req, res) => {
 exports.createMemoFromTask = async (req, res) => {
     try {
         const { taskId, pinColor } = req.body;
-
-        const validCategories = [
-            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
-            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance',
-            'errands', 'pet-care', 'learning', 'creative', 'maintenance',
-            'shopping', 'travel', 'others'
-        ];
 
         const task = await Task.findOne({
             _id: taskId,
@@ -80,8 +67,8 @@ exports.createMemoFromTask = async (req, res) => {
             containerColor: task.containerColor || "#fff2b3",
             pinColor: pinColor || "#d32f2f",
             position: {
-                x: 0,
-                y: 0,
+                xPct: 50,
+                yPct: 50,
                 z: nextZ
             }
         });
@@ -142,55 +129,102 @@ exports.updateMemo = async (req, res) => {
     }
 };
 
-// ------------------------------ UPDATE MEMO POSITION -----------------------------
-exports.updateMemoPosition = async (req, res) => {
+// ------------------------------ UPDATE MEMO LAYOUT -----------------------------
+exports.updateMemoLayout = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { x, y } = req.body;
+        const userId = req.user._id;
+        const { layout } = req.body;
 
-        const updateMemo = await Memo.findOneAndUpdate(
-            { _id: id, userId: req.user._id },
-            { "position.x": x, "position.y": y },
-            { new: true }
-        );
+        // ---------------------------------------------------------------------
+        // 1️⃣ VALIDATION
+        // ---------------------------------------------------------------------
 
-        if (!updateMemo) return res.status(404).json({ message: "Memo Not Found" });
-
-        res.json({ message: "Memo Position Updated", memo: updateMemo });
-    } catch (err) {
-        res.status(500).json({ message: "Error Updating Memo Position", error: err.message })
-    }
-};
-
-// -------------------------- BRING MEMO TO FRONT ------------------------------
-exports.bringMemoToFront = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const updatedMemo = await bringMemoToFront(id, req.user._id);
-
-        if (!updatedMemo) {
-            return res.status(404).json({ message: "Memo Not Found" });
+        if (!Array.isArray(layout)) {
+            return res.status(400).json({
+                message: "Layout must be an array"
+            });
         }
 
-        res.json({ message: "Memo brought to front", memo: updatedMemo });
-    } catch (err) {
-        res.status(500).json({ message: "Error bringing memo to front",error: err.message })
-    }
-}
-
-// -------------------------- SEND MEMO TO BACK -------------------------------
-exports.sendMemoToBack = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const updatedMemo = await sendMemoToBack(id, req.user._id);
-
-        if (!updatedMemo) {
-            return res.status(404).json({ message: "Memo Not Found" });
+        if (layout.length === 0) {
+            return res.status(400).json({
+                message: "Layout cannot be empty"
+            });
         }
 
-        res.json({ message: "Memo brought to front", memo: updatedMemo });
+        // Validate each item shape
+        for (const item of layout) {
+            if (
+                !item.id ||
+                typeof item.xPct !== "number" ||
+                typeof item.yPct !== "number" ||
+                typeof item.z !== "number"
+            ) {
+                return res.status(400).json({
+                    message: "Invalid layout item structure"
+                });
+            }
+
+            if (
+                item.xPct < 0 || item.xPct > 100 ||
+                item.yPct < 0 || item.yPct > 100
+            ) {
+                return res.status(400).json({
+                    message: "xPct / yPct must be between 0 and 100"
+                });
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // 2️⃣ OWNERSHIP CHECK
+        // ---------------------------------------------------------------------
+
+        const memoIds = layout.map(item => item.id);
+
+        const existingMemos = await Memo.find({
+            _id: { $in: memoIds },
+            userId
+        });
+
+        if (existingMemos.length !== layout.length) {
+            return res.status(403).json({
+                message: "One or more memos do not belong to user"
+            });
+        }
+
+        // ---------------------------------------------------------------------
+        // 3️⃣ SORT + COMPACT Z (BACKEND SAFETY NET)
+        // ---------------------------------------------------------------------
+
+        // Sort by z ascending (bottom → top)
+        const sortedLayout = [...layout].sort((a, b) => a.z - b.z);
+
+        // ---------------------------------------------------------------------
+        // 4️⃣ BULK UPDATE (ATOMIC)
+        // ---------------------------------------------------------------------
+
+        const bulkOps = sortedLayout.map((item, index) => ({
+            updateOne: {
+                filter: { _id: item.id, userId },
+                update: {
+                    "position.xPct": item.xPct,
+                    "position.yPct": item.yPct,
+                    "position.z": index // compacted, authoritative
+                }
+            }
+        }));
+
+        await Memo.bulkWrite(bulkOps);
+
+        res.json({
+            message: "Memo layout updated successfully"
+        });
+
     } catch (err) {
-        res.status(500).json({ message: "Error bringing memo to front", error: err.message });
+        console.error("🔥 updateMemoLayout ERROR:", err);
+        res.status(500).json({
+            message: "Failed to update memo layout",
+            error: err.message
+        });
     }
 };
 

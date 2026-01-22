@@ -51,14 +51,6 @@ exports.updateTask = async (req, res) => {
         const { id } = req.params;
         const { title, description, category, containerColor, status, deadline } = req.body;
 
-        // Validate category: fallback to "others" if invalid
-        const validCategories = [
-            'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
-            'relax', 'praying', 'hobby', 'social', 'self-care', 'finance',
-            'errands', 'pet-care', 'learning', 'creative', 'maintenance',
-            'shopping', 'travel', 'others'
-        ];
-
         const updates = {
             title,
             description,

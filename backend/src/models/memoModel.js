@@ -45,9 +45,25 @@ const memoSchema = new mongoose.Schema({
         match: /^#([0-9A-F]{3}){1,2}$/i
     },
     position: {
-        x: { type: Number, default: 0 },
-        y: { type: Number, default: 0 },
-        z: { type: Number, default: 1 }
+        xPct: {
+            type: Number,
+            require: true,
+            default: 50,  // Center of Board Horizontally
+            min: 0,
+            max: 100,
+        },
+        yPct: {
+            type: Number,
+            required: true,
+            default: 50, // Center of Board Vertically
+            min: 0,
+            max: 100
+        },
+        z: {
+            type: Number,
+            required: true,
+            default: 1
+        }
     },
     createdAt: {
         type: Date,
