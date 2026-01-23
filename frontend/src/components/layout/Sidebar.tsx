@@ -91,10 +91,7 @@ const Sidebar = () => {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                // ---------------- QUOTE PREFERENCE (FIXED) ----------------
-                // Backend supports up to 3 categories.
-                // Sidebar selector is single-choice, so we DISPLAY the first
-                // without mutating or overwriting stored preferences.
+                // ---------------- QUOTE PREFERENCE  ----------------
                 if (Array.isArray(user?.quoteCategoryPreferences)) {
                     const preferred = user.quoteCategoryPreferences[0];
                     if (preferred) {
@@ -103,8 +100,6 @@ const Sidebar = () => {
                 }
 
                 // Failed Task Snapshot
-                // Snapshot exists ONLY if backend detected failed tasks at last resetHour
-                // If undefined, we intentionally store null
                 if (user?.failedTaskSnapshot) {
                     setFailedTaskSnapshot(user.failedTaskSnapshot);
                 } else {
@@ -188,7 +183,7 @@ const Sidebar = () => {
                     </button>
                     <button
                         className="sidebar-btn"
-                        onClick={() => navigate("/memos")}
+                        onClick={() => navigate("/memoboard")}
                     >
                         Memo Board
                     </button>

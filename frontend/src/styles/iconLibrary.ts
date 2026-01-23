@@ -9,10 +9,13 @@ import {
     RiCheckboxCircleFill,
     RiCheckboxBlankCircleLine,
     RiCheckboxFill,
+    RiCheckFill,
 
     // ---------------- NAV / MENU ----------------
     RiMenuFill,
+    RiArrowUpSLine,
     RiArrowDownSLine,
+    RiArrowLeftSLine,
     RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------
@@ -50,10 +53,13 @@ export const Icons = {
     Check: RiCheckboxCircleFill,
     Uncheck: RiCheckboxBlankCircleLine,
     CheckboxDeleteTick: RiCheckboxFill,
+    Confirm: RiCheckFill,
 
     // ---------------- NAVIGATION ----------------
     Menu: RiMenuFill,
+    ArrowUp: RiArrowUpSLine,
     DropdownArrow: RiArrowDownSLine,
+    SidebarCollapse: RiArrowLeftSLine,
     Drag: RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------
