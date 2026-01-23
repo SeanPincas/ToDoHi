@@ -7,14 +7,58 @@ import MemoPreview from "../components/dashboard/MemoPreview";
 import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
 
 import Layout from '../components/layout/Layout';
+import { useTodo } from '../context/TodoContext';
+import { useAuthContext } from '../context/AuthContext';
+import { getCurrentResetCycleKey } from '../utils/resetCycle';
 
 const Dashboard: React.FC = () => {
+
+    const { tasks, openModal } = useTodo();
+    const { user } = useAuthContext();
 
     // ------------------ LIVE TIME & DATE ------------------
     const [time12, setTime12] = useState("");
     const [time24, setTime24] = useState("");
     const [currentDate, setCurrentDate] = useState("");
 
+    const [repeatChecked, setRepeatChecked] = useState(false);
+
+    // Repeat Task Modal
+    useEffect(() => {
+        // Guard wait for user + tasks
+        if (!user || !tasks || tasks.length === 0) return;
+        // Guard: run only once per load
+        if (repeatChecked) return;
+        //Filter status completed + failed tasks
+        const repeatableTasks = tasks.filter(
+            task => task.status === "completed" || task.status === "failed"
+        );
+        // No eligible tasks → do nothing
+        if (repeatableTasks.length === 0) {
+            setRepeatChecked(true);
+            return;
+        }
+        // Compute current reset cycle
+        const resetHour = typeof user.preference?.resetHour === "number"
+            ? user.preference.resetHour
+            : 0;
+
+        const currentCycleKey = getCurrentResetCycleKey(resetHour);
+
+        // Already Acknowledged reset cycle → do nothing
+        if (user.repeatCycleAcknowledged === currentCycleKey) {
+            setRepeatChecked(true);
+            return;
+        }
+        // Open Clocking Repeat Modal
+        openModal("repeat", {
+            tasks:repeatableTasks
+        });
+
+        setRepeatChecked(true);
+    }, [tasks, user, repeatChecked, openModal]);
+
+    // Live Clock
     useEffect(() => {
         const updateClock = () => {
             const now = new Date();

@@ -21,7 +21,7 @@ import {
 } from "../api/taskApi.ts";
 
 // ------------------------------ MODAL TYPES --------------------------------------
-export type ModalType = "add" | "edit" | "view" | "deleteConfirm";
+export type ModalType = "add" | "edit" | "view" | "deleteConfirm" | "repeat" | "repeatConfirm";
 
 // What the modal state looks like
 interface ModalState {

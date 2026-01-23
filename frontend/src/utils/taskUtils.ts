@@ -163,7 +163,7 @@ export const getTaskTextColor = (containerColor: string): string => {
 export const getFailedTextColor = (containerColorName: string): string => {
     const [base, shade] = containerColorName.split("-");
 
-    if (base === "red") return shade === "dark" ? "#5f0000ff" : "#7a1c1c";
+    if (base === "red") return shade === "dark" ? "#440101ff" : "#7a1c1c";
 
     if (shade === "dark" || base === "black") return "#f32323ff";
 

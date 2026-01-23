@@ -9,10 +9,13 @@ import {
     RiCheckboxCircleFill,
     RiCheckboxBlankCircleLine,
     RiCheckboxFill,
+    RiCheckFill,
 
     // ---------------- NAV / MENU ----------------
     RiMenuFill,
+    RiArrowUpSLine,
     RiArrowDownSLine,
+    RiArrowLeftSLine,
     RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------
@@ -25,6 +28,7 @@ import {
     RiTodoFill,
     RiCalendarTodoFill,
     RiBookOpenFill,
+    RiRepeat2Fill,
 
     // ---------------- FEEDBACK / ALERT ----------------
     RiErrorWarningFill,     // ⚠️ warning / danger / confirm delete
@@ -49,10 +53,13 @@ export const Icons = {
     Check: RiCheckboxCircleFill,
     Uncheck: RiCheckboxBlankCircleLine,
     CheckboxDeleteTick: RiCheckboxFill,
+    Confirm: RiCheckFill,
 
     // ---------------- NAVIGATION ----------------
     Menu: RiMenuFill,
+    ArrowUp: RiArrowUpSLine,
     DropdownArrow: RiArrowDownSLine,
+    SidebarCollapse: RiArrowLeftSLine,
     Drag: RiDragMove2Fill,
 
     // ---------------- USER / SETTINGS ----------------
@@ -65,6 +72,7 @@ export const Icons = {
     Todo: RiTodoFill,
     Planner: RiCalendarTodoFill,
     Notebook: RiBookOpenFill,
+    Repeat: RiRepeat2Fill,
 
     // ---------------- ALERTS / FEEDBACK ----------------
     Warning: RiErrorWarningFill,     // used in DeleteConfirmModal

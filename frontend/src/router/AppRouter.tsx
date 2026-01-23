@@ -19,6 +19,10 @@ import AddTaskModal from "../components/todo/AddTaskModal";
 import ViewTaskModal from "../components/todo/ViewTaskModal";
 import EditTaskModal from "../components/todo/EditTaskModal";
 import DeleteConfirmModal from "../components/common/modals/DeleteConfirmModal";
+import RepeatTaskModal from "../components/common/modals/RepeatTaskModal";
+import RepeatConfirmModal from "../components/common/modals/RepeatConfirmModal";
+import { MemoProvider } from "../context/MemoContext";
+import AddMemoModal from "../components/memo/AddMemoModal";
 
 const AppRouter: React.FC = () => {
     return (
@@ -43,11 +47,14 @@ const AppRouter: React.FC = () => {
                             />
 
                             <Route
-                                path="/memos"
+                                path="/memoboard"
                                 element={
-                                    <Layout>
-                                        <MemoBoardPage />
-                                    </Layout>
+                                    <MemoProvider>
+                                        <Layout>
+                                            <MemoBoardPage />
+                                            <AddMemoModal />
+                                        </Layout>
+                                    </MemoProvider>
                                 }
                             />
                         </Route>
@@ -63,7 +70,8 @@ const AppRouter: React.FC = () => {
                     <ViewTaskModal />
                     <EditTaskModal />
                     <DeleteConfirmModal />
-                    {/*<VerificationModal />*/}
+                    <RepeatTaskModal />
+                    <RepeatConfirmModal />
                 </TodoProvider>
             </AuthProvider>
         </BrowserRouter>

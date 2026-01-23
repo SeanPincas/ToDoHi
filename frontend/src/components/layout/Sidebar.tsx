@@ -64,6 +64,10 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const { logout, theme, toggleTheme } = useAuthContext();
 
+    const [failedTaskSnapshot, setFailedTaskSnapshot] = useState<{
+        tasks: { _id: string; title: string; status: string }[];
+    } | null>(null);
+
     // Debounce API saves
     const saveTimeout = useRef<number | null>(null);
 
@@ -87,15 +91,19 @@ const Sidebar = () => {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                // ---------------- QUOTE PREFERENCE (FIXED) ----------------
-                // Backend supports up to 3 categories.
-                // Sidebar selector is single-choice, so we DISPLAY the first
-                // without mutating or overwriting stored preferences.
+                // ---------------- QUOTE PREFERENCE  ----------------
                 if (Array.isArray(user?.quoteCategoryPreferences)) {
                     const preferred = user.quoteCategoryPreferences[0];
                     if (preferred) {
                         setQuotePref(preferred as QuoteCategory);
                     }
+                }
+
+                // Failed Task Snapshot
+                if (user?.failedTaskSnapshot) {
+                    setFailedTaskSnapshot(user.failedTaskSnapshot);
+                } else {
+                    setFailedTaskSnapshot(null);
                 }
 
             } catch (err) {
@@ -175,7 +183,7 @@ const Sidebar = () => {
                     </button>
                     <button
                         className="sidebar-btn"
-                        onClick={() => navigate("/memos")}
+                        onClick={() => navigate("/memoboard")}
                     >
                         Memo Board
                     </button>
@@ -219,9 +227,23 @@ const Sidebar = () => {
                     <h4 className="section-title">
                         Failed Tasks Yesterday
                     </h4>
-                    <ul className="failed-task-list">
-                        <li>No Data Loaded Yet...</li>
-                    </ul>
+                    <div className="failed-task-container">
+                        <ul className="failed-task-list">
+                            {/* If snapshot is NULL */}
+                            {!failedTaskSnapshot && (
+                                <li className="failed-task-empty">
+                                    No Failed Tasks Yesterday... Congratz ^o^
+                                </li>
+                            )}
+
+                            {/* Render Snapshot Tasks */}
+                            {failedTaskSnapshot?.tasks.map((task) => (
+                                <li key={task._id} className="failed-task-item">
+                                    {task.title}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
 
                 {/* PROFILE */}

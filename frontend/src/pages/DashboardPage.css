@@ -10,14 +10,14 @@
     box-shadow: var(--shadow-soft);
 
     /* Fluid max-width to prevent squeezing when sidebar appears */
-    max-width: clamp(1100px, 75vw, 1400px);
+    width: 100%;
+    max-width: 100%;
 
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 18px;
-
-    overflow: hidden;
+    box-sizing: border-box;
 }
 
 /* ========================================================================== */
@@ -109,6 +109,7 @@
 /* ========================================================================== */
 
 .dashboard-bento-grid {
+    min-width: 0;
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Default desktop layout */
@@ -117,6 +118,7 @@
 }
 
 .bento-box {
+    min-width: 0;
     background: var(--white);
     border: 3px solid var(--blue-dark);
     border-radius: 14px;
@@ -170,16 +172,17 @@
 /* RESPONSIVE BREAKPOINTS                                                     */
 /* ========================================================================== */
 
-/* ---------------- PHONE (≤ 480px) ---------------- */
-@media (max-width: 480px) {
+/* ---------------- MOBILE + SMALL TABLET (≤ 640px) ---------------- */
+@media (max-width: 640px) {
 
     .dashboard-container {
+        max-width: 100%;
         padding: 14px;
         gap: 14px;
     }
 
     .dashboard-bento-grid {
-        grid-template-columns: 1fr; /* 1 column */
+        grid-template-columns: 1fr; /* STACK ALL PREVIEWS */
         gap: 12px;
     }
 
@@ -188,27 +191,25 @@
     }
 }
 
-/* ---------------- SMALL TABLET (481px – 768px) ---------------- */
-@media (min-width: 481px) and (max-width: 768px) {
-
-    .dashboard-bento-grid {
-        grid-template-columns: 1fr 1fr; /* 2 columns */
-    }
-
-    .dashboard-charts {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
 /* ---------------- LARGE TABLET (769px – 1024px) ---------------- */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 641px) and (max-width: 1024px) {
 
     .dashboard-container {
         padding: 18px;
     }
 
     .dashboard-bento-grid {
-        grid-template-columns: 1fr 1fr 1fr; /* keep desktop layout */
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    /* MemoPreview spans full width on second row */
+    .dashboard-bento-grid > .bento-box:nth-child(3) {
+        grid-column: 1 / -1;
+    }
+
+    .dashboard-charts {
+        grid-template-columns: 1fr 1fr;
     }
 }
 

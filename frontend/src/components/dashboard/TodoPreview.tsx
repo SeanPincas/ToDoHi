@@ -56,7 +56,7 @@ const TodoPreview: React.FC = () => {
     // =====================================================================
     //                              UI STATES
     // =====================================================================
-    const [activeTab, setActiveTab] = useState<TaskTab>("pending");
+    const [activeTab, setActiveTab] = useState<TaskTab>("all");
 
     const [isRearrangeMode, setIsRearrangeMode] = useState(false);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
