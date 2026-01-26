@@ -56,7 +56,9 @@ const RepeatConfirmModal: React.FC = () => {
 
             const repeatIds = isRepeatAll ? allTaskIds : selectedIds;
 
-            await repeatTaskApi(repeatIds);
+            const response = await repeatTaskApi(repeatIds)
+
+            console.log("[RepeatConfirmModal] repeatTaskApi response:", response);
 
             await fetchTasks();
 
@@ -76,7 +78,7 @@ const RepeatConfirmModal: React.FC = () => {
             <div
                 style={modalCardBaseStyle}
                 className="repeat-confirm-card"
-                onMouseDown={(e) => e.stopPropagation()} // ❗ disable outside click close
+                onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= HEADER ================= */}
                 <div className="repeat-confirm-header">

@@ -2,8 +2,8 @@
 // MemoBoardPage.tsx
 // ============================================================================
 
-import React, { useRef, useLayoutEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import { updateMemoLayout } from "../api/memoApi";
 import { useMemoContext } from "../context/MemoContext";
@@ -41,6 +41,10 @@ const MemoBoardPage: React.FC = () => {
     } = useMemoContext();
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Memo id passed from MemoPreview via navigate("/memoboard", { state })
+    const openMemoId = (location.state as any)?.openMemoId ?? null;
 
     // -------------------------------------------------------------------------
     // CORK BOARD REF + SIZE STATE (SOURCE OF TRUTH)
@@ -83,6 +87,20 @@ const MemoBoardPage: React.FC = () => {
             window.removeEventListener("resize", measureBoard);
         };
     }, []);
+
+    // AUTO OPEN MEMO WHEN NAVIGATED FROM DASHBOARD PREVIEW
+    useEffect(() => {
+
+    if (!openMemoId) return;
+
+    // Open modal
+    setActiveMemoId(openMemoId);
+    openModal("view", openMemoId);
+
+    // Clear navigation state so it doesn't reopen
+    navigate("/memoboard", { replace: true });
+
+}, [openMemoId, navigate, openModal, setActiveMemoId]);
 
     // -------------------------------------------------------------------------
     // HANDLERS
@@ -165,18 +183,21 @@ const MemoBoardPage: React.FC = () => {
                         className="memo-nav-btn"
                         onClick={() => navigate("/")}
                     >
-                        ← Return to Dashboard
+                        <Icons.ArrowLeft />
+                        <span className="memo-nav-text">
+                            Return to Dashboard
+                        </span>
                     </button>
 
                     {/* CENTER */}
-                    <div className="memo-title-group">
+                    <div className="memo-board-title-group">
                         <div className="memo-board-title">
                             Memo Board
                         </div>
                         <div
                             className={`memo-board-edit-label ${boardMode === "edit"
-                                    ? "visible"
-                                    : ""
+                                ? "visible"
+                                : ""
                                 }`}
                         >
                             ( EDIT MODE )
@@ -193,7 +214,9 @@ const MemoBoardPage: React.FC = () => {
                                     onClick={handleAddMemo}
                                 >
                                     <Icons.Add />
-                                    <span className="memo-toolbar-text">Add</span>
+                                    <span className="memo-toolbar-text">
+                                        Add
+                                    </span>
                                 </button>
 
                                 <button
@@ -202,7 +225,7 @@ const MemoBoardPage: React.FC = () => {
                                 >
                                     <Icons.Drag />
                                     <span className="memo-toolbar-text">
-                                        Rearrange
+                                        Edit
                                     </span>
                                 </button>
                             </>
@@ -211,33 +234,35 @@ const MemoBoardPage: React.FC = () => {
                         {boardMode === "edit" && (
                             <>
                                 {/* Z controls will be FRONTEND-ONLY later */}
-                                <button
-                                    className="btn-secondary-rect memo-toolbar-btn"
-                                    disabled={!activeMemoId}
-                                    onClick={() => {
-                                        if (!activeMemoId) return;
-                                        sendMemoBackward(activeMemoId);
-                                    }}
-                                >
-                                    <Icons.DropdownArrow />
-                                    <span className="memo-toolbar-text">
-                                        Send Backward
-                                    </span>
-                                </button>
+                                <div className="memo-zorder-controls">
+                                    <button
+                                        className="btn-secondary-rect memo-toolbar-btn"
+                                        disabled={!activeMemoId}
+                                        onClick={() => {
+                                            if (!activeMemoId) return;
+                                            sendMemoBackward(activeMemoId);
+                                        }}
+                                    >
+                                        <Icons.DropdownArrow />
+                                        <span className="memo-toolbar-text">
+                                            Backward
+                                        </span>
+                                    </button>
 
-                                <button
-                                    className="btn-secondary-rect memo-toolbar-btn"
-                                    disabled={!activeMemoId}
-                                    onClick={() => {
-                                        if (!activeMemoId) return;
-                                        bringMemoForward(activeMemoId);
-                                    }}
-                                >
-                                    <Icons.ArrowUp />
-                                    <span className="memo-toolbar-text">
-                                        Bring Forward
-                                    </span>
-                                </button>
+                                    <button
+                                        className="btn-secondary-rect memo-toolbar-btn"
+                                        disabled={!activeMemoId}
+                                        onClick={() => {
+                                            if (!activeMemoId) return;
+                                            bringMemoForward(activeMemoId);
+                                        }}
+                                    >
+                                        <Icons.ArrowUp />
+                                        <span className="memo-toolbar-text">
+                                            Forward
+                                        </span>
+                                    </button>
+                                </div>
 
                                 <button
                                     className="btn-green-rect memo-toolbar-btn"
@@ -248,6 +273,7 @@ const MemoBoardPage: React.FC = () => {
                                         Done
                                     </span>
                                 </button>
+
                             </>
                         )}
                     </div>

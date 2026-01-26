@@ -1,0 +1,233 @@
+/* ============================================================================
+   MemoPreview.css
+   Dashboard memo preview widget
+   ============================================================================ */
+
+/* ============================ ROOT CARD ============================ */
+
+.memo-preview-card {
+
+    max-height: 300px;
+    min-height: 260px;
+    background: var(--white);
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    max-height: 54vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ============================ HEADER ============================ */
+
+.memo-preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.memo-preview-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.memo-preview-link {
+    background: none;
+    border: none;
+    padding: 0;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+
+    color: var(--blue-dark);
+
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.12s ease;
+}
+.memo-preview-link:hover {
+    color: var(--blue-light);
+    transform: translateX(2px);
+}
+
+.memo-preview-link:active {
+    transform: translateX(1px);
+}
+
+/* ============================ SCROLL AREA ============================ */
+
+.memo-preview-list-wrapper {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+/* ============================ LIST ============================ */
+
+.memo-preview-list {
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    overflow-y: auto;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.memo-preview-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================ MEMO ITEM ============================ */
+
+.memo-preview-item {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px 10px 35px;
+    /* space for pin */
+    border-radius: 10px;
+    border: 2px solid var(--blue-dark);
+
+    cursor: pointer;
+
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.memo-preview-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================ PIN ============================ */
+
+.memo-preview-pin {
+    position: absolute;
+
+    left: 10px;
+    top: 25px;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+}
+
+/* ============================ TEXT ============================ */
+
+.memo-preview-text {
+    display: flex;
+    flex-direction: column;
+    color: black;
+    gap: 3px;
+    min-width: 0;
+}
+
+.memo-preview-item-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+    line-clamp: 2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+.memo-preview-category {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+
+/* ============================================================================
+   GRID MODE — TABLET & BELOW
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+
+    .memo-preview-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    .memo-preview-item {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+
+        aspect-ratio: 1 / 1;
+
+        padding: 16px 15px 10px;
+    }
+
+    .memo-preview-pin {
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .memo-preview-text {
+        align-items: center;
+    }
+
+    .memo-preview-item-title {
+        font-size: 0.82rem;
+    }
+
+    .memo-preview-category {
+        font-size: 0.7rem;
+    }
+}
+
+/* ============================================================================
+   PHONE
+   ============================================================================ */
+
+@media (max-width: 480px) {
+
+    .memo-preview-card {
+        padding: 10px;
+    }
+
+    .memo-preview-title {
+        font-size: 1rem;
+    }
+
+    .memo-preview-link {
+        font-size: 0.75rem;
+    }
+
+    .memo-preview-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

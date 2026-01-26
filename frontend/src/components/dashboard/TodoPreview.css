@@ -4,7 +4,7 @@
 
 .todo-preview-container {
     max-height: 330px;
-    min-height: 260px;
+    min-height: 250px;
 
     background: var(--white);
     padding: 12px;
@@ -13,10 +13,10 @@
 
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 
     overflow: hidden;
-    max-height: 75vh;
+    max-height: 54vh;
     position: relative;
 }
 
@@ -155,6 +155,8 @@
     gap: 6px;
 
     max-height: 475px;
+    overflow: hidden;
+    position: relative;
     overflow-y: auto;
 }
 

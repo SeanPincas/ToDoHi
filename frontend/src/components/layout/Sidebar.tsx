@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import "./Sidebar.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
 import type { DropdownOption } from "../common/dropdownMenu/DropdownMenu";
@@ -62,6 +62,7 @@ const Sidebar = () => {
     const [showResetHourGuide, setShowResetHourGuide] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
     const { logout, theme, toggleTheme } = useAuthContext();
 
     const [failedTaskSnapshot, setFailedTaskSnapshot] = useState<{
@@ -72,6 +73,7 @@ const Sidebar = () => {
     const saveTimeout = useRef<number | null>(null);
 
     const toggleSidebar = () => setOpen(!open);
+    const closeSidebar = () => setOpen(false);
 
     // =====================================================================
     // LOAD USER (SAFE · NON-DESTRUCTIVE)
@@ -113,6 +115,11 @@ const Sidebar = () => {
 
         loadUser();
     }, []);
+
+    // AUTO CLOSE SIDEBAR ON ROUTE CHANGE
+    useEffect(() => {
+        setOpen(false);
+    }, [location.pathname]);
 
     // =====================================================================
     // HANDLERS (DEBOUNCED · SAFE)
@@ -177,13 +184,19 @@ const Sidebar = () => {
                 <div className="sidebar-section">
                     <button
                         className="sidebar-btn"
-                        onClick={() => navigate("/")}
+                        onClick={() => {
+                            closeSidebar();
+                            navigate("/");
+                        }}
                     >
                         Dashboard
                     </button>
                     <button
                         className="sidebar-btn"
-                        onClick={() => navigate("/memoboard")}
+                        onClick={() => {
+                            closeSidebar();
+                            navigate("/memoboard");
+                        }}
                     >
                         Memo Board
                     </button>

@@ -20,14 +20,14 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-// Context + types
+import {
+    restrictToVerticalAxis,
+    restrictToParentElement,
+} from "@dnd-kit/modifiers";
+
 import { useTodo } from "../../context/TodoContext";
 import type { Task } from "../../api/taskApi";
-
-// Components
 import { SortableTaskItem } from "../todo/SortableTaskItem";
-
-// Icons
 import { Icons } from "../../styles/iconLibrary";
 
 // Task utilities
@@ -81,9 +81,12 @@ const TodoPreview: React.FC = () => {
     //                            DND-KIT SETUP
     // =====================================================================
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+        useSensor(PointerSensor, {
+            activationConstraint: isRearrangeMode
+                ? { distance: 2 }   // short drag threshold when rearranging
+                : { distance: 9999 } // effectively disables drag in normal mode
+        })
     );
-
     const handleDragEnd = (event: any) => {
         if (!isRearrangeMode) return;
 
@@ -148,7 +151,7 @@ const TodoPreview: React.FC = () => {
     // =====================================================================
     const openViewTask = (task: Task) => {
         if (isRearrangeMode || isDeleteMode) return;
-        openModal("view", task);
+        openModal("view", { task });
     };
 
     // =====================================================================
@@ -238,6 +241,10 @@ const TodoPreview: React.FC = () => {
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
+                modifiers={[
+                    restrictToVerticalAxis,
+                    restrictToParentElement,
+                ]}
                 onDragEnd={handleDragEnd}
             >
                 <SortableContext

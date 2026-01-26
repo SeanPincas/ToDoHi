@@ -6,14 +6,17 @@
 .memo-board-page {
     display: flex;
     justify-content: center;
-    height: 100%;
-    padding: 20px;
+
+    flex: 1;        /* fill Layout content */
+    min-height: 0;
+
+  /* prevent page scroll */
 }
 
 /* MATCH DASHBOARD OFFSET BEHAVIOR */
 @media (min-width: 1400px) {
     .memo-board-page {
-        padding-left: clamp(0px, 18vw, 300px);
+        padding-left: clamp(0px, 20vw, 300px);
     }
 }
 
@@ -25,54 +28,79 @@
 
     width: 100%;
     max-width: 1550px;
-    /* ⬅️ EXPANDED (was 1400px) */
-    min-height: 820px;
-    /* ⬅️ FIXED BOARD PRESENCE */
+    height: 95%;
+    min-height: 0;
 
     padding: 22px;
-    /* ⬅️ slightly roomier */
     border-radius: 18px;
 
-    background: linear-gradient(135deg,
-            var(--memo-frame-bg-1),
-            var(--memo-frame-bg-2));
+    background: linear-gradient(
+        135deg,
+        var(--memo-frame-bg-1),
+        var(--memo-frame-bg-2)
+    );
 
     box-shadow:
         inset 0 0 0 4px rgba(0, 0, 0, 0.12),
         0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
-/* ============================ FRAME HEADER ============================ */
+/* ============================ HEADER GRID ============================ */
 
 .memo-board-topbar {
+    position: relative;
+
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
 
-    padding: 14px 18px;
-    /* ⬅️ taller header */
+    padding: 9px 18px;
     margin-bottom: 14px;
 
     border-radius: 12px;
-
     background: var(--memo-frame-header-bg);
 }
 
+/* ============================ NAV ============================ */
+
+.memo-nav-btn {
+    justify-self: start;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    background: none;
+    border: none;
+
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.memo-nav-text {
+    white-space: nowrap;
+}
+
 /* ============================ TITLE ============================ */
+
 .memo-board-title-group {
     display: flex;
     flex-direction: column;
-    align-items: center;      /* horizontal centering */
+    align-items: center;
     justify-content: center;
 
-    min-height: 64px;        /* LOCK vertical space so edit mode doesn't push layout */
+    min-height: 64px;
 }
 
 .memo-board-title {
-    font-size: 2.3rem;
+    font-size: 2rem;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 0.6px;
     color: var(--blue-dark);
+
+    text-align: center;
+    width: 100%;
 }
 
 .memo-board-edit-label {
@@ -80,84 +108,148 @@
     align-items: center;
     justify-content: center;
 
-    width: 100%;             /* span same width as title */
+    width: 100%;
 
     visibility: hidden;
     text-align: center;
+
+    margin-top: -8px;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #c62828;
-    margin-top: 4px;
 }
 
 .memo-board-edit-label.visible {
-    opacity: 1;
-    color: var(--blue-dark);
     visibility: visible;
-}
-
-/* ============================ NAV ============================ */
-
-.memo-nav-btn {
-    justify-self: start;
-    background: none;
-    border: none;
-    font-size: 0.9rem;
-    cursor: pointer;
-    color: var(--text-main);
+    color: var(--blue-dark);
 }
 
 /* ============================ TOOLBAR ============================ */
 
 .memo-board-toolbar {
     justify-self: end;
+
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
+
+    min-width: 0;
+}
+
+/* vertical z-stack */
+.memo-zorder-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    margin-left: auto;
+    align-items: stretch;
+    flex-shrink: 0;
 }
 
 .memo-toolbar-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 3px;
 }
 
+/* icon sizing */
 .btn-green-rect svg,
 .btn-primary-rect svg,
 .btn-info-rect svg,
 .btn-secondary-rect svg {
     font-size: 1.25rem;
-    /* ⬅️ increase icon size */
+}
+
+/* ============================ TABLET ============================ */
+
+@media (max-width: 1024px) {
+
+    /* hide nav label */
+    .memo-nav-text {
+        display: none;
+    }
+
+    .memo-board-toolbar {
+        gap: 8px;
+    }
+
+    .memo-board-toolbar .btn-green-rect,
+    .memo-board-toolbar .btn-primary-rect,
+    .memo-board-toolbar .btn-info-rect,
+    .memo-board-toolbar .btn-secondary-rect {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .memo-board-toolbar svg {
+        font-size: 1rem;
+    }
+
+    .memo-toolbar-text {
+        display: none;
+    }
+}
+
+/* ============================ PHONE ============================ */
+
+@media (max-width: 480px) {
+
+    .memo-board-topbar {
+        padding: 10px 12px;
+    }
+
+    /* toolbar becomes vertical rail */
+    .memo-board-toolbar {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+    }
+
+    .memo-zorder-controls {
+        gap: 4px;
+    }
+
+    .memo-board-toolbar .memo-toolbar-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .memo-board-title {
+        font-size: 1.6rem;
+    }
+
+    .memo-board-edit-label {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
 }
 
 /* ============================ CORK BOARD ============================ */
 
 .memo-board-canvas {
     flex: 1;
+    min-height: 0;
+    height: 100%;
+
+    box-sizing: border-box;
+
     position: relative;
-
-    min-height: 620px;
-    /* ⬅️ EXPANDED CORK AREA */
     padding: 24px;
-    /* ⬅️ board breathing space */
 
-    border-radius: 14px;
-
-    /* CORK TEXTURE */
     background-image: url("../assets/cork-board.jpg");
     background-size: cover;
-    /* stretch proportionally */
     background-repeat: no-repeat;
-    /* SINGLE image */
     background-position: center;
 
     box-shadow: var(--memo-cork-shadow);
 }
 
-/* Red Boundary */
+/* boundary indicator */
 .memo-board-boundary-shield {
     position: absolute;
     inset: 0;
@@ -166,8 +258,6 @@
     border-radius: 14px;
 
     pointer-events: none;
-
-    /* Must be under memos but above background */
     z-index: 1;
 
     box-shadow:
@@ -181,10 +271,4 @@
 .memo-board-empty {
     color: var(--text-main);
     opacity: 0.75;
-}
-
-@media (max-width: 1024px) {
-    .memo-toolbar-text {
-        display: none;
-    }
 }
