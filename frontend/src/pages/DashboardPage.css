@@ -31,7 +31,7 @@
 /* Sidebar visible — apply fluid offset */
 @media (min-width: 1400px) {
     .dashboard-page {
-        padding-left: clamp(0px, 20vw, 300px); /* Perfect sidebar offset */
+        padding-left: clamp(0px, 14vw, 300px); /* Perfect sidebar offset */
     }
 }
 

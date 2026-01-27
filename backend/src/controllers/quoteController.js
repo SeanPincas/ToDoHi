@@ -58,7 +58,12 @@ exports.getRandomQuote = async (req, res) => {
         const userId = req.user._id;
         const user = await User.findById(userId);
 
-        let chosenCategories = user.quoteCategoryPreferences;
+        let chosenCategories = user.quoteCategoryPreferences || [];
+
+        // Remove RANDOM token if present
+        chosenCategories = chosenCategories.filter(
+            (cat) => cat !== "Random"
+        );
 
         // If user has no preferences → return random quote from all
         const filter = chosenCategories.length > 0

@@ -21,6 +21,11 @@ import { useAuthContext } from "../../context/AuthContext";
 import { getMe, updateUserPreferences } from "../../api/userApi";
 
 import ThemeToggle from "../common/themeToggle/ThemeToggle";
+import {
+    updateQuotePreferencesApi,
+    getRandomQuoteApi,
+    getQuotesByCategoryApi,
+} from "../../api/quoteApi";
 
 // ---------------- NEW (UI ONLY) ----------------
 import ResetHourHelpIcon from "../common/icons/ResetHourHelpIcon";
@@ -57,6 +62,9 @@ const Sidebar = () => {
     // ---------------- PREFERENCES ----------------
     const [resetHour, setResetHour] = useState("0");
     const [quotePref, setQuotePref] = useState<QuoteCategory>("Motivation");
+    // ---------------- ACTIVE QUOTE ----------------
+    const [currentQuote, setCurrentQuote] = useState<string>("Loading quote...");
+
 
     // ---------------- UI STATE ----------------
     const [showResetHourGuide, setShowResetHourGuide] = useState(false);
@@ -93,12 +101,20 @@ const Sidebar = () => {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                // ---------------- QUOTE PREFERENCE  ----------------
+                // ---------------- QUOTE PREFERENCE ----------------
                 if (Array.isArray(user?.quoteCategoryPreferences)) {
+
                     const preferred = user.quoteCategoryPreferences[0];
-                    if (preferred) {
-                        setQuotePref(preferred as QuoteCategory);
-                    }
+
+                    // ----------------------------------
+                    // No saved prefs → RANDOM mode
+                    // ----------------------------------
+                    const selected =
+                        preferred ? preferred : "Random";
+
+                    setQuotePref(selected as QuoteCategory);
+
+                    fetchQuote(selected as QuoteCategory);
                 }
 
                 // Failed Task Snapshot
@@ -125,6 +141,35 @@ const Sidebar = () => {
     // HANDLERS (DEBOUNCED · SAFE)
     // =====================================================================
 
+    // QUOTE FETCHER (BASED ON USER PREF)
+    const fetchQuote = async (category: QuoteCategory) => {
+        try {
+
+            // RANDOM → backend decides category
+            if (category === "Random") {
+                const res = await getRandomQuoteApi();
+
+                setCurrentQuote(res.quote.text);
+                return;
+            }
+
+            // CATEGORY → pick random from that category
+            const res = await getQuotesByCategoryApi(category);
+
+            if (res.quotes.length > 0) {
+                const randomIndex = Math.floor(
+                    Math.random() * res.quotes.length
+                );
+
+                setCurrentQuote(res.quotes[randomIndex].text);
+            }
+
+        } catch (err) {
+            console.error("Failed fetching quote:", err);
+            setCurrentQuote("Stay productive today.");
+        }
+    };
+
     const handleResetHourChange = (val: string) => {
         setResetHour(val);
 
@@ -140,17 +185,29 @@ const Sidebar = () => {
     };
 
     const handleQuotePrefChange = (val: string) => {
-        setQuotePref(val as QuoteCategory);
+        const selected = val as QuoteCategory;
+
+        setQuotePref(selected);
+        fetchQuote(selected);
 
         if (saveTimeout.current) {
             clearTimeout(saveTimeout.current);
         }
 
-        saveTimeout.current = window.setTimeout(() => {
-            updateUserPreferences({
-                // UI sets ONE preference, backend still allows up to 3
-                quoteCategoryPreferences: [val],
-            }).catch(console.error);
+        // Save preference to QUOTE API
+        saveTimeout.current = window.setTimeout(async () => {
+            // "Random" is UI-only.
+            // Backend should receive EMPTY array → meaning random.
+            // -----------------------------
+            if (selected === "Random") {
+                updateQuotePreferencesApi([])
+                    .catch(console.error);
+                return;
+            }
+
+            // Normal category → save to backend
+            updateQuotePreferencesApi([selected])
+                .catch(console.error);
         }, 600);
     };
 
@@ -176,7 +233,7 @@ const Sidebar = () => {
                         className="sidebar-logo"
                     />
                     <p className="sidebar-quote">
-                        "Stay Productive, one day at a Time."
+                        "{currentQuote}"
                     </p>
                 </div>
 
@@ -236,7 +293,7 @@ const Sidebar = () => {
                 </div>
 
                 {/* FAILED TASKS */}
-                <div className="sidebar-section">
+                <div className="sidebar-section failed-section">
                     <h4 className="section-title">
                         Failed Tasks Yesterday
                     </h4>
@@ -260,7 +317,7 @@ const Sidebar = () => {
                 </div>
 
                 {/* PROFILE */}
-                <div className="sidebar-section">
+                <div className="sidebar-bottom">
                     <div className="profile-row">
                         <img
                             src="/default-profile.jpg"
