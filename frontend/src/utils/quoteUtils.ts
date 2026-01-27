@@ -8,6 +8,7 @@
 // 🟦 QUOTE CATEGORIES (Single Source of Truth)
 // ============================================================================
 export const QUOTE_CATEGORIES = [
+  "Random",
   "Motivation",
   "Success",
   "Life Lessons",
@@ -32,6 +33,7 @@ export type QuoteCategory = (typeof QUOTE_CATEGORIES)[number];
 // 🟨 CATEGORY LABELS (Display versions — customizable)
 // ============================================================================
 export const QUOTE_CATEGORY_LABELS: Record<QuoteCategory, string> = {
+  Random: "Random",
   Motivation: "Motivation",
   Success: "Success",
   "Life Lessons": "Life Lessons",

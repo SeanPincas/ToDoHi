@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const AuthController = require("../controllers/authController.js");
 const AuthMiddleware = require("../middleware/authMiddleware.js");
+const { authLimiter } = require("../middleware/rateLimiter.js");
 
-router.post("/register", AuthController.register);
-router.post("/login", AuthController.login);
+router.post("/register", authLimiter, AuthController.register);
+router.post("/login", authLimiter ,AuthController.login);
 
 // Protected Route
 router.get("/me", AuthMiddleware, AuthController.me);

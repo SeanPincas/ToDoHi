@@ -9,6 +9,8 @@
     width: 260px;
     height: 100dvh;
 
+    box-sizing: border-box;
+
     background: var(--paper-bg);
     border-right: 3px solid var(--blue-dark);
 
@@ -25,8 +27,6 @@
 
     transition: transform 0.3s ease;
     z-index: 999;
-
-    box-shadow: 3px 0px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* ============================ MOBILE TOGGLE ============================ */
@@ -58,8 +58,8 @@
 }
 
 .sidebar-logo {
-    width: 200px;
-    margin: 0 auto 0 auto;
+    width: 180px;
+    margin: -20px auto -20px auto;
 }
 
 .sidebar-quote {
@@ -70,42 +70,21 @@
     margin-top: -10px;
 }
 
-/* ============================ SCROLLABLE MIDDLE ============================ */
 
-.sidebar-scroll-area {
-    flex: 1;
-
-    overflow-y: auto;
-
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    padding-right: 4px;
-}
-
-/* scrollbar */
-.sidebar-scroll-area::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar-scroll-area::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 6px;
-}
 
 /* ============================ SECTIONS ============================ */
 
 .sidebar-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
+
 
 /* ============================ NAV BUTTONS ============================ */
 
 .sidebar-btn {
-    padding: 10px 15px;
+    padding: 8px 15px;
 
     background: var(--blue-light);
     border: 2px solid var(--blue-dark);
@@ -160,9 +139,19 @@
 /* ============================ FAILED TASK ============================ */
 
 .section-title {
-    font-size: 16px;
+    margin: 0;
+    margin-top: 10px;
+    margin-bottom: -5px;
     font-weight: bold;
     color: var(--blue-dark);
+}
+
+.sidebar-section.failed-section {
+    flex: 0 1 auto;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .failed-task-container {
@@ -172,6 +161,11 @@
     padding: 3px;
 
     box-shadow: var(--shadow-soft);
+
+    max-height: 100%;
+    display: flex;
+
+    overflow: hidden;
 }
 
 .failed-task-list {
@@ -179,8 +173,33 @@
     padding: 0;
     margin: 0;
 
-    max-height: 120px;
+    flex: 1;
+    min-height: 0;
+
     overflow-y: auto;
+}
+
+.failed-task-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.failed-task-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.failed-task-list::-webkit-scrollbar-thumb {
+    background: rgba(120, 180, 255, 0.55);
+    border-radius: 8px;
+}
+
+.failed-task-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 180, 255, 0.85);
+}
+
+/* Firefox */
+.failed-task-list {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 180, 255, 0.55) transparent;
 }
 
 .failed-task-item {
@@ -207,6 +226,9 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+
+    max-height: 35vh;
+    flex-shrink: 0;
 }
 
 /* ============================ PROFILE ============================ */
@@ -215,11 +237,12 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .sidebar-profile-pic {
-    width: 65px;
-    height: 65px;
+    width: 45px;
+    height: 45px;
 
     border-radius: 50%;
     border: 3px solid var(--blue-dark);
@@ -249,6 +272,8 @@
     transition: 0.25s;
 
     box-shadow: var(--shadow-soft);
+
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -258,9 +283,12 @@
 /* ============================ FOOTER ============================ */
 
 .sidebar-footer-row {
+    margin-top: 10px;
     display: flex;
     align-items: center;
     position: relative;
+
+    flex-shrink: 0
 }
 
 .sidebar-footer {

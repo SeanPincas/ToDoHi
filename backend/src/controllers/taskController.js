@@ -206,17 +206,23 @@ exports.repeatTasks = async (req, res) => {
 
         const cycleKey = `${yyyy}-${mm}-${dd}@${resetHour}`;
 
+        // ---------------- DEBUG LOG: repeat cycle acknowledgement ----------------
+        console.log("[repeatTasks] repeatCycleAcknowledged → writing:", {
+            userId,
+            cycleKey
+        });
+
         // Store acknowledgement on USER document
         await User.findByIdAndUpdate(userId, {
             repeatCycleAcknowledged: cycleKey
         });
 
         res.json({
-            message: "Tasks repeate successfully",
+            message: "Tasks repeated successfully",
             repeatedCount: newTasks.length
         });
     } catch (err) {
-        console.log("[reeatTasks] Error:", err);
+        console.log("[repeatTasks] Error:", err);
         res.status(500).json({ message: "Error Repeating Tasks", error: err.message })
     }
 };
