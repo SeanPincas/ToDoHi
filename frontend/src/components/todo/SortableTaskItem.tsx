@@ -55,7 +55,22 @@ export const SortableTaskItem = ({
     );
 
     const isSelectedForDelete = selectedToDelete.includes(task._id);
+    
+    const handleContainerClick = () => {
+        // ---------------- REARRANGE MODE ----------------
+        // Card is used purely for dragging — do nothing on click.
+        if (isRearrangeMode) return;
 
+        // ---------------- DELETE MODE ----------------
+        if (isDeleteMode) {
+            toggleDeleteSelection(task._id);
+            return;
+        }
+
+        // ---------------- NORMAL MODE ----------------
+        onOpenView();
+    };
+    
     // =================================================================================================
     //                                          RENDER
     // =================================================================================================
@@ -64,23 +79,13 @@ export const SortableTaskItem = ({
             ref={setNodeRef}
             style={containerStyle}
             className={`task-item-container ${isDragging ? "dragging" : ""}`}
-            onClick={() => {
-                // Prevent opening ViewModal while in delete mode instead its for delete selection
-                if (isDeleteMode) {
-                    toggleDeleteSelection(task._id);
-                    return;
-                }
-                // Prevent opening ViewModal while in rearrange
-                if (!isDeleteMode) {
-                    onOpenView();
-                }
-            }}
+            onClick={handleContainerClick}
         >
             {/* ---------- LEFT SIDE: CHECKBOXES / DELETE SELECTOR ---------- */}
             <div className="task-left-section">
 
                 {/* COMPLETION CHECKBOX (normal mode) */}
-                {!isDeleteMode && (
+                {!isDeleteMode && !isRearrangeMode &&(
                     <div
                         className="task-checkbox"
                         onClick={(e) => {

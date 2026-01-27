@@ -42,9 +42,9 @@ const AddMemoModal: React.FC = () => {
     useEffect(() => {
         if (activeModal === "add") {
             setTitle(""),
-                setContent(""),
-                setCategory("others"),
-                setContainerColor(resolveMemoContainerColor());
+            setContent(""),
+            setCategory("others"),
+            setContainerColor(resolveMemoContainerColor());
             setPinColor(getDefaultMemoPinColor());
             setErrorMsg(null);
             setLoading(false);

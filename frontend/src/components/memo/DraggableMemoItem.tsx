@@ -31,9 +31,12 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     boardWidth,
     boardHeight,
 }) => {
-    const { activeMemoId,
+    const {
+        activeMemoId,
         setActiveMemoId,
-        setIsMemoAtEdge
+        setIsMemoAtEdge,
+        boardMode,
+        openModal
     } = useMemoContext();
 
     // ------------------------------------------------------------------------
@@ -111,6 +114,16 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             : undefined,
     };
 
+    // -----------------------------------------------------------------------------
+    // CLICK → OPEN VIEW MEMO MODAL (VIEW MODE ONLY)
+    // -----------------------------------------------------------------------------
+    const handleMemoClick = () => {
+        // Edit mode is reserved for dragging / repositioning.
+        if (boardMode !== "view") return;
+
+        openModal("view", memo._id);
+    };
+
     // ------------------------------------------------------------------------
     // RENDER
     // ------------------------------------------------------------------------
@@ -120,6 +133,7 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             style={style}
             {...(isEditMode ? listeners : {})}
             {...(isEditMode ? attributes : {})}
+            onClick={handleMemoClick}
             onMouseDown={(e) => {
                 // UI-only selection (no backend intent)
                 if (!isEditMode) return;

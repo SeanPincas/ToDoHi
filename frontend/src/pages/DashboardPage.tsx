@@ -6,7 +6,6 @@ import TodoPreview from "../components/dashboard/TodoPreview";
 import MemoPreview from "../components/dashboard/MemoPreview";
 import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
 
-import Layout from '../components/layout/Layout';
 import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
 import { getCurrentResetCycleKey } from '../utils/resetCycle';
@@ -52,7 +51,7 @@ const Dashboard: React.FC = () => {
         }
         // Open Clocking Repeat Modal
         openModal("repeat", {
-            tasks:repeatableTasks
+            tasks: repeatableTasks
         });
 
         setRepeatChecked(true);
@@ -90,63 +89,63 @@ const Dashboard: React.FC = () => {
 
     // ------------------------------ RENDER ----------------------------------------------
     return (
-        <Layout showSidebar={true}>
-            <div className="dashboard-page">
+        <div className="dashboard-page">
 
-                <div className="dashboard-container">
+            <div className="dashboard-container">
 
-                    {/* ---------- GREETING ---------- */}
-                    <div className="dashboard-greeting-bar">
-                        <div className="greeting-left">
-                            <h2>👋 Hello, User</h2>
-                            <p>Welcome Back!</p>
-                        </div>
-
-                        <div className="greeting-right">
-                            <div className="time-row">
-                                <span className="time-text">{time12}</span>
-                                <span className="time-divider">||</span>
-                                <span className="time-text">{time24}</span>
-                            </div>
-
-                            <span className="date-text">{currentDate}</span>
-                        </div>
+                {/* ---------- GREETING ---------- */}
+                <div className="dashboard-greeting-bar">
+                    <div className="greeting-left">
+                        <h2>👋 Hello, User</h2>
+                        <p>Welcome Back!</p>
                     </div>
 
-                    {/* ---------- STATS BAR ---------- */}
-                    <DashboardStats />
-
-                    {/* ---------- BENTO GRID ---------- */}
-                    <div className="dashboard-bento-grid">
-                        <div className="bento-box">
-                            <div className="bento-scroll">
-                                <TodoPreview />
-                            </div>
+                    <div className="greeting-right">
+                        <div className="time-row">
+                            <span className="time-text">{time12}</span>
+                            <span className="time-divider">||</span>
+                            <span className="time-text">{time24}</span>
                         </div>
 
-                        <div className="bento-box">
-                            <div className="bento-scroll">
-                                <DailyPlanPreview />
-                            </div>
-                        </div>
-
-                        <div className="bento-box">
-                            <div className="bento-scroll">
-                                <MemoPreview />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ---------- CHARTS ---------- */}
-                    <div className="dashboard-charts">
-                        <div className="chart-card">Chart #1</div>
-                        <div className="chart-card">Chart #2</div>
-                        <div className="chart-card">Chart #3</div>
+                        <span className="date-text">{currentDate}</span>
                     </div>
                 </div>
 
+                {/* ---------- STATS BAR ---------- */}
+                <div className="dashboard-stats-wrapper">
+                    <DashboardStats />
+                </div>
+
+                {/* ---------- BENTO GRID ---------- */}
+                <div className="dashboard-bento-grid">
+                    <div className="bento-box">
+                        <div className="bento-scroll">
+                            <TodoPreview />
+                        </div>
+                    </div>
+
+                    <div className="bento-box">
+                        <div className="bento-scroll">
+                            <DailyPlanPreview />
+                        </div>
+                    </div>
+
+                    <div className="bento-box">
+                        <div className="bento-scroll">
+                            <MemoPreview />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ---------- CHARTS ---------- */}
+                <div className="dashboard-charts">
+                    <div className="chart-card">Chart #1</div>
+                    <div className="chart-card">Chart #2</div>
+                    <div className="chart-card">Chart #3</div>
+                </div>
             </div>
-        </Layout>
+
+        </div>
     );
 };
 

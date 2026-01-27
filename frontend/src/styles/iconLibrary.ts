@@ -15,8 +15,8 @@ import {
     RiMenuFill,
     RiArrowUpSLine,
     RiArrowDownSLine,
-    RiArrowLeftSLine,
     RiDragMove2Fill,
+    RiArrowLeftLine,
 
     // ---------------- USER / SETTINGS ----------------
     RiSettings3Fill,
@@ -59,8 +59,8 @@ export const Icons = {
     Menu: RiMenuFill,
     ArrowUp: RiArrowUpSLine,
     DropdownArrow: RiArrowDownSLine,
-    SidebarCollapse: RiArrowLeftSLine,
     Drag: RiDragMove2Fill,
+    ArrowLeft: RiArrowLeftLine,
 
     // ---------------- USER / SETTINGS ----------------
     Settings: RiSettings3Fill,

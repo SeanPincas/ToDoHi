@@ -1,0 +1,103 @@
+/* ============================================================================
+   DeleteConfirmMemoModal.css
+   Compact confirmation layout for Memo deletion
+   Geometry handled by modalStyles.ts
+   ============================================================================ */
+
+.delete-memo-modal-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;               /* tighter than before */
+}
+
+/* ================= HEADER ================= */
+
+.delete-memo-header h3 {
+    font-size: 1.15rem;      /* smaller */
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ================= TEXT ================= */
+
+.delete-memo-text {
+    font-size: 0.9rem;
+    line-height: 1.35;
+    margin: 0;
+}
+
+.delete-memo-title-preview {
+    font-weight: 600;
+    font-style: italic;
+    margin-top: 2px;
+}
+
+/* ================= ACTIONS ================= */
+
+.delete-memo-actions {
+    margin-top: 6px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* make buttons slightly tighter inside modal */
+.delete-memo-actions .btn-danger-rect,
+.delete-memo-actions .btn-secondary-rect {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+}
+
+/* ============================ TABLET ============================ */
+
+@media (max-width: 900px) {
+
+    .delete-memo-header h3 {
+        font-size: 1.05rem;
+    }
+
+    .delete-memo-text {
+        font-size: 0.85rem;
+    }
+
+    .delete-memo-actions {
+        gap: 8px;
+    }
+
+    .delete-memo-actions .btn-danger-rect,
+    .delete-memo-actions .btn-secondary-rect {
+        padding: 7px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================ PHONE ============================ */
+
+@media (max-width: 480px) {
+
+    .delete-memo-modal-card {
+        gap: 8px;
+    }
+
+    .delete-memo-header h3 {
+        font-size: 1rem;
+    }
+
+    .delete-memo-text {
+        font-size: 0.82rem;
+    }
+
+    .delete-memo-actions {
+        flex-direction: column-reverse;   /* destructive action closer to thumb */
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .delete-memo-actions .btn-danger-rect,
+    .delete-memo-actions .btn-secondary-rect {
+        width: 100%;
+        padding: 8px;
+    }
+}
