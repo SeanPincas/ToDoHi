@@ -11,6 +11,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { Task } from "../api/taskApi.ts";
+import { useAuthContext } from "./AuthContext";
 
 import {
     getAllTasks,
@@ -38,7 +39,7 @@ interface TodoContextType {
 
     // CRUD
     fetchTasks: () => Promise<void>;
-    addTask: (data: Partial<Task>) => Promise<void>;
+    addTask: (data: Partial<Task>) => Promise<Task>;
     updateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
     deleteTask: (taskId: string) => Promise<void>;
 
@@ -71,6 +72,7 @@ export const useTodo = () => {
 //                                   PROVIDER START                                    
 // ====================================================================================
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
+    const { refreshUser } = useAuthContext();
 
     // =================================================================================================
     //                                       REACT STATES
@@ -145,15 +147,18 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     // =================================================================================================
     //                                   ADD NEW TASK
     // =================================================================================================
-    const addTask = async (data: Partial<Task>) => {
+    const addTask = async (data: Partial<Task>): Promise<Task> => {
         try {
             const newTask = await createTask(data);
 
             setTasks(prev =>
                 [...prev, newTask].sort((a, b) => a.orderIndex - b.orderIndex)
             );
+            await refreshUser();
+            return newTask;
         } catch (error) {
             console.error("[TodoContext] Error Creating Task:", error);
+            throw error;
         }
     };
 
@@ -167,9 +172,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
             setTasks(prev =>
                 prev.map(t => (t._id === taskId ? { ...t, ...updated } : t))
             );
-
-
-
+            await refreshUser();
         } catch (error) {
             console.error("[TodoContext] Error Updating Task:", error);
         }
@@ -183,6 +186,8 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
             await apiDeleteTask(taskId);
 
             setTasks(prev => prev.filter(t => t._id !== taskId));
+
+            await refreshUser();
         } catch (error) {
             console.error("[TodoContext] Error deleting task:", error);
         }
@@ -222,7 +227,7 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
         await reorderTaskPositions(orderIds);
         // update local state
         setTasks(
-           fullOrderedTasks.map((task, index) => ({
+            fullOrderedTasks.map((task, index) => ({
                 ...task,
                 orderIndex: index,
             }))

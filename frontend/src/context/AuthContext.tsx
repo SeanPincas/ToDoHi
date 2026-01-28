@@ -41,6 +41,14 @@ interface User {
 
     profilePicture?: string;
     repeatCycleAcknowledged: string;
+    failedTaskSnapshot?: {
+        resetAt?: string;
+        tasks: {
+            _id: string;
+            title: string;
+            status: string;
+        }[];
+    };
 }
 
 type ThemeType = "light" | "dark";
@@ -57,6 +65,8 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     register: (username: string, email: string, password: string) => Promise<void>;
     logout: () => void;
+    refreshUser: () => Promise<void>;
+
 
     isAuthenticated: boolean;
 }
@@ -155,6 +165,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         navigate("/login", { replace: true });
     };
 
+    // ---------------- REFRESH USER (STATS / SNAPSHOTS) ----------------
+    const refreshUser = async () => {
+        try {
+            const current = await getCurrentUserApi();
+            setUser(current);
+
+            if (current?.preference?.theme) {
+                setTheme(current.preference.theme);
+            }
+        } catch (err) {
+            console.error("[AuthContext] Failed refreshing user:", err);
+        }
+    };
+
+
     const value: AuthContextType = {
         token,
         user,
@@ -164,6 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         register,
         logout,
+        refreshUser,
         isAuthenticated: !!user,
     };
 
