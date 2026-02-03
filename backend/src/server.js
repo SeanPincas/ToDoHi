@@ -15,6 +15,7 @@ const taskRoutes = require("./routes/taskRoute.js");
 const memoRoutes = require("./routes/memoRoute.js");
 const dailyPlanRoutes = require("./routes/dailyPlanRoute.js");
 const quoteRoutes = require("./routes/quoteRoute.js");
+const statsRoutes = require("./routes/statsRoute.js");
 
 // Environment Setup
 dotenv.config();

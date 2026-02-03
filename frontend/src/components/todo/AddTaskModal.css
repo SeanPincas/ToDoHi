@@ -234,8 +234,23 @@
 
 .todo-modal-footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Checkbox group (left side) */
+.todo-memo-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* Buttons stay grouped on right */
+.todo-modal-footer .btn-cancel,
+.todo-modal-footer .btn-primary {
+    margin-left: 6px;
 }
 
 .btn-cancel {

@@ -1,5 +1,6 @@
 // RepeatConfirmModal.tsx
 import React, { useState } from "react";
+import { useAuthContext } from "../../../context/AuthContext";
 import { useTodo } from "../../../context/TodoContext";
 import { repeatTaskApi } from "../../../api/taskApi";
 import { modalOverlayStyle, modalCardBaseStyle } from "../../../styles/modalStyles";
@@ -12,6 +13,7 @@ type RepeatConfirmMode = "repeatAll" | "confirmSelected";
 
 // ------------------------------ COMPONENT ------------------------------
 const RepeatConfirmModal: React.FC = () => {
+    const { refreshUser } = useAuthContext();
     const { modal, openModal, closeModal, fetchTasks } = useTodo();
     const [loading, setLoading] = useState(false);
 
@@ -61,6 +63,7 @@ const RepeatConfirmModal: React.FC = () => {
             console.log("[RepeatConfirmModal] repeatTaskApi response:", response);
 
             await fetchTasks();
+            await refreshUser();
 
             // Close everything after success
             closeModal();

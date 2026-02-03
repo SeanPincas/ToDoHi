@@ -15,6 +15,7 @@ export interface Task {
     category: TaskCategory | (string & {});
     status: TaskStatus | (string & {});
     createdAt: string;
+    updatedAt: string;
     deadline?: string | null;
     orderIndex: number;
     isExpired: boolean;

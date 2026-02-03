@@ -215,7 +215,7 @@ const TodoPreview: React.FC = () => {
                             setSelectedToDelete([]);
                         }}
                     >
-                        <Icons.Delete />
+                        {isDeleteMode ? <Icons.Close /> : <Icons.Delete />}
                     </button>
                 </div>
             </div>

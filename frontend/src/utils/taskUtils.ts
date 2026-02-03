@@ -177,8 +177,19 @@ export const getFailedTextColor = (containerColorName: string): string => {
 export const getCategoryOptions = () =>
     TASK_CATEGORIES.map(c => ({ value: c, label: CATEGORY_LABELS[c] }));
 
-export const getStatusOptions = () =>
-    TASK_STATUSES.map(s => ({ value: s, label: STATUS_LABELS[s] }));
+export const getStatusOptions = (opts?: { excludeFailed?: boolean }) => {
+    let statuses = [...TASK_STATUSES];
+
+    // ------------------ OPTIONAL FILTER ------------------
+    if (opts?.excludeFailed) {
+        statuses = statuses.filter(s => s !== "failed");
+    }
+
+    return statuses.map(s => ({
+        value: s,
+        label: STATUS_LABELS[s],
+    }));
+};
 
 /* ============================================================================
    7. STATUS HELPERS

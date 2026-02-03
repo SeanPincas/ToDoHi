@@ -50,3 +50,34 @@ export const getCurrentResetCycleKey = (resetHour: number): string => {
 
     return `${yyyy}-${mm}-${dd}@${hour}`;
 };
+
+// ============================================================================
+// RESET WINDOW (FOR STATS COMPUTATION)
+// Uses SAME boundary logic as getCurrentResetCycleKey()
+// ============================================================================
+export const getResetWindow = (resetHour: number) => {
+
+    // ------------------ SAFETY ------------------
+    const hour =
+        typeof resetHour === "number" && resetHour >= 0 && resetHour <= 23
+            ? resetHour
+            : 0;
+
+    const now = new Date();
+
+    // ------------------ RESET BOUNDARY ------------------
+    const start = new Date(now);
+    start.setHours(hour, 0, 0, 0);
+
+    if (now < start) {
+        start.setDate(start.getDate() - 1);
+    }
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    const yesterdayStart = new Date(start);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
+    return { start, end, yesterdayStart };
+};

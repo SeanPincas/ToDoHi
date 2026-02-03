@@ -16,6 +16,8 @@ import React, {
     useState
 } from "react";
 
+import { useAuthContext } from "./AuthContext";
+
 import {
     getAllMemos,
     createMemo,
@@ -103,6 +105,8 @@ export const useMemoContext = () => {
 // ====================================================================================
 
 export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { refreshUser } = useAuthContext();
+
     const [memos, setMemos] = useState<Memo[]>([]);
     const [loading, setLoading] = useState(false);
     const [boardMode, setBoardMode] = useState<BoardMode>("view");
@@ -146,11 +150,15 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
          * Array order = stacking order.
          */
         setMemos(prev => [...prev, memo]);
+
+        await refreshUser();
     };
 
     const addMemoFromTask = async (taskId: string, pinColor?: string) => {
         const memo = await createMemoFromTask({ taskId, pinColor });
         setMemos(prev => [...prev, memo]);
+
+        await refreshUser();
     };
 
     // -------------------------------------------------------------------------
@@ -225,6 +233,8 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const removeMemo = async (id: string) => {
         await deleteMemo(id);
         setMemos(prev => prev.filter(m => m._id !== id));
+
+        await refreshUser();
     };
 
     // -------------------------------------------------------------------------

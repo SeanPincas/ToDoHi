@@ -155,7 +155,7 @@ const EditTaskModal = () => {
                     <DropdownMenu
                         label="Status"
                         value={safeStatusLabel(status)}
-                        options={getStatusOptions()}
+                        options={getStatusOptions({ excludeFailed: true })}
                         onChange={setStatus}
                     />
                 </div>
