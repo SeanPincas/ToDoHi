@@ -7,10 +7,11 @@ import React from "react";
 import { useDraggable } from "@dnd-kit/core";
 
 import type { Memo } from "../../api/memoApi";
-import { getMemoCategoryEmoji } from "../../utils/memoUtils/memoUtils";
+import { getMemoCategoryIconKey } from "../../utils/memoUtils/memoUtils";
 import MemoCardBaseOverlay from "../../styles/MemoCardBaseOverlay";
 import { useMemoContext } from "../../context/MemoContext";
 import { clampPinTransform } from "../../utils/memoUtils/clampPinTransform";
+import { Icons } from "../../styles/iconLibrary";
 
 // ------------------------------ TYPES ---------------------------------------
 interface DraggableMemoItemProps {
@@ -31,9 +32,12 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     boardWidth,
     boardHeight,
 }) => {
-    const { activeMemoId,
+    const {
+        activeMemoId,
         setActiveMemoId,
-        setIsMemoAtEdge
+        setIsMemoAtEdge,
+        boardMode,
+        openModal
     } = useMemoContext();
 
     // ------------------------------------------------------------------------
@@ -111,15 +115,28 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             : undefined,
     };
 
+    // -----------------------------------------------------------------------------
+    // CLICK → OPEN VIEW MEMO MODAL (VIEW MODE ONLY)
+    // -----------------------------------------------------------------------------
+    const handleMemoClick = () => {
+        // Edit mode is reserved for dragging / repositioning.
+        if (boardMode !== "view") return;
+
+        openModal("view", memo._id);
+    };
+
     // ------------------------------------------------------------------------
     // RENDER
     // ------------------------------------------------------------------------
+    const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...(isEditMode ? listeners : {})}
             {...(isEditMode ? attributes : {})}
+            onClick={handleMemoClick}
             onMouseDown={(e) => {
                 // UI-only selection (no backend intent)
                 if (!isEditMode) return;
@@ -130,7 +147,7 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             <MemoCardBaseOverlay
                 title={memo.title}
                 content={memo.content}
-                categoryEmoji={getMemoCategoryEmoji(memo.category)}
+                categoryIcon={<CategoryIcon />}
                 containerColor={memo.containerColor}
                 pinColor={memo.pinColor}
                 isActive={activeMemoId === memo._id}

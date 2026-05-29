@@ -1,10 +1,72 @@
 /* --------------------------- GLOBAL LAYOUT WRAPPER --------------------------- */
 .layout-wrapper {
+    --shell-outer-pad: clamp(12px, 1.8vw, 24px);
     display: flex;
+    justify-content: center;
+    align-items: stretch;
     width: 100%;
+    height: 100vh;
     min-height: 100vh;
-    background: var(--paper-bg);
-    font-family: var(--font-main, 'Kalam', sans-serif);
+    background: transparent;
+    font-family: var(--font-body, 'Kalam', sans-serif);
+    padding: var(--shell-outer-pad);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.book-shell {
+    width: min(100%, 1600px);
+    height: calc(100vh - (2 * var(--shell-outer-pad)));
+    max-height: calc(100vh - (2 * var(--shell-outer-pad)));
+    min-height: 0;
+    padding: clamp(12px, 1.2vw, 18px);
+
+    background-color: #2f4f71;
+    background-image:
+        url("../../assets/leather.webp"),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(10, 28, 48, 0.18));
+    background-size: cover, cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-radius: clamp(18px, 2vw, 26px);
+    border: 1px solid rgba(23, 45, 68, 0.7);
+    box-shadow:
+        0 22px 42px var(--desk-shadow),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+@media (min-width: 1360px) and (max-width: 1600px) {
+    .book-shell {
+        min-height: clamp(720px, 82vh, 860px);
+    }
+}
+
+.notebook-sheet {
+    --sidebar-rail-size: clamp(46px, 3.2vw, 58px);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: clamp(14px, 1.6vw, 20px);
+    background-color: var(--paper-bg);
+    background-image:
+        linear-gradient(180deg, var(--page-line-top-fade), var(--page-line-bottom-fade)),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) var(--page-line-gap)
+        );
+
+    display: block;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: visible;
+    overflow-y: hidden;
 }
 
 /* --------------------------- MAIN CONTENT AREA --------------------------- */
@@ -14,27 +76,39 @@
    - instead allow fluid left/right margin from container styles
 */
 .layout-content {
-    flex: 1;
-    padding: 10px;
-
-    display: flex;
-    justify-content: center;  /* <-- allows natural left spacing */
-    align-items: flex-start;
+    height: 100%;
+    min-width: 0;
+    padding: 0 var(--sidebar-rail-size) 0 var(--sidebar-rail-size);
+    display: block;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
-/* --------------------------- CONTENT CONTAINER --------------------------- */
-/*
-   This is the actual page wrapper.
-   We give it FLEXIBLE max-width so dashboard can expand
-   and also retain breathing space on both sides.
-*/
-.content-container {
-    width: 100%;
+.notebook-sheet.no-sidebar {
+    display: block;
 }
 
 /* --------------------------- MOBILE --------------------------- */
-@media (max-width: 768px) {
+@media (max-width: 1199px) {
+    .notebook-sheet {
+        --sidebar-rail-size: 46px;
+    }
+
+    .layout-wrapper {
+        --shell-outer-pad: 10px;
+        padding: 10px;
+    }
+
+    .book-shell {
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    .notebook-sheet {
+        padding: 0;
+    }
+
     .layout-content {
-        padding: 12px;
+        padding: 0 var(--sidebar-rail-size) 0 var(--sidebar-rail-size);
     }
 }

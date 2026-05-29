@@ -3,8 +3,9 @@
 // ============================================================================
 
 import React, { useState, useEffect } from "react";
-import { useTodo } from "../../context/TodoContext";
 import { useAuthContext } from "../../context/AuthContext";
+import { useTodo } from "../../context/TodoContext";
+import { useMemoContext } from "../../context/MemoContext";
 import {
     TASK_CATEGORIES,
     CATEGORY_LABELS,
@@ -21,12 +22,15 @@ import "./AddTaskModal.css";
 const AddTaskModal: React.FC = () => {
     const { modal, closeModal, addTask } = useTodo();
     const { user } = useAuthContext();
+    const { addMemoFromTask } = useMemoContext();
 
     // ------------------ FORM FIELDS ------------------
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState<TaskCategory>("others");
     const [containerColor, setContainerColor] = useState("#ffffff");
+
+    const [createMemoToo, setCreateMemoToo] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -41,6 +45,9 @@ const AddTaskModal: React.FC = () => {
             setDescription("");
             setCategory("others");
             setContainerColor("#ffffff");
+
+            setCreateMemoToo(false);
+
             setIsCatDropdownOpen(false);
             setErrorMsg(null);
         }
@@ -83,7 +90,12 @@ const AddTaskModal: React.FC = () => {
         };
 
         try {
-            await addTask(payload);
+            const createdTask = await addTask(payload);
+
+            if (createMemoToo && createdTask?._id) {
+                await addMemoFromTask(createdTask._id);
+            }
+
             closeModal();
         } catch (err: any) {
             setErrorMsg(err?.message ?? "Failed to create task.");
@@ -149,9 +161,8 @@ const AddTaskModal: React.FC = () => {
                         <span className="todo-label">Category</span>
 
                         <div
-                            className={`todo-dropdown ${
-                                isCatDropdownOpen ? "open" : ""
-                            }`}
+                            className={`todo-dropdown ${isCatDropdownOpen ? "open" : ""
+                                }`}
                             onClick={() =>
                                 setIsCatDropdownOpen(!isCatDropdownOpen)
                             }
@@ -189,11 +200,10 @@ const AddTaskModal: React.FC = () => {
                             {TASK_COLOR_OPTIONS.map((c) => (
                                 <div
                                     key={c.hex}
-                                    className={`todo-color-option ${
-                                        containerColor === c.hex
-                                            ? "selected"
-                                            : ""
-                                    }`}
+                                    className={`todo-color-option ${containerColor === c.hex
+                                        ? "selected"
+                                        : ""
+                                        }`}
                                     style={{ backgroundColor: c.hex }}
                                     onClick={() =>
                                         setContainerColor(c.hex)
@@ -204,23 +214,37 @@ const AddTaskModal: React.FC = () => {
                     </label>
 
                     {/* ------------------ FOOTER ------------------ */}
-                    <div className="todo-modal-footer">
-                        <button
-                            type="button"
-                            className="btn-cancel"
-                            onClick={handleClose}
-                            disabled={loading}
-                        >
-                            Cancel
-                        </button>
 
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={loading}
-                        >
-                            {loading ? "Creating..." : "Create Task"}
-                        </button>
+                    <div className="todo-modal-footer">
+
+                        {/* ------------------ CREATE MEMO OPTION ------------------ */}
+                        <label className="todo-memo-checkbox">
+                            <input
+                                type="checkbox"
+                                checked={createMemoToo}
+                                onChange={(e) => setCreateMemoToo(e.target.checked)}
+                            />
+                            <span>Add Memo from this Task?</span>
+                        </label>
+
+                        <div className="todo-footer-actions">
+                            <button
+                                type="button"
+                                className="btn-cancel"
+                                onClick={handleClose}
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                className="btn-primary"
+                                disabled={loading}
+                            >
+                                {loading ? "Creating..." : "Create Task"}
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

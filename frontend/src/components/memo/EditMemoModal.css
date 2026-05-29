@@ -1,0 +1,204 @@
+/* ============================================================================
+   EditMemoModal.css
+   Mirrors AddMemoModal layout + responsiveness
+   ============================================================================ */
+
+/* ---------------- HEADER ---------------- */
+
+.memo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.memo-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* Close icon button */
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------- FORM FIELDS ---------------- */
+
+.memo-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.memo-modal-field label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0.85;
+}
+
+.memo-modal-field input,
+.memo-modal-field textarea {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--blue-dark);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: none;
+}
+
+/* ============================================================================
+   CATEGORY GRID (EMOJI STICKERS)
+   ============================================================================ */
+
+.memo-category-grid {
+    display: grid;
+    grid-template-columns: repeat(10, max-content);
+    grid-template-rows: repeat(2, max-content);
+    justify-content: center;
+    padding-bottom: 10px;
+    gap: 3px;
+}
+
+.memo-category-item {
+    aspect-ratio: 1 / 1;
+    height: 40px;
+
+    border: 2px solid var(--blue-dark);
+    border-radius: 10px;
+
+    background: var(--white);
+    cursor: pointer;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.memo-category-item .emoji {
+    font-size: 1rem;
+}
+
+.memo-category-item:hover {
+    transform: translateY(-2px);
+}
+
+.memo-category-item.active {
+    box-shadow: 0 0 0 3px var(--info-accent);
+}
+
+/* ============================================================================
+   PIN COLOR GRID
+   ============================================================================ */
+
+.memo-pin-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding-bottom: 10px;
+}
+
+.memo-pin-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+
+    border: 2px solid var(--blue-dark);
+
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.memo-pin-dot:hover {
+    transform: scale(1.1);
+}
+
+.memo-pin-dot.active {
+    box-shadow: 0 0 0 3px var(--info-accent);
+}
+
+/* ============================================================================
+   CONTAINER COLOR GRID
+   ============================================================================ */
+
+.memo-container-color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+}
+
+.memo-container-color-item {
+    aspect-ratio: 1 / 1;
+    height: 30px;
+
+    border-radius: 8px;
+    border: 2px solid var(--blue-dark);
+
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.memo-container-color-item:hover {
+    transform: translateY(-2px);
+}
+
+.memo-container-color-item.active {
+    box-shadow: 0 0 0 3px var(--info-accent);
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.memo-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+/* ---------- TABLET ---------- */
+@media (max-width: 768px) {
+    .memo-category-item {
+        height: 30px;
+    }
+
+    .memo-pin-dot {
+        width: 25px;
+        height: 25px;
+    }
+
+    .memo-container-color-item {
+        height: 28px;
+    }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 480px) {
+    .memo-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .memo-category-item {
+        height: 25px;
+    }
+
+    .memo-pin-dot {
+        width: 22px;
+        height: 22px;
+    }
+
+    .memo-container-color-item {
+        height: 22px;
+    }
+}

@@ -1,5 +1,7 @@
+import { Icons } from "../styles/iconLibrary";
+
 // ============================================================================
-// taskUtils.ts — ORGANIZED & CLEAN VERSION
+// taskUtils.ts - ORGANIZED & CLEAN VERSION
 // ============================================================================
 
 /* ============================================================================
@@ -53,6 +55,37 @@ export const STATUS_LABELS: Record<TaskStatus, string> = {
     failed: "Failed"
 };
 
+export type TaskIconKey = keyof typeof Icons;
+
+export const TASK_CATEGORY_ICON_MAP: Record<TaskCategory, TaskIconKey> = {
+    cleaning: "Recycle",
+    work: "Target",
+    study: "Planner",
+    fitness: "Flame",
+    health: "Leaf",
+    cooking: "Sun",
+    relax: "HalfMoon",
+    praying: "Star",
+    hobby: "Memo",
+    social: "CloudDialogue",
+    "self-care": "Leaf",
+    finance: "BatteryFull",
+    errands: "List",
+    "pet-care": "BranchLeaf",
+    learning: "Planner",
+    creative: "Memo",
+    maintenance: "Recycle",
+    shopping: "List",
+    travel: "Calendar",
+    others: "Shapes",
+};
+
+export const TASK_STATUS_ICON_MAP: Record<TaskStatus, TaskIconKey> = {
+    pending: "TimeSearch",
+    completed: "Check",
+    failed: "WarningRed",
+};
+
 // ---------------- TYPE GUARDS ----------------
 export const isTaskCategory = (v: string): v is TaskCategory =>
     TASK_CATEGORIES.includes(v as TaskCategory);
@@ -66,6 +99,16 @@ export const safeCategoryLabel = (c: string) =>
 
 export const safeStatusLabel = (s: string) =>
     isTaskStatus(s) ? STATUS_LABELS[s] : s;
+
+export const getTaskCategoryIconKey = (c?: string): TaskIconKey => {
+    if (!c || !isTaskCategory(c)) return TASK_CATEGORY_ICON_MAP.others;
+    return TASK_CATEGORY_ICON_MAP[c];
+};
+
+export const getTaskStatusIconKey = (s?: string): TaskIconKey => {
+    if (!s || !isTaskStatus(s)) return TASK_STATUS_ICON_MAP.pending;
+    return TASK_STATUS_ICON_MAP[s];
+};
 
 /* ============================================================================
    3. TABS & FILTERING
@@ -142,11 +185,12 @@ export const getColorNameFromHex = (hex: string): string => {
     const found = TASK_COLOR_OPTIONS.find(c => c.hex === hex);
     return found ? found.name : "white-light";
 };
+
 // ---------------- COLOR CONTRASTING FOR FONT COLOR ----------------
 export const getContainerHex = (colorName: string): string => {
     const found = TASK_COLOR_OPTIONS.find(c => c.name === colorName);
-    return found ? found.hex : TASK_COLORS.white.light
-}
+    return found ? found.hex : TASK_COLORS.white.light;
+};
 
 export const getTaskTextColor = (containerColor: string): string => {
     const [base, shade] = containerColor.split("-");
@@ -157,7 +201,7 @@ export const getTaskTextColor = (containerColor: string): string => {
     if (shade === "dark") return "#ffffff";
 
     return "#000000";
-}
+};
 
 // ------------------ TASK TITLE FAILED FONT COLOR ------------------------
 export const getFailedTextColor = (containerColorName: string): string => {
@@ -167,8 +211,8 @@ export const getFailedTextColor = (containerColorName: string): string => {
 
     if (shade === "dark" || base === "black") return "#f32323ff";
 
-    return "#b60000"
-}
+    return "#b60000";
+};
 
 /* ============================================================================
    6. SELECT OPTIONS (DROPDOWNS)
@@ -177,8 +221,19 @@ export const getFailedTextColor = (containerColorName: string): string => {
 export const getCategoryOptions = () =>
     TASK_CATEGORIES.map(c => ({ value: c, label: CATEGORY_LABELS[c] }));
 
-export const getStatusOptions = () =>
-    TASK_STATUSES.map(s => ({ value: s, label: STATUS_LABELS[s] }));
+export const getStatusOptions = (opts?: { excludeFailed?: boolean }) => {
+    let statuses = [...TASK_STATUSES];
+
+    // ------------------ OPTIONAL FILTER ------------------
+    if (opts?.excludeFailed) {
+        statuses = statuses.filter(s => s !== "failed");
+    }
+
+    return statuses.map(s => ({
+        value: s,
+        label: STATUS_LABELS[s],
+    }));
+};
 
 /* ============================================================================
    7. STATUS HELPERS
@@ -203,8 +258,3 @@ export const createStatusLock = (ms: number) => {
         return true;
     };
 };
-
-
-
-
-

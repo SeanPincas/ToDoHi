@@ -23,55 +23,60 @@ import RepeatTaskModal from "../components/common/modals/RepeatTaskModal";
 import RepeatConfirmModal from "../components/common/modals/RepeatConfirmModal";
 import { MemoProvider } from "../context/MemoContext";
 import AddMemoModal from "../components/memo/AddMemoModal";
+import ViewMemoModal from "../components/memo/ViewMemoModal";
+import DeleteConfirmMemoModal from "../components/memo/DeleteConfirmMemoModal";
+import EditMemoModal from "../components/memo/EditMemoModal";
 
 const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
             <AuthProvider>
                 <TodoProvider>
+                    <MemoProvider>
+                        <Routes>
+                            {/* ---------- Public Routes ---------- */}
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
 
-                    <Routes>
-                        {/* ---------- Public Routes ---------- */}
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
+                            {/* ---------- Protected Routes ---------- */}
+                            <Route element={<ProtectedRoute />}>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <Layout>
+                                            <DashboardPage />
+                                        </Layout>
+                                    }
+                                />
 
-                        {/* ---------- Protected Routes ---------- */}
-                        <Route element={<ProtectedRoute />}>
-                            <Route
-                                path="/"
-                                element={
-                                    <Layout>
-                                        <DashboardPage />
-                                    </Layout>
-                                }
-                            />
-
-                            <Route
-                                path="/memoboard"
-                                element={
-                                    <MemoProvider>
+                                <Route
+                                    path="/memoboard"
+                                    element={
                                         <Layout>
                                             <MemoBoardPage />
                                             <AddMemoModal />
+                                            <ViewMemoModal />
+                                            <EditMemoModal />
+                                            <DeleteConfirmMemoModal />
                                         </Layout>
-                                    </MemoProvider>
-                                }
-                            />
-                        </Route>
+                                    }
+                                />
+                            </Route>
 
-                        {/* ---------- Fallback ---------- */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                            {/* ---------- Fallback ---------- */}
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
 
-                    {/* ===================================================== */}
-                    {/*                   GLOBAL TODO MODALS                 */}
-                    {/* ===================================================== */}
-                    <AddTaskModal />
-                    <ViewTaskModal />
-                    <EditTaskModal />
-                    <DeleteConfirmModal />
-                    <RepeatTaskModal />
-                    <RepeatConfirmModal />
+                        {/* ===================================================== */}
+                        {/*                   GLOBAL TODO MODALS                 */}
+                        {/* ===================================================== */}
+                        <AddTaskModal />
+                        <ViewTaskModal />
+                        <EditTaskModal />
+                        <DeleteConfirmModal />
+                        <RepeatTaskModal />
+                        <RepeatConfirmModal />
+                    </MemoProvider>
                 </TodoProvider>
             </AuthProvider>
         </BrowserRouter>

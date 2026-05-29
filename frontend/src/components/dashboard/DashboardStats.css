@@ -27,7 +27,7 @@
     text-align: center;
 
     border-right: 2px solid var(--blue-dark);
-    padding: 6px;
+    padding: 3px;
 }
 
 .stats-item:last-child {
@@ -52,6 +52,7 @@
     font-weight: bold;
     color: var(--blue-dark);
     margin-top: 3px;
+    margin-bottom: -7px;
 }
 
 .stats-bar,

@@ -76,6 +76,7 @@
     font-size: 1rem;
     font-weight: 700;
     margin: 6px 0 0 0;
+    color: black;
 
     /* Clamp title */
     line-clamp: 1;
@@ -97,11 +98,12 @@
 .memo-content {
     font-size: 0.85rem;
     line-height: 1.2;
+    color: black;
 
     /* HARD CLAMP (LOCKED STANDARD) */
-    line-clamp: 4;
+    line-clamp: 8;
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 8;
     -webkit-box-orient: vertical;
 
     overflow: hidden;
@@ -123,7 +125,7 @@
     }
 
     .memo-title {
-        font-size: 0.95rem;
+        font-size: 0.90rem;
     }
 
     .memo-category {
@@ -131,9 +133,9 @@
     }
 
     .memo-content {
-        line-clamp: 3;
+        line-clamp: 7;
         font-size: 0.8rem;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 7;
     }
 }
 
@@ -157,7 +159,8 @@
     }
 
     .memo-title {
-        font-size: 0.85rem;
+
+        font-size: 0.75rem;
     }
 
     .memo-category {
@@ -165,9 +168,9 @@
     }
 
     .memo-content {
-        line-clamp: 3;
+        line-clamp: 5;
         font-size: 0.75rem;
         line-height: 1.15;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 5;
     }
 }

@@ -1,22 +1,34 @@
 /* ========================================================================== */
-/* TODO PREVIEW — FINAL + UPDATED FOR REFACTORED STYLES                      */
+/* TODO PREVIEW - CLEAN REFORMED STYLES                                       */
 /* ========================================================================== */
 
 .todo-preview-container {
-    max-height: 330px;
-    min-height: 260px;
+    --paper-attach-border: #c8bba4;
+    --paper-attach-border-soft: #d7ccb8;
+    --paper-attach-shadow: rgba(196, 184, 162, 0.65);
+    --paper-attach-shadow-deep: rgba(178, 165, 141, 0.5);
 
-    background: var(--white);
-    padding: 12px;
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+
+    background-color: var(--paper-bg);
+    padding: 12px 12px 10px;
     border-radius: 12px;
-    box-shadow: var(--shadow-soft);
+    border: 1.5px solid var(--paper-attach-border);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.45) inset,
+        inset -6px 0 10px -10px var(--paper-attach-shadow-deep),
+        5px 0 8px -7px var(--paper-attach-shadow),
+        0 6px 10px -6px var(--paper-attach-shadow),
+        0 14px 18px -12px var(--paper-attach-shadow-deep);
 
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 
     overflow: hidden;
-    max-height: 75vh;
     position: relative;
 }
 
@@ -25,176 +37,260 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+    min-height: 30px;
+}
+
+.todo-mode-label-slot {
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 1;
+}
+
+.mode-label {
+    margin-left: 0;
+    font-size: 14px;
+    font-weight: 600;
+    padding-left: 3px;
+    opacity: 0.88;
+    font-family: var(--font-heading);
+}
+
+.mode-label.delete {
+    color: #e74c3c;
+}
+
+.mode-label.rearrange {
+    color: #00bcd4;
 }
 
 .todo-preview-title {
-    margin: 0;
-    font-size: 18px;
+    margin: 0 auto;
+    font-size: 24px;
     font-weight: 700;
-    padding-right: 5px;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 .todo-preview-actions {
     display: flex;
     align-items: center;
     gap: 8px;
+    z-index: 1;
 }
 
-/* We no longer use .icon-btn here because we use reusable icon-btn-square */
-
-
 /* ========================================================================== */
-/* FILTER TABS                                                                */
+/* FILTER TABS + CATEGORY FILTER                                              */
 /* ========================================================================== */
-
 
 .todo-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Default: 2×2 */
-    justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     width: 100%;
-    gap: 6px;
+    gap: 5px;
 }
 
-/* --------------------------- BASE BUTTON STYLE ---------------------------- */
 .todo-tabs button {
-    padding: 6px 10px;
-    border-radius: 8px;
-    border: 2px solid var(--blue-dark);
-    background: var(--white);
+    padding: 3px 9px;
+    min-height: 25px;
+    border-radius: 7px;
+    border: 1px solid var(--paper-attach-border-soft);
+    background: color-mix(in srgb, var(--paper-bg) 92%, #fff 8%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 1px 2px rgba(28, 44, 60, 0.1);
     cursor: pointer;
 
+    font-family: var(--font-heading);
     font-size: 12px;
-    color: var(--text-main);
+    color: color-mix(in srgb, var(--text-main) 88%, #1b2a39 12%);
     font-weight: 600;
+    letter-spacing: 0.2px;
 
     white-space: nowrap;
-    transition: all 0.15s ease-in-out;
+    transition:
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out,
+        transform 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
 }
 
 .todo-tabs button.active {
-    background: var(--blue-light);
+    background: color-mix(in srgb, var(--btn-primary) 82%, #fff 18%);
+    border-color: var(--paper-attach-border);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.45),
+        0 2px 5px rgba(28, 44, 60, 0.14);
 }
 
-/* ========================================================================== */
-/* PHONES + SMALL TABLET                                                 */
-/* ========================================================================== */
-@media (max-width: 640px) {
-
-    .todo-tabs {
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* 2x2 stretched layout */
-        gap: 6px;
-        width: 100%;
-    }
-
-    .todo-tabs button {
-        width: 100%;
-        padding: 6px 10px;
-        font-size: 12px;
-
-        border-width: 1.5px;
-        border-radius: 8px;
-        text-align: center;
-    }
+.todo-tabs button:hover {
+    background: color-mix(in srgb, var(--paper-bg) 80%, #fff 20%);
+    transform: translateY(-1px);
 }
 
-
-/* ========================================================================== */
-/* LAPTOPS 769px – 1350px (still 2×2 layout)                                   */
-/* ========================================================================== */
-@media (min-width: 641px) and (max-width: 849px) {
-    .todo-tabs {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .todo-tabs button {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
+.todo-tabs button:focus-visible,
+.todo-category-menu .dropdown-trigger:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--blue-light) 62%, #fff 38%);
+    outline-offset: 1px;
 }
 
-@media (min-width: 850px) and (max-width: 1000px) {
-    .todo-tabs {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;                 /* slightly reduced spacing */
-    }
-    .todo-tabs button {
-        padding: 6px 8px;         /* slightly smaller */
-        font-size: 11px;          /* shrink to prevent overflow */
-        text-align: center;
-    }
-
-    
+.todo-category-menu {
+    width: 106px;
+    max-width: 100%;
 }
 
-/* ========================================================================== */
-/* LARGE DESKTOPS ≥ 1351px — switch to 4 inline buttons centered              */
-/* ========================================================================== */
-@media (min-width: 1351px) {
-    .todo-tabs {
-        grid-template-columns: repeat(4, auto);
-        justify-content: center;
-        gap: 4px;
-    }
+.todo-category-menu .dropdown-wrapper {
+    gap: 0;
+}
 
-    .todo-tabs button {
-        padding: 5px 7px;
-        font-size: 13px;
-    }
+.todo-category-menu .dropdown-label {
+    display: none;
+}
+
+.todo-category-menu .dropdown-trigger {
+    min-height: 25px;
+    padding: 2px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--paper-attach-border-soft);
+    background: color-mix(in srgb, var(--paper-bg) 92%, #fff 8%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 1px 2px rgba(28, 44, 60, 0.1);
+    color: color-mix(in srgb, var(--text-main) 88%, #1b2a39 12%);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.todo-category-menu .dropdown-menu {
+    font-size: 11px;
+    border-width: 1px;
+    border-color: var(--paper-attach-border);
+}
+
+.todo-category-menu .dropdown-item {
+    padding: 6px 8px;
 }
 
 /* ========================================================================== */
 /* TASK LIST                                                                  */
 /* ========================================================================== */
 
+.todo-list-container {
+    flex: 1;
+    min-height: 0;
+    padding: 5px 12px 7px;
+    background: var(--paper-bg);
+    border: 1px solid var(--paper-attach-border);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-list-container > div {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .todo-list {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-
-    max-height: 475px;
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    gap: 0;
+    overflow: hidden;
     overflow-y: auto;
+    margin-bottom: 0;
 }
 
 .todo-list::-webkit-scrollbar {
-    width: 0;
+    width: 4px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--blue-dark) 18%, transparent 82%);
+    border-radius: 999px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--blue-dark) 28%, transparent 72%);
+}
+
+.todo-list {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--blue-dark) 22%, transparent 78%) transparent;
+}
+
+.todo-list .task-item-container:last-child {
+    border-bottom: none;
+}
+
+.todo-list-add-btn {
+    margin-top: 7px;
+    flex-shrink: 0;
+    font-family: var(--font-heading);
+}
+
+.todo-preview-container > .btn-info-rect,
+.todo-preview-container > .btn-danger-rect {
+    flex-shrink: 0;
+    margin-top: 4px;
 }
 
 /* ========================================================================== */
-/* MODE VISUAL CUES (ADDED — DOES NOT AFFECT EXISTING STYLES)                */
+/* MODE CONTEXT BACKGROUNDS                                                   */
 /* ========================================================================== */
 
-/* --- Mode label beside "To-Do List" title --- */
-.todo-preview-title .mode-label {
-    margin-left: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    opacity: 0.85;
-}
-
-.todo-preview-title .mode-label.delete {
-    color: #e74c3c; /* delete mode */
-}
-
-.todo-preview-title .mode-label.rearrange {
-    color: #00bcd4; /* rearrange mode */
-}
-
-/* --- Slight emphasis on active mode button --- */
-.icon-btn-square.active {
-    transform: scale(1.30);
-    transition: transform 0.15s ease;
-}
-
-/* --- Very subtle background context per mode --- */
 .todo-preview-container.delete-mode {
-    background: rgba(231, 76, 60, 0.10); /* stronger tint */
+    background: rgba(231, 76, 60, 0.1);
     box-shadow: inset 4px 0 0 rgba(231, 76, 60, 0.55);
 }
 
 .todo-preview-container.rearrange-mode {
-    background: rgba(0, 188, 212, 0.10); /* stronger tint */
+    background: rgba(0, 188, 212, 0.1);
     box-shadow: inset 4px 0 0 rgba(0, 188, 212, 0.55);
+}
+
+/* ========================================================================== */
+/* RESPONSIVE                                                                 */
+/* ========================================================================== */
+
+@media (max-width: 640px) {
+    .todo-tabs {
+        gap: 4px;
+    }
+
+    .todo-tabs button {
+        padding: 3px 8px;
+        min-height: 24px;
+        font-size: 11px;
+    }
+
+    .todo-category-menu {
+        width: 90px;
+    }
+
+    .todo-mode-label-slot {
+        min-width: 98px;
+    }
+
+    .todo-preview-title {
+        font-size: 16px;
+    }
 }

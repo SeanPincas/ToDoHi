@@ -5,19 +5,25 @@
 .task-item-container {
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    gap: 8px;
+    min-height: 30px;
+    padding: 3px 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--page-line-color, var(--rule-line)) 92%, #ffffff 8%);
+    background: transparent;
     cursor: pointer;
 }
 
 .task-item-container.dragging {
-    opacity: 0.5;
+    opacity: 0.55;
+    background: color-mix(in srgb, var(--blue-light) 16%, transparent 84%);
 }
 
 .task-left-section {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 22px;
+    min-width: 22px;
 }
 
 .task-checkbox, 
@@ -25,8 +31,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
+    color: currentColor;
+}
+
+.task-checkbox svg,
+.delete-select-circle svg {
+    color: currentColor;
+}
+
+.task-left-placeholder {
+    width: 14px;
+    height: 14px;
 }
 
 .delete-select-circle.selected {
@@ -36,13 +53,21 @@
 .task-body {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex-wrap: nowrap;
 }
 
 .task-title {
     margin: 0;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
+    color: currentColor;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .task-title.completed {
@@ -52,17 +77,51 @@
 
 .task-title.failed {
     text-decoration: line-through;
+    flex-shrink: 1;
 }
 
-.task-subinfo {
-    font-weight: bold;
-    font-size: 12px;
-    opacity: 0.8;
-    margin-top: 2px;
+.task-color-swatch {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 2px;
+    border: 1px solid color-mix(in srgb, var(--blue-dark) 45%, #ffffff 55%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+    flex-shrink: 0;
+}
+
+.task-meta-label {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.88;
+    white-space: nowrap;
+    color: currentColor;
+    flex-shrink: 0;
+}
+
+.task-meta-icon {
+    width: 12px;
+    height: 12px;
+    color: currentColor;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.task-subinfo-right {
+    margin-left: auto;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
 }
 
 .task-drag-handle {
-    font-size: 22px;
-    opacity: 0.7;
+    font-size: 16px;
+    opacity: 0.76;
     cursor: grab;
+}
+
+.task-item-container.rearrange-row .task-drag-handle {
+    color: var(--blue-dark);
 }

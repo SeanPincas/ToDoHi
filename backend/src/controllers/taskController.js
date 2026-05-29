@@ -95,14 +95,28 @@ exports.deleteTask = async (req, res) => {
 // --------------------------- MARK COMPLETED TASK -----------------------------
 exports.markComplete = async (req, res) => {
     try {
-        const { id } = req.params
-        const task = await Task.findByIdAndUpdate(
-            { _id: id, userId: req.user._id },
-            { status: "completed" },
-            { new: true }
-        );
+        const { id } = req.params;
 
-        if (!task) return res.status(404).json({ message: "Task Not Found" })
+        // Fetch first so we can detect status transition
+        const existing = await Task.findOne({
+            _id: id,
+            userId: req.user._id
+        });
+
+        if (!existing)
+            return res.status(404).json({ message: "Task Not Found" });
+
+        // If already completed → do NOT increment stats again
+        if (existing.status === "completed") {
+            return res.json({
+                message: "Task already completed",
+                task: existing
+            });
+        }
+
+        // Mark completed
+        existing.status = "completed";
+        await existing.save();
 
         // ---------------- STATS: increment totalTasksCompleted ----------------
         await User.findByIdAndUpdate(
@@ -110,9 +124,16 @@ exports.markComplete = async (req, res) => {
             { $inc: { "stats.totalTasksCompleted": 1 } }
         );
 
-        res.json({ message: "Task Completed", task })
+        res.json({
+            message: "Task Completed",
+            task: existing
+        });
+
     } catch (err) {
-        res.status(500).json({ message: "Error Marking Task Complete", error: err.message })
+        res.status(500).json({
+            message: "Error Marking Task Complete",
+            error: err.message
+        });
     }
 };
 
@@ -183,6 +204,13 @@ exports.repeatTasks = async (req, res) => {
 
         await Task.insertMany(newTasks);
 
+        // ---------------- STATS: increment totalTasksCreated for repeated tasks ----------------
+        await User.findByIdAndUpdate(userId, {
+            $inc: {
+                "stats.totalTasksCreated": newTasks.length
+            }
+        });
+
         // DELETE ALL unwanted tasks
         await Task.deleteMany({
             userId,
@@ -206,17 +234,23 @@ exports.repeatTasks = async (req, res) => {
 
         const cycleKey = `${yyyy}-${mm}-${dd}@${resetHour}`;
 
+        // ---------------- DEBUG LOG: repeat cycle acknowledgement ----------------
+        console.log("[repeatTasks] repeatCycleAcknowledged → writing:", {
+            userId,
+            cycleKey
+        });
+
         // Store acknowledgement on USER document
         await User.findByIdAndUpdate(userId, {
             repeatCycleAcknowledged: cycleKey
         });
 
         res.json({
-            message: "Tasks repeate successfully",
+            message: "Tasks repeated successfully",
             repeatedCount: newTasks.length
         });
     } catch (err) {
-        console.log("[reeatTasks] Error:", err);
+        console.log("[repeatTasks] Error:", err);
         res.status(500).json({ message: "Error Repeating Tasks", error: err.message })
     }
 };

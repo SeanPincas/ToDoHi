@@ -3,7 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
-const rateLimit = require("express-rate-limit");
+const { apiLimiter } = require("./middleware/rateLimiter.js");
 
 // Import Scheduler (new)
 const { startScheduler } = require("./utils/scheduler.js");
@@ -15,6 +15,7 @@ const taskRoutes = require("./routes/taskRoute.js");
 const memoRoutes = require("./routes/memoRoute.js");
 const dailyPlanRoutes = require("./routes/dailyPlanRoute.js");
 const quoteRoutes = require("./routes/quoteRoute.js");
+const statsRoutes = require("./routes/statsRoute.js");
 
 // Environment Setup
 dotenv.config();
@@ -22,25 +23,14 @@ dotenv.config();
 // Initialize Express App
 const app = express();
 
+app.use(apiLimiter);
+
 // Enable CORS and JSON body parsing
 app.use(cors({
-  origin: "http://localhost:5173", // your React frontend
-  credentials: true               // allow cookies/auth headers
+  origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+  credentials: true
 }));
 app.use(express.json());
-
-// ---------------- RATE LIMITER ----------------
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 100,
-  message: {
-    message: "Too many requests. Please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(limiter);
 
 // ---------------- ROUTES ----------------
 app.use("/api/auth", authRoutes);

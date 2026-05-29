@@ -6,59 +6,50 @@ import TodoPreview from "../components/dashboard/TodoPreview";
 import MemoPreview from "../components/dashboard/MemoPreview";
 import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
 
-import Layout from '../components/layout/Layout';
 import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
 import { getCurrentResetCycleKey } from '../utils/resetCycle';
 
 const Dashboard: React.FC = () => {
-
     const { tasks, openModal } = useTodo();
     const { user } = useAuthContext();
 
-    // ------------------ LIVE TIME & DATE ------------------
     const [time12, setTime12] = useState("");
     const [time24, setTime24] = useState("");
     const [currentDate, setCurrentDate] = useState("");
-
     const [repeatChecked, setRepeatChecked] = useState(false);
 
-    // Repeat Task Modal
     useEffect(() => {
-        // Guard wait for user + tasks
         if (!user || !tasks || tasks.length === 0) return;
-        // Guard: run only once per load
         if (repeatChecked) return;
-        //Filter status completed + failed tasks
+
         const repeatableTasks = tasks.filter(
-            task => task.status === "completed" || task.status === "failed"
+            (task) => task.status === "completed" || task.status === "failed"
         );
-        // No eligible tasks → do nothing
+
         if (repeatableTasks.length === 0) {
             setRepeatChecked(true);
             return;
         }
-        // Compute current reset cycle
+
         const resetHour = typeof user.preference?.resetHour === "number"
             ? user.preference.resetHour
             : 0;
 
         const currentCycleKey = getCurrentResetCycleKey(resetHour);
 
-        // Already Acknowledged reset cycle → do nothing
         if (user.repeatCycleAcknowledged === currentCycleKey) {
             setRepeatChecked(true);
             return;
         }
-        // Open Clocking Repeat Modal
+
         openModal("repeat", {
-            tasks:repeatableTasks
+            tasks: repeatableTasks,
         });
 
         setRepeatChecked(true);
     }, [tasks, user, repeatChecked, openModal]);
 
-    // Live Clock
     useEffect(() => {
         const updateClock = () => {
             const now = new Date();
@@ -88,65 +79,67 @@ const Dashboard: React.FC = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // ------------------------------ RENDER ----------------------------------------------
     return (
-        <Layout showSidebar={true}>
-            <div className="dashboard-page">
-
-                <div className="dashboard-container">
-
-                    {/* ---------- GREETING ---------- */}
-                    <div className="dashboard-greeting-bar">
-                        <div className="greeting-left">
-                            <h2>👋 Hello, User</h2>
-                            <p>Welcome Back!</p>
-                        </div>
-
-                        <div className="greeting-right">
-                            <div className="time-row">
-                                <span className="time-text">{time12}</span>
-                                <span className="time-divider">||</span>
-                                <span className="time-text">{time24}</span>
+        <div className="dashboard-page">
+            <div className="dashboard-container">
+                <div className="opened-book-spread">
+                    <section className="book-page left-book-page">
+                        <div className="dashboard-greeting-bar">
+                            <div className="greeting-left">
+                                <h2>Welcome Back!</h2>
+                                <p>Hello, {user?.username || "User"}</p>
                             </div>
 
-                            <span className="date-text">{currentDate}</span>
-                        </div>
-                    </div>
+                            <div className="greeting-right">
+                                <div className="time-row">
+                                    <span className="time-text">{time12}</span>
+                                    <span className="time-divider">||</span>
+                                    <span className="time-text">{time24}</span>
+                                </div>
 
-                    {/* ---------- STATS BAR ---------- */}
-                    <DashboardStats />
-
-                    {/* ---------- BENTO GRID ---------- */}
-                    <div className="dashboard-bento-grid">
-                        <div className="bento-box">
-                            <div className="bento-scroll">
-                                <TodoPreview />
+                                <span className="date-text">{currentDate}</span>
                             </div>
                         </div>
 
-                        <div className="bento-box">
+                        <div className="left-page-stack">
+                            <div className="bento-box left-page-todo">
+                                <div className="bento-scroll todo-pane-scroll">
+                                    <TodoPreview />
+                                </div>
+                            </div>
+
+                            <div className="bento-box left-page-memo">
+                                <div className="bento-scroll memo-pane-scroll">
+                                    <MemoPreview />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div className="book-spine" aria-hidden="true" />
+
+                    <section className="book-page right-book-page">
+                        <div className="dashboard-stats-wrapper">
+                            <DashboardStats />
+                        </div>
+
+                        <div className="bento-box right-page-planner">
                             <div className="bento-scroll">
                                 <DailyPlanPreview />
                             </div>
                         </div>
 
-                        <div className="bento-box">
-                            <div className="bento-scroll">
-                                <MemoPreview />
+                        <div className="right-page-chart-stack">
+                            <div className="dashboard-charts right-page-charts">
+                                <div className="chart-card">Chart #1</div>
+                                <div className="chart-card">Chart #2</div>
+                                <div className="chart-card">Chart #3</div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* ---------- CHARTS ---------- */}
-                    <div className="dashboard-charts">
-                        <div className="chart-card">Chart #1</div>
-                        <div className="chart-card">Chart #2</div>
-                        <div className="chart-card">Chart #3</div>
-                    </div>
+                    </section>
                 </div>
-
             </div>
-        </Layout>
+        </div>
     );
 };
 

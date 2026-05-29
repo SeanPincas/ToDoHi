@@ -14,14 +14,15 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, showSidebar = true }) => {
     return (
         <div className={`layout-wrapper ${showSidebar ? "sidebar-open" : ""}`}>
+            <div className="book-shell">
+                <div className={`notebook-sheet ${showSidebar ? "with-sidebar" : "no-sidebar"}`}>
+                    {/* Sidebar (optional) */}
+                    {showSidebar && <Sidebar />}
 
-            {/* Sidebar (optional) */}
-            {showSidebar && <Sidebar />}
-
-            {/* Page content */}
-            <div className="layout-content">
-                <div className="content-container">
-                    {children}
+                    {/* Page content */}
+                    <div className="layout-content">
+                        {children}
+                    </div>
                 </div>
             </div>
         </div>

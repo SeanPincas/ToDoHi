@@ -11,7 +11,7 @@ import "../../styles/ButtonStyles.css"
 import {
     memoPinColors,
     getDefaultMemoPinColor,
-    memoCategoryEmojiMap,
+    memoCategoryIconMap,
     resolveMemoContainerColor,
     MEMO_CONTAINER_COLORS
 } from "../../utils/memoUtils/memoUtils";
@@ -42,9 +42,9 @@ const AddMemoModal: React.FC = () => {
     useEffect(() => {
         if (activeModal === "add") {
             setTitle(""),
-                setContent(""),
-                setCategory("others"),
-                setContainerColor(resolveMemoContainerColor());
+            setContent(""),
+            setCategory("others"),
+            setContainerColor(resolveMemoContainerColor());
             setPinColor(getDefaultMemoPinColor());
             setErrorMsg(null);
             setLoading(false);
@@ -140,8 +140,10 @@ const AddMemoModal: React.FC = () => {
                         <label>Category</label>
 
                         <div className="memo-category-grid">
-                            {Object.entries(memoCategoryEmojiMap).map(
-                                ([key, emoji]) => (
+                            {Object.entries(memoCategoryIconMap).map(
+                                ([key, iconKey]) => {
+                                    const CategoryIcon = Icons[iconKey];
+                                    return (
                                     <button
                                         key={key}
                                         type="button"
@@ -149,9 +151,10 @@ const AddMemoModal: React.FC = () => {
                                             }`}
                                         onClick={() => setCategory(key)}
                                     >
-                                        <span className="emoji">{emoji}</span>
+                                        <span className="emoji"><CategoryIcon /></span>
                                     </button>
-                                )
+                                    );
+                                }
                             )}
                         </div>
                     </div>

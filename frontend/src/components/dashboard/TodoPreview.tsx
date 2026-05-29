@@ -20,21 +20,25 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-// Context + types
+import {
+    restrictToVerticalAxis,
+    restrictToParentElement,
+} from "@dnd-kit/modifiers";
+
 import { useTodo } from "../../context/TodoContext";
 import type { Task } from "../../api/taskApi";
-
-// Components
 import { SortableTaskItem } from "../todo/SortableTaskItem";
-
-// Icons
 import { Icons } from "../../styles/iconLibrary";
+import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
 
 // Task utilities
 import {
+    TASK_CATEGORIES,
+    CATEGORY_LABELS,
     TASK_TABS,
     TASK_TAB_LABELS,
     type TaskTab,
+    type TaskCategory,
 } from "../../utils/taskUtils";
 
 import "../../styles/buttonStyles.css"
@@ -57,6 +61,7 @@ const TodoPreview: React.FC = () => {
     //                              UI STATES
     // =====================================================================
     const [activeTab, setActiveTab] = useState<TaskTab>("all");
+    const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
 
     const [isRearrangeMode, setIsRearrangeMode] = useState(false);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -75,15 +80,20 @@ const TodoPreview: React.FC = () => {
         }
     };
 
-    const tasks = getActiveList();
+    const tasks = getActiveList().filter((task) =>
+        activeCategory === "all" ? true : task.category === activeCategory
+    );
 
     // =====================================================================
     //                            DND-KIT SETUP
     // =====================================================================
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+        useSensor(PointerSensor, {
+            activationConstraint: isRearrangeMode
+                ? { distance: 2 }   // short drag threshold when rearranging
+                : { distance: 9999 } // effectively disables drag in normal mode
+        })
     );
-
     const handleDragEnd = (event: any) => {
         if (!isRearrangeMode) return;
 
@@ -148,7 +158,7 @@ const TodoPreview: React.FC = () => {
     // =====================================================================
     const openViewTask = (task: Task) => {
         if (isRearrangeMode || isDeleteMode) return;
-        openModal("view", task);
+        openModal("view", { task });
     };
 
     // =====================================================================
@@ -165,17 +175,20 @@ const TodoPreview: React.FC = () => {
             {/*                          HEADER                                 */}
             {/* =============================================================== */}
             <div className="todo-preview-header">
-                <h2 className="todo-preview-title">
-                    To-Do List
-                    {isDeleteMode && <span className="mode-label delete">(Delete Mode)</span>}
-                    {isRearrangeMode && <span className="mode-label rearrange">(Rearrange Mode)</span>}
-                </h2>
+                <div className="todo-mode-label-slot">
+                    {isDeleteMode && <span className="mode-label delete">Delete Mode</span>}
+                    {isRearrangeMode && <span className="mode-label rearrange">Rearrange Mode</span>}
+                </div>
+
+                <h2 className="todo-preview-title">To-Do List</h2>
 
                 <div className="todo-preview-actions">
 
                     {/* REARRANGE BUTTON */}
                     <button
                         className={`icon-btn-square ${isRearrangeMode ? "active" : ""}`}
+                        aria-label={isRearrangeMode ? "Cancel rearrange mode" : "Enable rearrange mode"}
+                        title={isRearrangeMode ? "Cancel rearrange mode" : "Enable rearrange mode"}
                         onClick={() => {
                             setIsRearrangeMode(prev => {
                                 const next = !prev;
@@ -191,7 +204,7 @@ const TodoPreview: React.FC = () => {
                             setSelectedToDelete([]);
                         }}
                     >
-                        <Icons.Drag />
+                        {isRearrangeMode ? <Icons.Close /> : <Icons.Drag />}
                     </button>
 
                     {/* DELETE BUTTON */}
@@ -212,7 +225,7 @@ const TodoPreview: React.FC = () => {
                             setSelectedToDelete([]);
                         }}
                     >
-                        <Icons.Delete />
+                        {isDeleteMode ? <Icons.Close /> : <Icons.Delete />}
                     </button>
                 </div>
             </div>
@@ -227,39 +240,71 @@ const TodoPreview: React.FC = () => {
                         className={activeTab === tab ? "active" : ""}
                         onClick={() => setActiveTab(tab)}
                     >
-                        {TASK_TAB_LABELS[tab].toUpperCase()}
+                        {TASK_TAB_LABELS[tab]}
                     </button>
                 ))}
+
+                <div className="todo-category-menu">
+                    <DropdownMenu
+                        label="Category"
+                        value={activeCategory === "all" ? "All Categories" : CATEGORY_LABELS[activeCategory]}
+                        options={[
+                            { value: "all", label: "All Categories" },
+                            ...TASK_CATEGORIES.map((cat) => ({
+                                value: cat,
+                                label: CATEGORY_LABELS[cat],
+                            })),
+                        ]}
+                        onChange={(value) => setActiveCategory(value as "all" | TaskCategory)}
+                        maxHeight={235}
+                    />
+                </div>
             </div>
 
             {/* =============================================================== */}
             {/*                     TASK LIST + DRAG & DROP                     */}
             {/* =============================================================== */}
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-            >
-                <SortableContext
-                    items={tasks.map((t) => t._id)}
-                    strategy={verticalListSortingStrategy}
+            <div className="todo-list-container">
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    modifiers={[
+                        restrictToVerticalAxis,
+                        restrictToParentElement,
+                    ]}
+                    onDragEnd={handleDragEnd}
                 >
-                    <div className="todo-list">
-                        {tasks.map(task => (
-                            <SortableTaskItem
-                                key={task._id}
-                                task={task}
-                                isRearrangeMode={isRearrangeMode}
-                                isDeleteMode={isDeleteMode}
-                                selectedToDelete={selectedToDelete}
-                                toggleDeleteSelection={toggleDeleteSelection}
-                                toggleCompletion={toggleCompletion}
-                                onOpenView={() => openViewTask(task)}
-                            />
-                        ))}
-                    </div>
-                </SortableContext>
-            </DndContext>
+                    <SortableContext
+                        items={tasks.map((t) => t._id)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        <div className="todo-list">
+                            {tasks.map(task => (
+                                <SortableTaskItem
+                                    key={task._id}
+                                    task={task}
+                                    isRearrangeMode={isRearrangeMode}
+                                    isDeleteMode={isDeleteMode}
+                                    selectedToDelete={selectedToDelete}
+                                    toggleDeleteSelection={toggleDeleteSelection}
+                                    toggleCompletion={toggleCompletion}
+                                    onOpenView={() => openViewTask(task)}
+                                />
+                            ))}
+                        </div>
+                    </SortableContext>
+                </DndContext>
+
+                {/* ==================== ADD TASK ===================== */}
+                {!isDeleteMode && !isRearrangeMode && (
+                    <button
+                        className="btn-primary-rect primary-btn todo-list-add-btn"
+                        onClick={() => openModal("add")}
+                    >
+                        <Icons.Add /> Add Task
+                    </button>
+                )}
+            </div>
 
             {/* ================= DELETE MODE ACTION ================= */}
 
@@ -286,16 +331,6 @@ const TodoPreview: React.FC = () => {
                 >
                     <Icons.Check />
                     Confirm Arrangment
-                </button>
-            )}
-
-            {/* ==================== ADD TASK ===================== */}
-            {!isDeleteMode && !isRearrangeMode && (
-                <button
-                    className="btn-primary-rect primary-btn"
-                    onClick={() => openModal("add")}
-                >
-                    <Icons.Add /> Add Task
                 </button>
             )}
 

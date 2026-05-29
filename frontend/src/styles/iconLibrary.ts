@@ -1,82 +1,125 @@
 import {
     // ---------------- BASIC ACTIONS ----------------
-    RiAddFill,
-    RiDeleteBin6Fill,
-    RiPencilFill,
-    RiCloseFill,
+    PiPlus,
+    PiTrash,
+    PiPencilSimple,
+    PiX,
 
     // ---------------- CHECK / STATUS ----------------
-    RiCheckboxCircleFill,
-    RiCheckboxBlankCircleLine,
-    RiCheckboxFill,
-    RiCheckFill,
+    PiCheckCircle,
+    PiCircle,
+    PiCheckSquare,
+    PiCheck,
 
     // ---------------- NAV / MENU ----------------
-    RiMenuFill,
-    RiArrowUpSLine,
-    RiArrowDownSLine,
-    RiArrowLeftSLine,
-    RiDragMove2Fill,
+    PiList,
+    PiArrowUp,
+    PiCaretDown,
+    PiArrowsOutCardinal,
+    PiArrowLeft,
 
     // ---------------- USER / SETTINGS ----------------
-    RiSettings3Fill,
-    RiUserFill,
-    RiLockFill,
-    RiTimeFill,
+    PiGearSix,
+    PiUser,
+    PiLock,
+    PiClockCountdown,
 
     // ---------------- PRODUCTIVITY ----------------
-    RiTodoFill,
-    RiCalendarTodoFill,
-    RiBookOpenFill,
-    RiRepeat2Fill,
+    PiListChecks,
+    PiCalendar,
+    PiNotebookDuotone,
+    PiArrowsClockwise,
 
     // ---------------- FEEDBACK / ALERT ----------------
-    RiErrorWarningFill,     // ⚠️ warning / danger / confirm delete
-    RiInformationFill,      // ℹ️ info messages / help
-    RiQuestionFill,         // ❓ tooltips / guides
-    RiAlertFill             // 🚨 critical alerts (future-proof)
-} from "react-icons/ri";
+    PiWarningCircle,
+    PiInfo,
+    PiQuestionMark,
+    PiWarningOctagon,
+
+    // ---------------- EXTRA ICONS REQUESTED ----------------
+    PiHouseDuotone,
+    PiNotePencilDuotone,
+    PiLeafDuotone,
+    PiPlantDuotone,
+    PiFireDuotone,
+    PiSunDuotone,
+    PiMoon,
+    PiPushPin,
+    PiTarget,
+    PiStar,
+    PiChatCircleDotsDuotone,
+    PiBatteryFullDuotone,
+    PiHandWaving,
+    PiPower,
+    PiShapes
+} from "react-icons/pi";
 
 // ============================================================================
 // ICON MAP
-// Usage: <Icons.Delete /> instead of importing from react-icons directly
+// Usage: <Icons.Delete /> instead of importing icon sets directly
 // ============================================================================
 
 export const Icons = {
     // ---------------- BASIC CRUD ----------------
-    Add: RiAddFill,
-    Delete: RiDeleteBin6Fill,
-    Edit: RiPencilFill,
-    Close: RiCloseFill,
+    Add: PiPlus,
+    Delete: PiTrash,
+    Edit: PiPencilSimple,
+    Close: PiX,
 
     // ---------------- CHECKBOX / STATUS ----------------
-    Check: RiCheckboxCircleFill,
-    Uncheck: RiCheckboxBlankCircleLine,
-    CheckboxDeleteTick: RiCheckboxFill,
-    Confirm: RiCheckFill,
+    Check: PiCheckCircle,
+    Uncheck: PiCircle,
+    CheckboxDeleteTick: PiCheckSquare,
+    Confirm: PiCheck,
 
     // ---------------- NAVIGATION ----------------
-    Menu: RiMenuFill,
-    ArrowUp: RiArrowUpSLine,
-    DropdownArrow: RiArrowDownSLine,
-    SidebarCollapse: RiArrowLeftSLine,
-    Drag: RiDragMove2Fill,
+    Menu: PiList,
+    ArrowUp: PiArrowUp,
+    DropdownArrow: PiCaretDown,
+    Drag: PiArrowsOutCardinal,
+    ArrowLeft: PiArrowLeft,
 
     // ---------------- USER / SETTINGS ----------------
-    Settings: RiSettings3Fill,
-    User: RiUserFill,
-    Lock: RiLockFill,
-    Clock: RiTimeFill,
+    Settings: PiGearSix,
+    User: PiUser,
+    Lock: PiLock,
+    Clock: PiClockCountdown,
 
     // ---------------- PRODUCTIVITY ----------------
-    Todo: RiTodoFill,
-    Planner: RiCalendarTodoFill,
-    Notebook: RiBookOpenFill,
-    Repeat: RiRepeat2Fill,
+    Todo: PiListChecks,
+    Planner: PiCalendar,
+    Notebook: PiNotebookDuotone,
+    Repeat: PiArrowsClockwise,
 
     // ---------------- ALERTS / FEEDBACK ----------------
-    Warning: RiErrorWarningFill,     // used in DeleteConfirmModal
-    Info: RiInformationFill,         // future: help modals, tips
-    Question: RiQuestionFill,        // future: tooltips, guides
-    Alert: RiAlertFill               // future: critical system alerts
+    Warning: PiWarningCircle,
+    Info: PiInfo,
+    Question: PiQuestionMark,
+    Alert: PiWarningOctagon,
+
+    // ---------------- ADDITIONAL PHOSPHOR SET ----------------
+    Home: PiHouseDuotone,
+    Memo: PiNotePencilDuotone,
+    TimeSearch: PiClockCountdown,
+    Leaf: PiLeafDuotone,
+    BranchLeaf: PiPlantDuotone,
+    Flame: PiFireDuotone,
+    WarningRed: PiWarningCircle,
+    Recycle: PiArrowsClockwise,
+    Sun: PiSunDuotone,
+    HalfMoon: PiMoon,
+    Calendar: PiCalendar,
+    Pin: PiPushPin,
+    TrashCan: PiTrash,
+    QuestionMark: PiQuestionMark,
+    Target: PiTarget,
+    Star: PiStar,
+    Candle: PiFireDuotone,
+    CloudDialogue: PiChatCircleDotsDuotone,
+    BatteryFull: PiBatteryFullDuotone,
+    PlusSign: PiPlus,
+    List: PiList,
+    HandWaving: PiHandWaving,
+    Off: PiPower,
+    Shapes: PiShapes
 };
