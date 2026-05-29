@@ -1,60 +1,128 @@
 /* ========================================================================== */
-/* DASHBOARD PAGE — FINAL FLUID, RESPONSIVE, SIDEBAR-AWARE DESIGN            */
-/* ========================================================================== */
-
-.dashboard-container {
-    background: var(--white);
-    border: 3px solid var(--blue-dark);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: var(--shadow-soft);
-
-    /* Fluid max-width to prevent squeezing when sidebar appears */
-    width: 100%;
-    max-width: 100%;
-
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    box-sizing: border-box;
-}
-
-/* ========================================================================== */
-/* DESKTOP SIDEBAR OFFSET (APPLIED ONLY TO DASHBOARD PAGE)                    */
+/* DASHBOARD PAGE - OPENED BOOK TWO-PAGE RECOMPOSITION                        */
 /* ========================================================================== */
 
 .dashboard-page {
-    transition: padding-left 0.3s ease;
+    --paper-attach-border: #c8bba4;
+    --paper-attach-border-soft: #d7ccb8;
+    --paper-attach-shadow: rgba(196, 184, 162, 0.65);
+    --paper-attach-shadow-deep: rgba(178, 165, 141, 0.5);
+
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    margin: 0;
+    padding-right: 0;
+    overflow: hidden;
 }
 
-/* Sidebar visible — apply fluid offset */
-@media (min-width: 1400px) {
-    .dashboard-page {
-        padding-left: clamp(0px, 14vw, 300px); /* Perfect sidebar offset */
-    }
+.dashboard-container {
+    background-color: var(--paper-bg, var(--sheet-bg, var(--white)));
+    background-image:
+        linear-gradient(180deg, var(--page-line-top-fade), var(--page-line-bottom-fade)),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) var(--page-line-gap)
+        );
+    border: 1px solid var(--border-ink-strong, var(--blue-dark));
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: clamp(8px, 0.9vw, 12px);
+    box-shadow: var(--shadow-paper-lift, var(--shadow-soft));
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 100%, 100% var(--page-line-gap);
+
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-/* ========================================================================== */
-/* GREETING BAR                                                               */
-/* ========================================================================== */
+.opened-book-spread {
+    --book-spine-width: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--book-spine-width) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 8px;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.book-page {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow: hidden;
+}
+
+.left-page-stack,
+.right-page-charts {
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+}
+
+.left-page-stack {
+    flex: 1;
+    grid-template-rows: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
+.right-page-chart-stack {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1.5px solid var(--paper-attach-border);
+    border-radius: 14px;
+    background: var(--paper-bg);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.45) inset,
+        0 3px 6px -4px var(--paper-attach-shadow),
+        0 8px 12px -10px var(--paper-attach-shadow-deep);
+}
+
+.book-spine {
+    align-self: stretch;
+    height: auto;
+    min-height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(
+        to right,
+        rgba(46, 66, 89, 0.2),
+        rgba(46, 66, 89, 0.06),
+        rgba(46, 66, 89, 0.2)
+    );
+}
 
 .dashboard-greeting-bar {
-    margin-top: -5px;
+    margin-top: -2px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
+    gap: 8px;
 }
 
 .greeting-left h2 {
     margin: 0;
-    font-size: clamp(20px, 2vw, 30px);
+    font-size: clamp(18px, 1.7vw, 24px);
+    line-height: 1.05;
 }
 
 .greeting-left p {
-    margin: 0 50px;
-    font-size: clamp(12px, 1.2vw, 16px);
+    margin: 0;
+    font-size: clamp(11px, 1vw, 14px);
+    line-height: 1.2;
 }
 
 .greeting-right {
@@ -67,85 +135,65 @@
 .time-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .time-text {
-    font-size: clamp(14px, 1.8vw, 28px);
+    font-size: clamp(13px, 1.35vw, 21px);
     font-weight: bold;
     color: var(--blue-dark);
+    line-height: 1;
 }
 
 .time-divider {
-    font-size: clamp(18px, 2vw, 35px);
+    font-size: clamp(15px, 1.5vw, 24px);
     color: var(--red-accent);
+    line-height: 1;
 }
 
 .date-text {
-    font-size: clamp(12px, 1.3vw, 16px);
+    font-size: clamp(11px, 1vw, 14px);
     color: var(--blue-dark);
+    line-height: 1.2;
 }
 
 .dashboard-stats-wrapper {
-    margin-top: -15px;   /* pull upward slightly */
-}
-
-/* greeting bar left-shift to avoid hamburger overlap */
-@media (max-width: 1320px) {
-    .dashboard-greeting-bar {
-        margin-left: clamp(20px, 3vw, 30px);
-    }
-}
-
-@media (max-width: 900px) {
-    .dashboard-greeting-bar {
-        margin-left: clamp(15px, 2vw, 25x);
-    }
-}
-
-@media (max-width: 600px) {
-    .dashboard-greeting-bar {
-        margin-left: clamp(10px, 2vw, 15px);
-    }
-}
-
-/* ========================================================================== */
-/* BENTO GRID                                                                 */
-/* ========================================================================== */
-
-.dashboard-bento-grid {
-    min-width: 0;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Default desktop layout */
-    margin-top: -12.5px;
-    gap: 5px;
-    overflow: hidden;
+    margin-top: 0;
 }
 
 .bento-box {
     min-width: 0;
-    background: var(--white);
-    border: 3px solid var(--blue-dark);
+    min-height: 0;
+    background: var(--paper-bg);
+    border: 1.5px solid var(--paper-attach-border);
     border-radius: 14px;
-
-    min-height: 250px;
-    
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0px 2px 6px rgba(0,0,0,0.10);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.45) inset,
+        0 3px 6px -4px var(--paper-attach-shadow),
+        0 8px 12px -10px var(--paper-attach-shadow-deep);
 }
 
-.bento-title {
-    padding-bottom: 6px;
-    font-size: clamp(14px, 1.4vw, 18px);
-    font-weight: bold;
-    border-bottom: 2px solid var(--blue-dark);
+.left-page-todo {
+    min-height: 0;
+    height: 100%;
+    overflow: visible;
+}
+
+.left-page-memo {
+    min-height: 0;
+    height: 100%;
+}
+
+.right-page-planner {
+    min-height: 220px;
 }
 
 .bento-scroll {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
 
@@ -158,89 +206,63 @@
     border-radius: 8px;
 }
 
-/* ========================================================================== */
-/* CHARTS GRID                                                                */
-/* ========================================================================== */
-
 .dashboard-charts {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    grid-template-columns: 1fr;
+    gap: 0;
 }
 
 .chart-card {
-    background: var(--white);
-    border: 3px solid var(--blue-dark);
-    border-radius: 14px;
-    padding: 18px;
-    height: 180px;
+    background: var(--paper-bg);
+    border: 0;
+    border-bottom: 1px solid var(--paper-attach-border-soft);
+    border-radius: 0;
+    padding: 12px;
+    min-height: 120px;
 }
 
-/* ========================================================================== */
-/* RESPONSIVE BREAKPOINTS                                                     */
-/* ========================================================================== */
+.chart-card:last-child {
+    border-bottom: 0;
+}
 
-/* ---------------- MOBILE + SMALL TABLET (≤ 640px) ---------------- */
-@media (max-width: 640px) {
-
-    .dashboard-container {
-        max-width: 100%;
-        padding: 14px;
-        gap: 14px;
+@media (max-width: 1400px) {
+    .opened-book-spread {
+        --book-spine-width: 6px;
+        gap: 10px;
     }
+}
 
-    .dashboard-bento-grid {
-        grid-template-columns: 1fr; /* STACK ALL PREVIEWS */
+@media (max-width: 1120px) {
+    .opened-book-spread {
+        grid-template-columns: 1fr;
         gap: 10px;
     }
 
-    .dashboard-charts {
+    .book-spine {
+        display: none;
+    }
+
+    .right-page-charts {
         grid-template-columns: 1fr;
     }
 }
 
-/* ---------------- LARGE TABLET (769px – 1024px) ---------------- */
-@media (min-width: 641px) and (max-width: 1024px) {
-
+@media (max-width: 900px) {
     .dashboard-container {
-        padding: 18px;
+        padding: 8px;
     }
 
-    .dashboard-bento-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    /* MemoPreview spans full width on second row */
-    .dashboard-bento-grid > .bento-box:nth-child(3) {
-        grid-column: 1 / -1;
-    }
-
-    .dashboard-charts {
-        grid-template-columns: 1fr 1fr;
+    .dashboard-greeting-bar {
+        margin-left: 6px;
     }
 }
 
-/* ---------------- SMALL DESKTOP (1025px – 1350px) ---------------- */
-@media (min-width: 1025px) and (max-width: 1350px) {
-    .dashboard-container {
-        max-width: clamp(900px, 92vw, 1200px);
-    }
+.todo-pane-scroll,
+.memo-pane-scroll {
+    overflow-y: hidden;
 }
 
-/* ---------------- WIDE DESKTOP ≥ 1650px ---------------- */
-@media (min-width: 1650px) {
-    .dashboard-container {
-        max-width: 1600px; /* upscale cleanly */
-    }
-}
-
-/* ========================================================================== */
-/* FIX: LEFT SPACE WHEN SCREEN SHRINKS BELOW ~65% DESKTOP WIDTH               */
-/* ========================================================================== */
-
-@media (max-width: 1250px) {
-    .greeting-left {
-        padding-left: clamp(15px, 5vw, 45px);
-    }
+.todo-pane-scroll {
+    overflow: visible;
+    box-shadow: inset -5px 0 8px -10px rgba(178, 165, 141, 0.55);
 }

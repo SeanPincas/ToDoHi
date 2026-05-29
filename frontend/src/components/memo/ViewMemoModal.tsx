@@ -10,7 +10,7 @@ import { useMemoContext } from "../../context/MemoContext";
 import { Icons } from "../../styles/iconLibrary";
 
 import {
-    getMemoCategoryEmoji,
+    getMemoCategoryIconKey,
 } from "../../utils/memoUtils/memoUtils";
 
 const ViewMemoModal = () => {
@@ -32,6 +32,7 @@ const ViewMemoModal = () => {
     // GUARD
     // ---------------------------------------------------------------------
     if (activeModal !== "view" || !memo) return null;
+    const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
 
     // ---------------------------------------------------------------------
     // CLOSE HANDLER (OVERLAY ONLY)
@@ -69,7 +70,7 @@ const ViewMemoModal = () => {
                         </h2>
 
                         <span className="memo-zoom-emoji">
-                            {getMemoCategoryEmoji(memo.category)}
+                            <CategoryIcon />
                         </span>
                     </div>
 

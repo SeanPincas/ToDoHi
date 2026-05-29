@@ -2,7 +2,7 @@ const Memo = require("../models/memoModel.js");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 
-const { getNextZIndex } = require("../utils/memoboard");
+const { getNextZIndex } = require("../utils/memoBoard");
 const { validCategories } = require("../utils/helpers");
 
 // --------------------------- CREATE MEMO MANUALLY ---------------------------

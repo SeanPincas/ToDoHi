@@ -7,40 +7,62 @@
 
 /* Root CSS Variables (Global Theme Colors) */
 :root {
+    /* FONT SYSTEM */
+    --font-heading: "Kalam", "Segoe Print", "Trebuchet MS", cursive;
+    --font-body: "Kalam", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --font-readable: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
     /* TEXT COLORS */
-    --text-main: #000000;
+    --text-main: #223141;
+    --text-muted: #5a6672;
 
-    /* PRIMARY PALETTE FROM LOGO */
-    --blue-dark: #0e2544;
-    --blue-light: #5bb7ff;
+    /* SHELL + PAPER FOUNDATION */
+    --app-shell-bg: #b28760;
+    --table-bg-fallback: #a57b58;
+    --table-bg-image: url("./assets/wood-table.webp");
+    --desk-shadow: rgba(49, 33, 20, 0.2);
+    --paper-bg: #f6efe2;
+    --sheet-bg: #fbf8f1;
+    --white: var(--sheet-bg);
+    --rule-line: rgba(107, 126, 145, 0.2);
+    --page-line-color: var(--rule-line);
+    --page-line-gap: 34px;
+    --page-line-thickness: 1px;
+    --page-line-top-fade: rgba(255, 255, 255, 0.28);
+    --page-line-bottom-fade: rgba(255, 255, 255, 0.02);
 
-    /* ACCENT COLORS */
-    --red-accent: #ff3b30;
+    /* INK + ACCENT PALETTE */
+    --blue-dark: #35516d;
+    --blue-light: #7fa9db;
+    --red-accent: #d86f64;
+    --success-accent: #6f9b65;
+    --warning-accent: #c69d52;
+    --memo-accent: #9d8cc7;
 
     /* EDIT INTENT */
-    --info-accent: #22d3ee;
-    --info-accent-hover: #06b6d4;
-    --info-border: #0ea5e9;
+    --info-accent: #87b8d4;
+    --info-accent-hover: #74a8c7;
+    --info-border: #5f8eb2;
 
     /* GUIDE ICONS */
-    --guide-accent: #94a3b8;
-    --guide-accent-hover: #0e2544;
-
-    /* BACKGROUND COLORS */
-    --paper-bg: #f7f3e9;
-    --white: #ffffff;
+    --guide-accent: #92a0ad;
+    --guide-accent-hover: #35516d;
 
     /* BUTTON COLORS */
     --btn-primary: var(--blue-light);
-    --btn-primary-hover: #4aa4ed;
+    --btn-primary-hover: #6a98ce;
     --btn-outline: var(--blue-dark);
 
     /* DANGER BUTTON */
     --btn-danger: var(--red-accent);
-    --btn-danger-hover: #d93228;
+    --btn-danger-hover: #c95d53;
 
-    /* COMMON SHADOW */
-    --shadow-soft: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    /* BORDER + SHADOW TOKENS */
+    --border-ink-soft: rgba(53, 81, 109, 0.72);
+    --border-ink-strong: rgba(44, 69, 94, 0.85);
+    --border-width-soft: 1px;
+    --shadow-soft: 0 3px 10px rgba(34, 49, 65, 0.1);
+    --shadow-paper-lift: 0 10px 22px rgba(34, 49, 65, 0.12);
 
     /* ===================== MEMO BOARD THEME ===================== */
 
@@ -60,8 +82,17 @@ body {
     min-width: 0;
     margin: 0;
     padding: 0;
-    background: var(--paper-bg);
-    font-family: 'Kalam', sans-serif;
+    background-color: var(--table-bg-fallback);
+    background-image:
+        var(--table-bg-image),
+        radial-gradient(circle at 16% 12%, rgba(255, 255, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 84% 88%, rgba(255, 255, 255, 0.07), transparent 36%),
+        linear-gradient(165deg, rgba(73, 50, 34, 0.2), transparent 55%);
+    background-size: cover, auto, auto, auto;
+    background-position: center center, center, center, center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: var(--font-body);
     color: var(--text-main);
 
     overflow-x: hidden;
@@ -74,15 +105,28 @@ body {
 
 /* Utility classes */
 .paper-border {
-    border: 2px solid var(--blue-dark);
+    border: var(--border-width-soft) solid var(--border-ink-strong);
     border-radius: 10px;
     background: var(--white);
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-paper-lift);
+}
+
+/* Reusable lined-paper background */
+.paper-sheet-lines {
+    background-image:
+        linear-gradient(180deg, var(--page-line-top-fade), var(--page-line-bottom-fade)),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) calc(var(--page-line-gap) - var(--page-line-thickness)),
+            var(--page-line-color) var(--page-line-gap)
+        );
 }
 
 .btn-primary {
     background: var(--btn-primary);
-    border: 2px solid var(--blue-dark);
+    border: 1.5px solid var(--border-ink-strong);
     padding: 8px 14px;
     color: var(--text-main);
     border-radius: 8px;
@@ -99,7 +143,7 @@ body {
 
 .btn-danger {
     background: var(--btn-danger);
-    border: 2px solid var(--blue-dark);
+    border: 1.5px solid var(--border-ink-strong);
     padding: 8px 14px;
     color: var(--white);
     border-radius: 8px;
@@ -120,39 +164,54 @@ body {
 
 body[data-theme="dark"] {
     /* TEXT COLORS */
-    --text-main: #e5e7eb;
+    --text-main: #e5ebf3;
+    --text-muted: #a2afbf;
 
-    /* PRIMARY PALETTE */
-    --blue-dark: #60a5fa;
-    --blue-light: #0ea5e9;
+    /* SHELL + PAPER FOUNDATION */
+    --app-shell-bg: #1a2431;
+    --table-bg-fallback: #1a2431;
+    --table-bg-image: none;
+    --desk-shadow: rgba(0, 0, 0, 0.35);
+    --paper-bg: #111b28;
+    --sheet-bg: #172434;
+    --white: var(--sheet-bg);
+    --rule-line: rgba(133, 160, 191, 0.12);
+    --page-line-color: var(--rule-line);
+    --page-line-top-fade: rgba(255, 255, 255, 0.08);
+    --page-line-bottom-fade: rgba(0, 0, 0, 0.12);
 
-    /* ACCENT COLORS */
-    --red-accent: #ff6b6b;
+    /* INK + ACCENT PALETTE */
+    --blue-dark: #8cb4df;
+    --blue-light: #567ca9;
+    --red-accent: #d97f7a;
+    --success-accent: #77a86d;
+    --warning-accent: #c5a165;
+    --memo-accent: #a292c6;
 
     /* EDIT INTENT */
-    --info-accent: #38bdf8;
-    --info-accent-hover: #0ea5e9;
-    --info-border: #7dd3fc;
+    --info-accent: #6b9cc0;
+    --info-accent-hover: #5b8daf;
+    --info-border: #7ba8c9;
 
     /* GUIDE ICONS */
-    --guide-accent: #ffffff;
-    --guide-accent-hover: #60a5fa;
-
-    /* BACKGROUND COLORS */
-    --paper-bg: #0b1220;
-    --white: #0f172a;
+    --guide-accent: #c3cfdd;
+    --guide-accent-hover: #8cb4df;
 
     /* BUTTON COLORS */
-    --btn-primary: #1e293b;
-    --btn-primary-hover: #334155;
-    --btn-outline: #60a5fa;
+    --btn-primary: #35506d;
+    --btn-primary-hover: #426184;
+    --btn-outline: #8cb4df;
 
     /* DANGER BUTTON */
-    --btn-danger: #ef4444;
-    --btn-danger-hover: #dc2626;
+    --btn-danger: #cb6b66;
+    --btn-danger-hover: #b85c58;
 
-    /* SHADOW */
-    --shadow-soft: 0px 2px 8px rgba(0, 0, 0, 0.6);
+    /* BORDER + SHADOW TOKENS */
+    --border-ink-soft: rgba(140, 180, 223, 0.65);
+    --border-ink-strong: rgba(155, 192, 232, 0.82);
+    --border-width-soft: 1px;
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.36);
+    --shadow-paper-lift: 0 10px 24px rgba(0, 0, 0, 0.34);
 
     /* ----------------------- MEMO BOARD (DARK) ----------------------------- */
 

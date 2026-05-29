@@ -1,12 +1,15 @@
-// =====================================================================================================
-//                                     SORTABLE TASK ITEM (DND ITEM)
-// =====================================================================================================
-
 import "./SortableTaskItem.css";
 import type { Task } from "../../api/taskApi";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { getTaskItemStyle } from "../../styles/taskStyles";
+import {
+    getContainerHex,
+    getTaskCategoryIconKey,
+    getTaskStatusIconKey,
+    safeCategoryLabel,
+    safeStatusLabel,
+} from "../../utils/taskUtils";
 
 import { Icons } from "../../styles/iconLibrary";
 
@@ -22,7 +25,6 @@ interface SortableTaskProps {
     onOpenView: () => void;
 }
 
-// ------------------------------ COMPONENT START -----------------------------------
 export const SortableTaskItem = ({
     task,
     isRearrangeMode,
@@ -32,10 +34,6 @@ export const SortableTaskItem = ({
     toggleCompletion,
     onOpenView,
 }: SortableTaskProps) => {
-
-    // =================================================================================================
-    //                                 DND-KIT HOOK
-    // =================================================================================================
     const {
         attributes,
         listeners,
@@ -45,7 +43,6 @@ export const SortableTaskItem = ({
         isDragging,
     } = useSortable({ id: task._id });
 
-    // Generate item style from centralized style helper
     const containerStyle = getTaskItemStyle(
         transform,
         transition,
@@ -54,43 +51,52 @@ export const SortableTaskItem = ({
         task.status,
     );
 
+    const getTaskAccentColor = (containerColor: string) => {
+        if (!containerColor) return "var(--text-main)";
+        if (containerColor.startsWith("#")) return containerColor;
+
+        const resolved = getContainerHex(containerColor);
+        return resolved || "var(--text-main)";
+    };
+
+    const accentColor = getTaskAccentColor(task.containerColor);
+    const CategoryIcon = Icons[getTaskCategoryIconKey(task.category)];
+    const StatusIcon = Icons[getTaskStatusIconKey(task.status)];
+
+    const rowStyle = {
+        transform: containerStyle.transform,
+        transition: containerStyle.transition,
+        opacity: containerStyle.opacity,
+        color: "var(--text-main)",
+    };
+
     const isSelectedForDelete = selectedToDelete.includes(task._id);
-    
+
     const handleContainerClick = () => {
-        // ---------------- REARRANGE MODE ----------------
-        // Card is used purely for dragging — do nothing on click.
         if (isRearrangeMode) return;
 
-        // ---------------- DELETE MODE ----------------
         if (isDeleteMode) {
             toggleDeleteSelection(task._id);
             return;
         }
 
-        // ---------------- NORMAL MODE ----------------
         onOpenView();
     };
-    
-    // =================================================================================================
-    //                                          RENDER
-    // =================================================================================================
+
     return (
         <div
             ref={setNodeRef}
-            style={containerStyle}
-            className={`task-item-container ${isDragging ? "dragging" : ""}`}
+            style={rowStyle}
+            className={`task-item-container ${isDragging ? "dragging" : ""} ${isRearrangeMode ? "rearrange-row" : ""}`}
             onClick={handleContainerClick}
         >
-            {/* ---------- LEFT SIDE: CHECKBOXES / DELETE SELECTOR ---------- */}
             <div className="task-left-section">
-
-                {/* COMPLETION CHECKBOX (normal mode) */}
-                {!isDeleteMode && !isRearrangeMode &&(
+                {!isDeleteMode && !isRearrangeMode && (
                     <div
                         className="task-checkbox"
                         onClick={(e) => {
-                            e.stopPropagation()
-                            toggleCompletion(task)
+                            e.stopPropagation();
+                            toggleCompletion(task);
                         }}
                     >
                         {task.status === "completed" ? (
@@ -101,13 +107,12 @@ export const SortableTaskItem = ({
                     </div>
                 )}
 
-                {/* DELETE MODE SELECTOR */}
                 {isDeleteMode && (
                     <div
                         className={`delete-select-circle ${isSelectedForDelete ? "selected" : ""}`}
                         onClick={(e) => {
-                            e.stopPropagation()
-                            toggleDeleteSelection(task._id)
+                            e.stopPropagation();
+                            toggleDeleteSelection(task._id);
                         }}
                     >
                         {isSelectedForDelete ? (
@@ -117,25 +122,38 @@ export const SortableTaskItem = ({
                         )}
                     </div>
                 )}
+
+                {isRearrangeMode && !isDeleteMode && (
+                    <div className="task-drag-handle" {...attributes} {...listeners}>
+                        <Icons.Drag />
+                    </div>
+                )}
             </div>
 
-            {/* ---------- MIDDLE: TASK BODY ---------- */}
             <div className="task-body">
-                <p className={`task-title ${task.status}`}>
-                    {task.title}
-                </p>
+                <p className={`task-title ${task.status}`}>{task.title}</p>
 
-                <span className="task-subinfo">
-                    {task.category} • {task.status}
-                </span>
-            </div>
+                <span
+                    className="task-color-swatch"
+                    style={{ backgroundColor: accentColor }}
+                    aria-hidden="true"
+                    title={`Task color: ${task.containerColor}`}
+                />
 
-            {/* ---------- RIGHT SIDE: DRAG HANDLE ---------- */}
-            {isRearrangeMode && (
-                <div className="task-drag-handle" {...attributes} {...listeners}>
-                    <Icons.Drag />
+                <div className="task-subinfo-right">
+                    <span className="task-meta-label task-category-label">
+                        {safeCategoryLabel(task.category)}
+                    </span>
+
+                    <CategoryIcon className="task-meta-icon task-category-icon" />
+
+                    <span className="task-meta-label task-status-label">
+                        {safeStatusLabel(task.status)}
+                    </span>
+
+                    <StatusIcon className="task-meta-icon task-status-icon" />
                 </div>
-            )}
+            </div>
         </div>
     );
 };
