@@ -8,39 +8,20 @@
     - Memo containerColor is a LIGHT version of task containerColor
     - No text contrast logic here
     - Pin colors are finite and predefined
-    - Category is visual metadata (emoji)
+    - Category is visual metadata (icon)
 */
 
+import { getTaskCategoryIconKey, TASK_CATEGORY_ICON_MAP, type TaskIconKey } from "../taskUtils";
+
 // ============================================================================
-// 1. CATEGORY → EMOJI (STICKER STYLE)
+// 1. CATEGORY -> ICON KEY
 // ============================================================================
 
-export const memoCategoryEmojiMap: Record<string, string> = {
-    cleaning: "🧹",
-    work: "💼",
-    study: "📚",
-    fitness: "🏋️",
-    health: "🩺",
-    cooking: "🍳",
-    relax: "🛋️",
-    praying: "🙏",
-    hobby: "🎨",
-    social: "🧑‍🤝‍🧑",
-    "self-care": "🧘",
-    finance: "💰",
-    errands: "🧾",
-    "pet-care": "🐾",
-    learning: "🧠",
-    creative: "✏️",
-    maintenance: "🛠️",
-    shopping: "🛒",
-    travel: "✈️",
-    others: "📌"
-};
+export const memoCategoryIconMap: Record<string, TaskIconKey> = TASK_CATEGORY_ICON_MAP;
 
-export function getMemoCategoryEmoji(category?: string): string {
-    if (!category) return memoCategoryEmojiMap.others;
-    return memoCategoryEmojiMap[category] || memoCategoryEmojiMap.others;
+export function getMemoCategoryIconKey(category?: string): TaskIconKey {
+    if (!category) return memoCategoryIconMap.others;
+    return memoCategoryIconMap[category] || getTaskCategoryIconKey(category);
 }
 
 // ============================================================================
@@ -81,10 +62,10 @@ const TASK_COLOR_GROUPS: Record<MemoContainerColorKey, string[]> = {
 };
 
 // ============================================================================
-// RESOLVER: TASK HEX → MEMO LIGHT COLOR
+// RESOLVER: TASK HEX -> MEMO LIGHT COLOR
 // ============================================================================
 
-export function resolveMemoContainerColor (
+export function resolveMemoContainerColor(
     taskContainerColor?: string
 ): string {
     if (!taskContainerColor) {
@@ -116,8 +97,6 @@ export function getMemoContainerColorByKey(
         MEMO_CONTAINER_COLORS.yellow
     );
 }
-
-
 
 // ============================================================================
 // 3. MEMO PIN COLORS (ONE TRUTH)

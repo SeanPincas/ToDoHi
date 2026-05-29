@@ -3,11 +3,12 @@
 // ============================================================================
 
 import "./MemoCardBaseOverlay.css";
+import type { ReactNode } from "react";
 
 interface MemoCardBaseOverlayProps {
     title: string;
     content?: string;
-    categoryEmoji?: string;
+    categoryIcon?: ReactNode;
     containerColor: string;
     pinColor: string;
     isActive?: boolean;
@@ -17,7 +18,7 @@ interface MemoCardBaseOverlayProps {
 const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     title,
     content,
-    categoryEmoji,
+    categoryIcon,
     containerColor,
     pinColor,
     isActive = false,
@@ -44,9 +45,9 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
                     <h4 className="memo-title">
                         {title}
                     </h4>
-                    {categoryEmoji && (
+                    {categoryIcon && (
                         <span className="memo-category">
-                            {categoryEmoji}
+                            {categoryIcon}
                         </span>
                     )}
                 </div>

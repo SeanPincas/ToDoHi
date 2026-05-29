@@ -1,18 +1,11 @@
-// ============================================================================
-// MemoPreview.tsx
-// ============================================================================
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useMemoContext } from "../../context/MemoContext";
-import { getMemoCategoryEmoji } from "../../utils/memoUtils/memoUtils";
+import { getMemoCategoryIconKey } from "../../utils/memoUtils/memoUtils";
+import { Icons } from "../../styles/iconLibrary";
 
 import "./MemoPreview.css";
-
-// ----------------------------------------------------------------------------
-// COMPONENT
-// ----------------------------------------------------------------------------
 
 const MemoPreview: React.FC = () => {
     const { memos, loading } = useMemoContext();
@@ -20,8 +13,6 @@ const MemoPreview: React.FC = () => {
 
     return (
         <div className="memo-preview-card">
-
-            {/* ================= HEADER ================= */}
             <div className="memo-preview-header">
                 <div className="memo-preview-title">Memos</div>
 
@@ -29,66 +20,61 @@ const MemoPreview: React.FC = () => {
                     className="memo-preview-link"
                     onClick={() => navigate("/memoboard")}
                 >
-                    View Board →
+                    View Board ?
                 </button>
             </div>
 
-            {/* ================= LIST WRAPPER (SCROLLS) ================= */}
-            <div className="memo-preview-list-wrapper">
+            <div className="memo-preview-list-container">
+                <div className="memo-preview-list-wrapper">
+                    {loading && (
+                        <div className="memo-preview-empty">
+                            Loading memos...
+                        </div>
+                    )}
 
-                {/* ---------- LOADING ---------- */}
-                {loading && (
-                    <div className="memo-preview-empty">
-                        Loading memos…
-                    </div>
-                )}
+                    {!loading && memos.length === 0 && (
+                        <div className="memo-preview-empty">
+                            No memos yet.
+                        </div>
+                    )}
 
-                {/* ---------- EMPTY ---------- */}
-                {!loading && memos.length === 0 && (
-                    <div className="memo-preview-empty">
-                        No memos yet.
-                    </div>
-                )}
+                    {!loading && memos.length > 0 && (
+                        <div className="memo-preview-list">
+                            {memos.map((memo) => {
+                                const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
+                                return (
+                                    <div
+                                        key={memo._id}
+                                        className="memo-preview-item"
+                                        style={{ backgroundColor: memo.containerColor }}
+                                        onClick={() =>
+                                            navigate("/memoboard", {
+                                                state: {
+                                                    openMemoId: memo._id,
+                                                },
+                                            })
+                                        }
+                                    >
+                                        <span
+                                            className="memo-preview-pin"
+                                            style={{ backgroundColor: memo.pinColor }}
+                                        />
 
-                {/* ---------- LIST ---------- */}
-                {!loading && memos.length > 0 && (
-                    <div className="memo-preview-list">
+                                        <div className="memo-preview-text">
+                                            <div className="memo-preview-item-title">
+                                                {memo.title}
+                                            </div>
 
-                        {memos.map(memo => (
-                            <div
-                                key={memo._id}
-                                className="memo-preview-item"
-                                style={{ backgroundColor: memo.containerColor }}
-                                onClick={() =>
-                                    navigate("/memoboard", {
-                                        state: {
-                                            openMemoId: memo._id,
-                                        },
-                                    })
-                                }
-                            >
-                                {/* PIN */}
-                                <span
-                                    className="memo-preview-pin"
-                                    style={{ backgroundColor: memo.pinColor }}
-                                />
-
-                                {/* TEXT */}
-                                <div className="memo-preview-text">
-
-                                    <div className="memo-preview-item-title">
-                                        {memo.title}
+                                            <div className="memo-preview-category">
+                                                <CategoryIcon /> {memo.category}
+                                            </div>
+                                        </div>
                                     </div>
-
-                                    <div className="memo-preview-category">
-                                        {getMemoCategoryEmoji(memo.category)}{" "}
-                                        {memo.category}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

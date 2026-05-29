@@ -27,8 +27,8 @@ app.use(apiLimiter);
 
 // Enable CORS and JSON body parsing
 app.use(cors({
-  origin: "http://localhost:5173", // your React frontend
-  credentials: true               // allow cookies/auth headers
+  origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+  credentials: true
 }));
 app.use(express.json());
 
