@@ -7,10 +7,11 @@ import React from "react";
 import { useDraggable } from "@dnd-kit/core";
 
 import type { Memo } from "../../api/memoApi";
-import { getMemoCategoryEmoji } from "../../utils/memoUtils/memoUtils";
+import { getMemoCategoryIconKey } from "../../utils/memoUtils/memoUtils";
 import MemoCardBaseOverlay from "../../styles/MemoCardBaseOverlay";
 import { useMemoContext } from "../../context/MemoContext";
 import { clampPinTransform } from "../../utils/memoUtils/clampPinTransform";
+import { Icons } from "../../styles/iconLibrary";
 
 // ------------------------------ TYPES ---------------------------------------
 interface DraggableMemoItemProps {
@@ -127,6 +128,8 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     // ------------------------------------------------------------------------
     // RENDER
     // ------------------------------------------------------------------------
+    const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
+
     return (
         <div
             ref={setNodeRef}
@@ -144,7 +147,7 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             <MemoCardBaseOverlay
                 title={memo.title}
                 content={memo.content}
-                categoryEmoji={getMemoCategoryEmoji(memo.category)}
+                categoryIcon={<CategoryIcon />}
                 containerColor={memo.containerColor}
                 pinColor={memo.pinColor}
                 isActive={activeMemoId === memo._id}

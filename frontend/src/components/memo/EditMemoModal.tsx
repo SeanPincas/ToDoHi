@@ -7,7 +7,7 @@ import { useMemoContext } from "../../context/MemoContext";
 import { Icons } from "../../styles/iconLibrary";
 
 import {
-    memoCategoryEmojiMap,
+    memoCategoryIconMap,
     MEMO_CONTAINER_COLORS,
     memoPinColors,
     getDefaultMemoPinColor
@@ -124,8 +124,10 @@ const EditMemoModal = () => {
                 {/* ================= CATEGORY ================= */}
                 <label>Category</label>
                 <div className="memo-category-grid">
-                    {Object.entries(memoCategoryEmojiMap).map(
-                        ([key, emoji]) => (
+                    {Object.entries(memoCategoryIconMap).map(
+                        ([key, iconKey]) => {
+                            const CategoryIcon = Icons[iconKey];
+                            return (
                             <button
                                 key={key}
                                 type="button"
@@ -134,9 +136,10 @@ const EditMemoModal = () => {
                                 }`}
                                 onClick={() => setCategory(key)}
                             >
-                                <span className="emoji">{emoji}</span>
+                                <span className="emoji"><CategoryIcon /></span>
                             </button>
-                        )
+                            );
+                        }
                     )}
                 </div>
 
