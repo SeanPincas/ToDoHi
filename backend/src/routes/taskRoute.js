@@ -5,6 +5,10 @@ const AuthMiddleware = require("../middleware/authMiddleware.js");
 
 router.post("/", AuthMiddleware,  TaskController.createTask);
 router.get("/", AuthMiddleware, TaskController.getTasks);
+router.get("/archive", AuthMiddleware, TaskController.getTaskArchive);
+router.post("/archive/:id/repeat", AuthMiddleware, TaskController.repeatTaskArchiveEntry);
+router.delete("/archive/:id", AuthMiddleware, TaskController.deleteTaskArchiveEntry);
+router.get("/review", AuthMiddleware, TaskController.getRepeatReview);
 
 router.put("/reorder", AuthMiddleware, TaskController.reorderTasks);
 router.patch("/:id/complete", AuthMiddleware, TaskController.markComplete);

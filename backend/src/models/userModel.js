@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
     },
     preference: {
         resetHour: { type: Number, default: 0 },
+        dayTaskDelete: { type: Number, enum: [3, 7, 15, 30], default: 30 },
         theme: { type: String, enum: ['light', 'dark'], default: 'light' }
     },
     quoteCategoryPreferences: {
@@ -51,10 +52,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    lastResetCycleKey: {
+        type: String,
+        default: null
+    },
     stats: {
         totalTasksCreated: { type: Number, default: 0 },
         totalTasksCreatedToday: { type: Number, default: 0},
         totalTasksCompleted: { type: Number, default: 0 },
+        tasksCompletedToday: { type: Number, default: 0 },
+        tasksFailedYesterday: { type: Number, default: 0 },
         totalMemosCreated: { type: Number, default: 0 },
         totalDailyPlanCompleted: { type: Number, default: 0 },
 
@@ -63,6 +70,9 @@ const userSchema = new mongoose.Schema({
         longestStreak: { type: Number, default: 0 },
     },
     failedTaskSnapshot: {
+        cycleKey: {
+            type: String
+        },
         resetAt: {
             type: Date
         },
@@ -75,6 +85,14 @@ const userSchema = new mongoose.Schema({
                 title: {
                     type: String,
                     required: true
+                },
+                category: {
+                    type: String,
+                    default: "others"
+                },
+                containerColor: {
+                    type: String,
+                    default: "#ffffff"
                 },
                 status: {
                     type: String,

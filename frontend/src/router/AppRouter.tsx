@@ -52,13 +52,13 @@ const AppRouter: React.FC = () => {
                                 <Route
                                     path="/memoboard"
                                     element={
-                                        <Layout>
+                                        <>
                                             <MemoBoardPage />
                                             <AddMemoModal />
                                             <ViewMemoModal />
                                             <EditMemoModal />
                                             <DeleteConfirmMemoModal />
-                                        </Layout>
+                                        </>
                                     }
                                 />
                             </Route>

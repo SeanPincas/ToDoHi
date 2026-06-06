@@ -4,20 +4,23 @@
    ============================================================================ */
 
 .memo-board-page {
+    --memo-page-pad: clamp(8px, 1.1vw, 18px);
     display: flex;
     justify-content: center;
+    align-items: stretch;
 
-    flex: 1;        /* fill Layout content */
-    min-height: 0;
-
-  /* prevent page scroll */
-}
-
-/* MATCH DASHBOARD OFFSET BEHAVIOR */
-@media (min-width: 1400px) {
-    .memo-board-page {
-        padding-left: clamp(0px, 20vw, 300px);
-    }
+    width: 100%;
+    min-height: 100vh;
+    height: 100vh;
+    padding: var(--memo-page-pad);
+    box-sizing: border-box;
+    background:
+        linear-gradient(rgba(247, 242, 232, 0.14), rgba(247, 242, 232, 0.14)),
+        url("../assets/wallpaper.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
 }
 
 /* ============================ FRAME ============================ */
@@ -28,21 +31,24 @@
 
     width: 100%;
     max-width: 1550px;
-    height: 95%;
+    height: calc(100vh - (2 * var(--memo-page-pad)));
+    max-height: calc(100vh - (2 * var(--memo-page-pad)));
     min-height: 0;
 
     padding: 22px;
     border-radius: 18px;
 
-    background: linear-gradient(
-        135deg,
-        var(--memo-frame-bg-1),
-        var(--memo-frame-bg-2)
-    );
+    background:
+        linear-gradient(rgba(88, 58, 30, 0.14), rgba(88, 58, 30, 0.14)),
+        url("../assets/wood-table.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
     box-shadow:
         inset 0 0 0 4px rgba(0, 0, 0, 0.12),
         0 12px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
 }
 
 /* ============================ HEADER GRID ============================ */
@@ -167,6 +173,9 @@
 /* ============================ TABLET ============================ */
 
 @media (max-width: 1024px) {
+    .memo-board-page {
+        --memo-page-pad: 10px;
+    }
 
     /* hide nav label */
     .memo-nav-text {
@@ -193,11 +202,19 @@
     .memo-toolbar-text {
         display: none;
     }
+
+    .memo-board-frame {
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+    }
 }
 
 /* ============================ PHONE ============================ */
 
 @media (max-width: 480px) {
+    .memo-board-page {
+        --memo-page-pad: 8px;
+    }
 
     .memo-board-topbar {
         padding: 10px 12px;
@@ -227,6 +244,45 @@
         font-size: 9px;
         letter-spacing: 1px;
     }
+
+    .memo-board-frame {
+        height: calc(100vh - 16px);
+        max-height: calc(100vh - 16px);
+        padding: 14px;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .memo-board-page {
+        --memo-page-pad: 12px;
+    }
+
+    .memo-board-frame {
+        height: calc(100vh - 24px);
+        max-height: calc(100vh - 24px);
+    }
+}
+
+@media (min-width: 1367px) and (max-width: 1919px) {
+    .memo-board-page {
+        --memo-page-pad: 16px;
+    }
+
+    .memo-board-frame {
+        height: calc(100vh - 32px);
+        max-height: calc(100vh - 32px);
+    }
+}
+
+@media (min-width: 1920px) {
+    .memo-board-page {
+        --memo-page-pad: 18px;
+    }
+
+    .memo-board-frame {
+        height: calc(100vh - 36px);
+        max-height: calc(100vh - 36px);
+    }
 }
 
 /* ============================ CORK BOARD ============================ */
@@ -234,19 +290,19 @@
 .memo-board-canvas {
     flex: 1;
     min-height: 0;
-    height: 100%;
 
     box-sizing: border-box;
 
     position: relative;
     padding: 24px;
 
-    background-image: url("../assets/cork-board.jpg");
+    background-image: url("../assets/cork-board.webp");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
 
     box-shadow: var(--memo-cork-shadow);
+    overflow: hidden;
 }
 
 /* boundary indicator */

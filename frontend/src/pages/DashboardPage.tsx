@@ -90,6 +90,13 @@ const Dashboard: React.FC = () => {
                                 <p>Hello, {user?.username || "User"}</p>
                             </div>
 
+                            <img
+                                src="/logo.webp"
+                                alt=""
+                                aria-hidden="true"
+                                className="dashboard-header-logo"
+                            />
+
                             <div className="greeting-right">
                                 <div className="time-row">
                                     <span className="time-text">{time12}</span>

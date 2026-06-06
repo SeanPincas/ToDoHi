@@ -134,7 +134,7 @@ export const SortableTaskItem = ({
                 <p className={`task-title ${task.status}`}>{task.title}</p>
 
                 <span
-                    className="task-color-swatch"
+                    className="task-color-line"
                     style={{ backgroundColor: accentColor }}
                     aria-hidden="true"
                     title={`Task color: ${task.containerColor}`}

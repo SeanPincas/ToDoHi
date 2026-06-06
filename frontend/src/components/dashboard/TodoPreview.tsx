@@ -30,13 +30,17 @@ import type { Task } from "../../api/taskApi";
 import { SortableTaskItem } from "../todo/SortableTaskItem";
 import { Icons } from "../../styles/iconLibrary";
 import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
+import { SegmentedSwitch } from "../common/switch/SegmentedSwitch";
+import bougainvilleaImage from "../../assets/bougainvillea.webp";
 
 // Task utilities
 import {
     TASK_CATEGORIES,
     CATEGORY_LABELS,
+    TASK_CATEGORY_ICON_MAP,
     TASK_TABS,
     TASK_TAB_LABELS,
+    TASK_COLORS,
     type TaskTab,
     type TaskCategory,
 } from "../../utils/taskUtils";
@@ -62,6 +66,7 @@ const TodoPreview: React.FC = () => {
     // =====================================================================
     const [activeTab, setActiveTab] = useState<TaskTab>("all");
     const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
+    const [activeContainerColor, setActiveContainerColor] = useState<"all" | string>("all");
 
     const [isRearrangeMode, setIsRearrangeMode] = useState(false);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -80,9 +85,26 @@ const TodoPreview: React.FC = () => {
         }
     };
 
-    const tasks = getActiveList().filter((task) =>
-        activeCategory === "all" ? true : task.category === activeCategory
-    );
+    const tasks = getActiveList().filter((task) => {
+        const categoryMatch = activeCategory === "all" ? true : task.category === activeCategory;
+        const colorMatch = activeContainerColor === "all" ? true : task.containerColor === activeContainerColor;
+        return categoryMatch && colorMatch;
+    });
+
+    const colorOptions = Object.entries(TASK_COLORS).flatMap(([colorName, shades]) => ([
+        { value: `${colorName}-light`, label: `${colorName} light`, swatch: shades.light },
+        { value: `${colorName}-normal`, label: `${colorName} normal`, swatch: shades.normal },
+        { value: `${colorName}-dark`, label: `${colorName} dark`, swatch: shades.dark },
+    ]));
+
+    const categoryOptions = [
+        { value: "all", label: "All", iconKey: "List" as const },
+        ...TASK_CATEGORIES.map((cat) => ({
+            value: cat,
+            label: CATEGORY_LABELS[cat],
+            iconKey: TASK_CATEGORY_ICON_MAP[cat],
+        })),
+    ];
 
     // =====================================================================
     //                            DND-KIT SETUP
@@ -180,7 +202,15 @@ const TodoPreview: React.FC = () => {
                     {isRearrangeMode && <span className="mode-label rearrange">Rearrange Mode</span>}
                 </div>
 
-                <h2 className="todo-preview-title">To-Do List</h2>
+                <div className="todo-preview-title-wrap">
+                    <h2 className="todo-preview-title">To-Do List</h2>
+                </div>
+
+                <div
+                    aria-hidden="true"
+                    className="todo-preview-header-flower"
+                    style={{ backgroundImage: `url(${bougainvilleaImage})` }}
+                />
 
                 <div className="todo-preview-actions">
 
@@ -234,29 +264,73 @@ const TodoPreview: React.FC = () => {
             {/*                           FILTER TABS                           */}
             {/* =============================================================== */}
             <div className="todo-tabs">
-                {TASK_TABS.map(tab => (
-                    <button
-                        key={tab}
-                        className={activeTab === tab ? "active" : ""}
-                        onClick={() => setActiveTab(tab)}
-                    >
-                        {TASK_TAB_LABELS[tab]}
-                    </button>
-                ))}
+                <SegmentedSwitch
+                    value={activeTab}
+                    options={TASK_TABS.map((tab) => ({
+                        value: tab,
+                        label: TASK_TAB_LABELS[tab],
+                    }))}
+                    onChange={setActiveTab}
+                    className="todo-status-switch"
+                />
 
                 <div className="todo-category-menu">
                     <DropdownMenu
                         label="Category"
                         value={activeCategory === "all" ? "All Categories" : CATEGORY_LABELS[activeCategory]}
-                        options={[
-                            { value: "all", label: "All Categories" },
-                            ...TASK_CATEGORIES.map((cat) => ({
-                                value: cat,
-                                label: CATEGORY_LABELS[cat],
-                            })),
-                        ]}
+                        selectedValue={activeCategory}
+                        options={categoryOptions}
                         onChange={(value) => setActiveCategory(value as "all" | TaskCategory)}
                         maxHeight={235}
+                        renderOption={(option) => {
+                            const IconComp = option.iconKey ? Icons[option.iconKey] : null;
+                            return (
+                                <span className="todo-category-option">
+                                    {IconComp && <IconComp className="todo-category-option-icon" />}
+                                    <span>{option.label}</span>
+                                </span>
+                            );
+                        }}
+                    />
+                </div>
+
+                <div className="todo-color-menu">
+                    <DropdownMenu
+                        label="Container Color"
+                        value="Container Color"
+                        selectedValue={activeContainerColor}
+                        options={[
+                            { value: "all", label: "All", swatch: "transparent" },
+                            ...colorOptions,
+                        ]}
+                        onChange={(value) => setActiveContainerColor(value)}
+                        maxHeight={260}
+                        menuClassName="todo-color-grid-menu"
+                        itemClassName="todo-color-grid-item"
+                        renderValue={(selected) => {
+                            const swatchColor = selected?.value === "all" ? "transparent" : selected?.swatch;
+                            return (
+                                <span className="todo-color-trigger-value">
+                                    <span
+                                        className={`todo-color-trigger-swatch ${selected?.value === "all" ? "all" : ""}`}
+                                        style={swatchColor ? { backgroundColor: swatchColor } : undefined}
+                                    />
+                                    <span className="todo-filter-text">{selected?.value === "all" || !selected ? "All Colors" : "Color"}</span>
+                                </span>
+                            );
+                        }}
+                        renderOption={(option, isActive) => (
+                            option.value === "all" ? (
+                                <span className={`todo-color-all-option ${isActive ? "active" : ""}`}>
+                                    All
+                                </span>
+                            ) : (
+                                <span
+                                    className={`todo-color-option-fill ${isActive ? "active" : ""}`}
+                                    style={{ backgroundColor: option.swatch }}
+                                />
+                            )
+                        )}
                     />
                 </div>
             </div>
@@ -301,38 +375,33 @@ const TodoPreview: React.FC = () => {
                         className="btn-primary-rect primary-btn todo-list-add-btn"
                         onClick={() => openModal("add")}
                     >
-                        <Icons.Add /> Add Task
+                        <Icons.Add /> <span className="todo-main-action-text">Add Task</span>
+                    </button>
+                )}
+
+                {isDeleteMode && (
+                    <button
+                        className="btn-danger-rect primary-btn todo-list-add-btn todo-list-mode-btn"
+                        disabled={selectedToDelete.length === 0}
+                        onClick={openDeleteConfirm}
+                    >
+                        <Icons.Delete />
+                        <span className="todo-main-action-text">Delete Selected ({selectedToDelete.length})</span>
+                    </button>
+                )}
+
+                {!isDeleteMode && isRearrangeMode && (
+                    <button
+                        className="btn-info-rect primary-btn todo-list-add-btn todo-list-mode-btn"
+                        onClick={() => {
+                            setIsRearrangeMode(false)
+                        }}
+                    >
+                        <Icons.Check />
+                        <span className="todo-main-action-text">Confirm Arrangment</span>
                     </button>
                 )}
             </div>
-
-            {/* ================= DELETE MODE ACTION ================= */}
-
-            {isDeleteMode && (
-                <button
-                    className="btn-danger-rect primary-btn"
-                    disabled={selectedToDelete.length === 0}
-                    onClick={openDeleteConfirm}
-                >
-                    <Icons.Delete />
-                    Delete Selected ({selectedToDelete.length})
-                </button>
-            )}
-
-            {/* ================= REARRANGE MODE ACTION ================= */}
-
-            {!isDeleteMode && isRearrangeMode && (
-                <button
-                    className="btn-info-rect primary-btn"
-                    onClick={() => {
-                        // Exit Rearrange Mode
-                        setIsRearrangeMode(false)
-                    }}
-                >
-                    <Icons.Check />
-                    Confirm Arrangment
-                </button>
-            )}
 
         </div >
     );
