@@ -1,12 +1,5 @@
 const mongoose = require("mongoose");
-
-// Define categories as plain text (no emojis)
-const categoryList = [
-    'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
-    'relax', 'praying', 'hobby', 'social', 'self-care', 'finance',
-    'errands', 'pet-care', 'learning', 'creative', 'maintenance',
-    'shopping', 'travel', 'others'
-];
+const { categoryList, hexColorPattern } = require("../utils/taskConstants");
 
 // Define the Task schema
 const taskSchema = new mongoose.Schema({
@@ -61,7 +54,7 @@ const taskSchema = new mongoose.Schema({
     containerColor: {
         type: String,
         default: '#ffffff',
-        match: /^#([0-9A-F]{3}){1,2}$/i
+        match: hexColorPattern
     }
 });
 

@@ -48,13 +48,11 @@
     }
 }
 
-/* Desktop modal widening + left margin rule */
+/* Desktop modal widening only */
 @media (min-width: 901px) {
     .todo-modal-card {
         width: 520px;
         /* expanded for color grid */
-        margin-left: 300px;
-        /* your global left modal offset */
     }
 }
 

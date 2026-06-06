@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import "./Sidebar.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Icons } from "../../styles/iconLibrary";
@@ -20,6 +20,7 @@ import {
 
 import ResetHourHelpIcon from "../common/icons/ResetHourHelpIcon";
 import ResetHourGuideModal from "../common/modals/ResetHourGuideModal";
+import UserSettingsModal from "../common/modals/UserSettingsModal";
 
 const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map((_, i) => ({
     value: String(i),
@@ -33,11 +34,13 @@ const QUOTE_OPTIONS: DropdownOption[] = QUOTE_CATEGORIES.map((cat) => ({
 
 const Sidebar = () => {
     const [open, setOpen] = useState(false);
+    const [hoveredTab, setHoveredTab] = useState<string | null>(null);
     const [username, setUsername] = useState("Username");
     const [resetHour, setResetHour] = useState("0");
     const [quotePref, setQuotePref] = useState<QuoteCategory>("Motivation");
     const [currentQuote, setCurrentQuote] = useState<string>("Loading quote...");
     const [showResetHourGuide, setShowResetHourGuide] = useState(false);
+    const [showUserSettingsModal, setShowUserSettingsModal] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -48,9 +51,31 @@ const Sidebar = () => {
     } | null>(null);
 
     const saveTimeout = useRef<number | null>(null);
+    const hoverCollapseTimeout = useRef<number | null>(null);
 
     const toggleSidebar = () => setOpen((prev) => !prev);
     const closeSidebar = () => setOpen(false);
+
+    const clearHoverTimeout = () => {
+        if (hoverCollapseTimeout.current) {
+            clearTimeout(hoverCollapseTimeout.current);
+            hoverCollapseTimeout.current = null;
+        }
+    };
+
+    const handleTabHoverStart = (tabId: string) => {
+        if (open) return;
+        clearHoverTimeout();
+        setHoveredTab(tabId);
+    };
+
+    const handleTabHoverEnd = () => {
+        if (open) return;
+        clearHoverTimeout();
+        hoverCollapseTimeout.current = window.setTimeout(() => {
+            setHoveredTab(null);
+        }, 1500);
+    };
 
     useEffect(() => {
         const loadUser = async () => {
@@ -88,6 +113,19 @@ const Sidebar = () => {
     useEffect(() => {
         setOpen(false);
     }, [location.pathname]);
+
+    useEffect(() => {
+        if (open) {
+            clearHoverTimeout();
+            setHoveredTab(null);
+        }
+    }, [open]);
+
+    useEffect(() => {
+        return () => {
+            clearHoverTimeout();
+        };
+    }, []);
 
     const fetchQuote = async (category: QuoteCategory) => {
         try {
@@ -145,27 +183,59 @@ const Sidebar = () => {
     return (
         <>
             <aside className={`sidebar ${open ? "open" : "collapsed"}`}>
-                <div className="sidebar-rail" aria-label="Sidebar quick actions">
+                <div className="sidebar-tab" aria-label="Sidebar quick actions">
                     <button
-                        className="sidebar-rail-btn sidebar-rail-toggle"
+                        className={`sidebar-rail-btn sidebar-rail-toggle ${hoveredTab === "settings" ? "hover-stretch" : ""}`}
                         onClick={toggleSidebar}
                         aria-expanded={open}
-                        aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
-                        title={open ? "Collapse sidebar" : "Expand sidebar"}
+                        aria-label={open ? "Collapse sidebar settings" : "Open sidebar settings"}
+                        onMouseEnter={() => handleTabHoverStart("settings")}
+                        onMouseLeave={handleTabHoverEnd}
                     >
-                        <Icons.Menu />
+                        <span className="sidebar-rail-btn-icons">
+                            <Icons.Menu />
+                        </span>
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "settings" ? "visible" : ""}`}>Menu</span>
                     </button>
-                    <button className="sidebar-rail-btn" onClick={() => navigate("/")} aria-label="Go to Dashboard" title="Dashboard">
+                    <button
+                        className={`sidebar-rail-btn ${hoveredTab === "dashboard" ? "hover-stretch" : ""}`}
+                        onClick={() => navigate("/")}
+                        aria-label="Go to Dashboard"
+                        onMouseEnter={() => handleTabHoverStart("dashboard")}
+                        onMouseLeave={handleTabHoverEnd}
+                    >
                         <Icons.Home />
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "dashboard" ? "visible" : ""}`}>Dashboard</span>
                     </button>
-                    <button className="sidebar-rail-btn" onClick={() => navigate("/memoboard")} aria-label="Go to Memo Board" title="Memo Board">
+                    <button
+                        className={`sidebar-rail-btn ${hoveredTab === "memo" ? "hover-stretch" : ""}`}
+                        onClick={() => navigate("/memoboard")}
+                        aria-label="Go to Memo Board"
+                        onMouseEnter={() => handleTabHoverStart("memo")}
+                        onMouseLeave={handleTabHoverEnd}
+                    >
                         <Icons.Memo />
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "memo" ? "visible" : ""}`}>Memo Board</span>
                     </button>
-                    <button className="sidebar-rail-btn" onClick={() => setShowResetHourGuide(true)} aria-label="Open Reset Hour guide" title="Reset Hour Guide">
-                        <Icons.Question />
+                    <button
+                        className={`sidebar-rail-btn ${hoveredTab === "user-settings" ? "hover-stretch" : ""}`}
+                        onClick={() => setShowUserSettingsModal(true)}
+                        aria-label="Open user settings"
+                        onMouseEnter={() => handleTabHoverStart("user-settings")}
+                        onMouseLeave={handleTabHoverEnd}
+                    >
+                        <Icons.User />
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "user-settings" ? "visible" : ""}`}>User Settings</span>
                     </button>
-                    <button className="sidebar-rail-btn sidebar-rail-btn-bottom" onClick={logout} aria-label="Logout" title="Logout">
+                    <button
+                        className={`sidebar-rail-btn sidebar-rail-btn-bottom ${hoveredTab === "logout" ? "hover-stretch" : ""}`}
+                        onClick={logout}
+                        aria-label="Logout"
+                        onMouseEnter={() => handleTabHoverStart("logout")}
+                        onMouseLeave={handleTabHoverEnd}
+                    >
                         <Icons.Off />
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "logout" ? "visible" : ""}`}>Logout</span>
                     </button>
                 </div>
 
@@ -177,6 +247,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="sidebar-section">
+                        <p className="sidebar-panel-section-label">Navigation</p>
                         <button
                             className="sidebar-btn"
                             onClick={() => {
@@ -198,6 +269,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="sidebar-section">
+                        <p className="sidebar-panel-section-label">Settings</p>
                         <div className="reset-hour-wrapper">
                             <DropdownMenu
                                 label="Reset Hour"
@@ -222,6 +294,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="sidebar-section failed-section">
+                        <p className="sidebar-panel-section-label">Status</p>
                         <h4 className="section-title">Failed Tasks Yesterday</h4>
                         <div className="failed-task-container">
                             <ul className="failed-task-list">
@@ -246,7 +319,7 @@ const Sidebar = () => {
                         </button>
 
                         <div className="sidebar-footer-row">
-                            <footer className="sidebar-footer">� 2025 ToDoHi</footer>
+                            <footer className="sidebar-footer">© 2025 ToDoHi</footer>
                             <div className="sidebar-theme-toggle">
                                 <ThemeToggle theme={theme} onToggle={toggleTheme} />
                             </div>
@@ -265,10 +338,12 @@ const Sidebar = () => {
             </aside>
 
             {showResetHourGuide && <ResetHourGuideModal onClose={() => setShowResetHourGuide(false)} />}
+            {showUserSettingsModal && <UserSettingsModal onClose={() => setShowUserSettingsModal(false)} />}
         </>
     );
 };
 
 export default Sidebar;
+
 
 

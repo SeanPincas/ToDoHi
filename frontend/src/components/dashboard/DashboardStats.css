@@ -8,7 +8,7 @@
 
     background: var(--white);
     border: 3px solid var(--blue-dark);
-    border-radius: 14px;
+    border-radius: 8px;
 
     box-shadow: var(--shadow-soft);
 
@@ -37,7 +37,7 @@
 /* --------------------------- TEXT STYLING --------------------------- */
 
 .stats-label {
-    font-size: 12px;
+    font-size: clamp(10px, 0.76vw, 12px);
     opacity: 0.85;
     color: var(--blue-dark);
     min-height: 18px;
@@ -48,7 +48,7 @@
 }
 
 .stats-value {
-    font-size: 25px;
+    font-size: clamp(18px, 1.45vw, 25px);
     font-weight: bold;
     color: var(--blue-dark);
     margin-top: 3px;
@@ -97,5 +97,32 @@
     .stats-value {
         font-size: 15px;
         margin-top: 0;
+    }
+}
+
+@media (max-width: 1366px) {
+    .stats-bar {
+        border-width: 2px;
+    }
+
+    .stats-item {
+        border-right-width: 1px;
+        padding: 2px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .stats-bar {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .stats-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stats-item {
+        min-width: 86px;
+        flex: 0 0 auto;
     }
 }
