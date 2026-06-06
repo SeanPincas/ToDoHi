@@ -61,16 +61,7 @@ exports.runDailyStats = async () => {
             });
 
             // ============================================================
-            // 2. TASKS FAILED LAST RESET CYCLE
-            // ============================================================
-            const tasksFailedYesterday = await Task.countDocuments({
-                userId,
-                status: "failed",
-                updatedAt: { $gte: yesterdayStart, $lt: start }
-            });
-
-            // ============================================================
-            // 3. DAILY PLAN STREAK LOGIC (RESET-HOUR AWARE)
+            // 2. DAILY PLAN STREAK LOGIC (RESET-HOUR AWARE)
             // ============================================================
             const yesterdayDateKey = yesterdayStart
                 .toISOString()
@@ -92,12 +83,11 @@ exports.runDailyStats = async () => {
             }
 
             // ============================================================
-            // 4. UPDATE USER STATS
+            // 3. UPDATE USER STATS
             // ============================================================
             await User.findByIdAndUpdate(userId, {
                 $set: {
                     "stats.tasksCompletedToday": tasksCompletedToday,
-                    "stats.tasksFailedYesterday": tasksFailedYesterday,
                     "stats.dailyStreak": dailyStreak,
                     "stats.longestStreak": longestStreak
                 }

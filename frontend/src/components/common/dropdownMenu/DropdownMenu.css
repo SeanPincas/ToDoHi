@@ -36,6 +36,18 @@
     box-shadow: var(--shadow-soft);
 }
 
+.dropdown-trigger-value-wrap {
+    display: inline-flex;
+    align-items: center;
+    min-height: 100%;
+}
+
+.dropdown-trigger-text {
+    display: inline-flex;
+    align-items: center;
+    transform: translateY(1px);
+}
+
 /* --------------------------- ARROW --------------------------- */
 
 .dropdown-arrow {

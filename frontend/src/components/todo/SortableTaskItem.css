@@ -68,6 +68,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+    flex: 0 1 auto;
+    max-width: 56%;
 }
 
 .task-title.completed {
@@ -80,14 +82,14 @@
     flex-shrink: 1;
 }
 
-.task-color-swatch {
-    width: 10px;
-    height: 10px;
-    min-width: 10px;
-    border-radius: 2px;
-    border: 1px solid color-mix(in srgb, var(--blue-dark) 45%, #ffffff 55%);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
-    flex-shrink: 0;
+.task-color-line {
+    height: 3px;
+    min-width: 14px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--blue-dark) 28%, #ffffff 72%);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28) inset;
+    flex: 1 1 auto;
+    opacity: 0.95;
 }
 
 .task-meta-label {
