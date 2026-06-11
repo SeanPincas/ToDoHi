@@ -9,8 +9,8 @@ import { Icons } from "../../styles/iconLibrary";
 import "../../styles/ButtonStyles.css";
 import {
     modalOverlayStyle,
-    modalCardBaseStyle,
 } from "../../styles/modalStyles";
+import "../common/modals/modalBaseTheme.css";
 
 import { DropdownMenu } from "../common/dropdownMenu";
 
@@ -106,8 +106,7 @@ const EditTaskModal = () => {
             onMouseDown={handleCancel}
         >
             <div
-                style={modalCardBaseStyle}
-                className="edit-modal-card"
+                className="modal-card-base edit-modal-card"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* HEADER */}

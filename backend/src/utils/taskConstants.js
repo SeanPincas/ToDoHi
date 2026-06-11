@@ -1,3 +1,10 @@
+// ============================================================================
+// File Name: taskConstants.js
+// Purpose:
+// - Central shared task-domain constants.
+// - Used by models and utilities that validate categories or task colors.
+// ============================================================================
+
 const categoryList = [
     "cleaning", "work", "study", "fitness", "health", "cooking",
     "relax", "praying", "hobby", "social", "self-care", "finance",

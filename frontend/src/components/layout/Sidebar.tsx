@@ -7,6 +7,7 @@ import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
 import type { DropdownOption } from "../common/dropdownMenu/DropdownMenu";
 
 import { QUOTE_CATEGORIES, type QuoteCategory } from "../../utils/quoteUtils";
+import { getFailedTasksYesterdayPreview, type FailedYesterdayItem } from "../../utils/repeatReview";
 
 import { useAuthContext } from "../../context/AuthContext";
 import { getMe, updateUserPreferences } from "../../api/userApi";
@@ -46,9 +47,7 @@ const Sidebar = () => {
     const location = useLocation();
     const { logout, theme, toggleTheme } = useAuthContext();
 
-    const [failedTaskSnapshot, setFailedTaskSnapshot] = useState<{
-        tasks: { _id: string; title: string; status: string }[];
-    } | null>(null);
+    const [failedTasksYesterday, setFailedTasksYesterday] = useState<FailedYesterdayItem[]>([]);
 
     const saveTimeout = useRef<number | null>(null);
     const hoverCollapseTimeout = useRef<number | null>(null);
@@ -90,18 +89,15 @@ const Sidebar = () => {
                     setResetHour(String(user.preference.resetHour));
                 }
 
-                if (Array.isArray(user?.quoteCategoryPreferences)) {
-                    const preferred = user.quoteCategoryPreferences[0];
+                if (Array.isArray(user?.preference?.quoteCategory)) {
+                    const preferred = user.preference.quoteCategory[0];
                     const selected = preferred ? preferred : "Random";
                     setQuotePref(selected as QuoteCategory);
                     fetchQuote(selected as QuoteCategory);
                 }
 
-                if (user?.failedTaskSnapshot) {
-                    setFailedTaskSnapshot(user.failedTaskSnapshot);
-                } else {
-                    setFailedTaskSnapshot(null);
-                }
+                const failedPreview = await getFailedTasksYesterdayPreview();
+                setFailedTasksYesterday(failedPreview);
             } catch (err) {
                 console.error("Sidebar load failed:", err);
             }
@@ -298,8 +294,8 @@ const Sidebar = () => {
                         <h4 className="section-title">Failed Tasks Yesterday</h4>
                         <div className="failed-task-container">
                             <ul className="failed-task-list">
-                                {!failedTaskSnapshot && <li className="failed-task-empty">No Failed Tasks Yesterday... Congratz ^o^</li>}
-                                {failedTaskSnapshot?.tasks.map((task) => (
+                                {failedTasksYesterday.length === 0 && <li className="failed-task-empty">No Failed Tasks Yesterday... Congratz ^o^</li>}
+                                {failedTasksYesterday.map((task) => (
                                     <li key={task._id} className="failed-task-item">
                                         {task.title}
                                     </li>

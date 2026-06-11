@@ -1,10 +1,10 @@
 import React from "react";
 import {
     modalOverlayStyle,
-    modalCardBaseStyle,
 } from "../../../styles/modalStyles";
 
 import "./UserSettingsModal.css";
+import "./modalBaseTheme.css";
 
 interface Props {
     onClose: () => void;
@@ -14,8 +14,7 @@ const UserSettingsModal: React.FC<Props> = ({ onClose }) => {
     return (
         <div style={modalOverlayStyle} onClick={onClose}>
             <div
-                style={modalCardBaseStyle}
-                className="user-settings-modal"
+                className="modal-card-base user-settings-modal"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="user-settings-modal-header">

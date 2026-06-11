@@ -15,8 +15,8 @@ import {
 
 import {
     modalOverlayStyle,
-    modalCardBaseStyle,
 } from "../../styles/modalStyles";
+import "../common/modals/modalBaseTheme.css";
 
 import "./EditMemoModal.css";
 
@@ -88,7 +88,7 @@ const EditMemoModal = () => {
 
     return (
         <div style={modalOverlayStyle}>
-            <div style={modalCardBaseStyle}>
+            <div className="modal-card-base memo-modal-card">
 
                 {/* ================= HEADER ================= */}
                 <div className="memo-header">

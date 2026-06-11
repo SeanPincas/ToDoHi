@@ -3,7 +3,7 @@ const User = require("../models/userModel.js");
 // --------------------------- UPDATE USER PREFERENCE ---------------------------
 exports.updatePreference = async (req, res) => {
     try {
-        const { resetHour, theme, quoteCategoryPreferences } = req.body;
+        const { resetHour, dayTaskDelete, theme, quoteCategory } = req.body;
 
         const updatePayload = {};
 
@@ -12,12 +12,19 @@ exports.updatePreference = async (req, res) => {
             updatePayload["preference.resetHour"] = resetHour;
         }
 
+        if (dayTaskDelete !== undefined) {
+            // Applies only to newly archived tasks.
+            // Existing TaskArchive records keep their already assigned
+            // retentionDeleteAt value for predictable retention behavior.
+            updatePayload["preference.dayTaskDelete"] = dayTaskDelete;
+        }
+
         if (theme !== undefined) {
             updatePayload["preference.theme"] = theme;
         }
 
-        if (quoteCategoryPreferences !== undefined) {
-            updatePayload["quoteCategoryPreferences"] = quoteCategoryPreferences;
+        if (quoteCategory !== undefined) {
+            updatePayload["preference.quoteCategory"] = quoteCategory;
         }
 
         const updatedUser = await User.findByIdAndUpdate(

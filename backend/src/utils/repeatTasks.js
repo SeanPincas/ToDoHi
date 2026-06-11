@@ -1,10 +1,21 @@
+// ============================================================================
+// File Name: repeatTasks.js
+// Purpose:
+// - Executes the backend daily-review repeat flow.
+// - Recreates selected tasks as fresh live tasks.
+// - Archives old completed/failed tasks after the review decision.
+// - Owns repeat-specific date logic such as repeat deadlines and cycle keys.
+// ============================================================================
+
 const Task = require("../models/taskModel");
 const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
 const { buildArchiveRecord } = require("./taskArchive");
-const { syncFailedTaskSnapshotForCycle } = require("./failedTaskSnapshot");
 const { DEFAULT_ARCHIVE_LABEL } = require("./repeatReviewConstants");
 
+// Improvement note:
+//   computeRepeatDeadline and computeRepeatCycleKey should eventually be moved
+//   into a shared reset-cycle/date utility instead of living beside flow logic.
 function computeRepeatDeadline(resetHour, now = new Date()) {
     const deadline = new Date(now);
     deadline.setHours(resetHour, 0, 0, 0);
@@ -108,9 +119,7 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
         _id: { $in: oldTasks.map(task => task._id) }
     });
 
-    const userUpdate = {
-        repeatCycleAcknowledged: cycleKey
-    };
+    const userUpdate = {};
 
     if (insertedTasks.length > 0) {
         userUpdate.$inc = {
@@ -118,13 +127,9 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
         };
     }
 
-    await User.findByIdAndUpdate(userId, userUpdate);
-
-    await syncFailedTaskSnapshotForCycle({
-        userId,
-        cycleKey,
-        resetAt: archivedAt
-    });
+    if (Object.keys(userUpdate).length > 0) {
+        await User.findByIdAndUpdate(userId, userUpdate);
+    }
 
     return {
         ok: true,
