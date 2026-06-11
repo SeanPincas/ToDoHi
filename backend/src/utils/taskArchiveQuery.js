@@ -1,3 +1,10 @@
+// ============================================================================
+// File Name: taskArchiveQuery.js
+// Purpose:
+// - Provides filtered retrieval logic for TaskArchive entries.
+// - Normalizes archive filters and limit controls for archive APIs.
+// ============================================================================
+
 const TaskArchive = require("../models/taskArchiveModel");
 const { archiveTypeList, archiveReasonList } = require("./taskArchiveConstants");
 

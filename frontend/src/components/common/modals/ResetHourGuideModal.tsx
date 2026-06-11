@@ -6,10 +6,10 @@
 import React from "react";
 import {
     modalOverlayStyle,
-    modalCardBaseStyle,
 } from "../../../styles/modalStyles";
 
 import "../../common/modals/ResetHourGuideModal.css";
+import "./modalBaseTheme.css";
 
 interface Props {
     onClose: () => void;
@@ -19,8 +19,7 @@ const ResetHourGuideModal: React.FC<Props> = ({ onClose }) => {
     return (
         <div style={modalOverlayStyle} onClick={onClose}>
             <div
-                style={modalCardBaseStyle}
-                className="reset-hour-guide"
+                className="modal-card-base reset-hour-guide"
                 onClick={(e) => e.stopPropagation()}
             >
                 <h3>How Reset Hour Works</h3>

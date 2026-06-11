@@ -17,7 +17,7 @@
 
 
 /* ---------------- CARD ---------------- */
-/* The base shape comes from modalCardBaseStyle.
+/* The base shape comes from modal-card-base.
    These styles refine spacing and alignment. */
 .delete-confirm-card {
     display: flex;

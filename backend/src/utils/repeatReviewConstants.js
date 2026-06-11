@@ -1,3 +1,10 @@
+// ============================================================================
+// File Name: repeatReviewConstants.js
+// Purpose:
+// - Stores shared constants for the repeat-review domain.
+// - Keeps review/archive labels and defaults separate from flow utilities.
+// ============================================================================
+
 const DEFAULT_ARCHIVE_LABEL = "Failed Task Archive";
 const DEFAULT_REVIEW_LIMIT = 200;
 

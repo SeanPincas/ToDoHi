@@ -1,9 +1,17 @@
+// ============================================================================
+// File Name: scheduler.js
+// Purpose:
+// - Orchestrates scheduled backend jobs.
+// - Owns task expiry, per-user reset-cycle handling, and archive cleanup.
+// - Should coordinate time-based jobs, not become the single home of every
+//   date utility used elsewhere in the repeat/archive domain.
+// ============================================================================
+
 const cron = require("node-cron");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 const { runDailyStats } = require("./dailyStats.js");
 const { cleanupExpiredTaskArchives } = require("./taskArchiveCleanup.js");
-const { syncFailedTaskSnapshotForCycle } = require("./failedTaskSnapshot.js");
 
 // ============================================================================
 // HELPER: Compute reset-cycle key for a user
@@ -14,6 +22,10 @@ const { syncFailedTaskSnapshotForCycle } = require("./failedTaskSnapshot.js");
 //
 // Meaning:
 //   This uniquely identifies ONE reset window for ONE user
+//
+// Improvement note:
+//   This reset-cycle math is also mirrored in repeatTasks.js and frontend
+//   resetCycle helpers. A shared reset-cycle utility would be cleaner later.
 // ============================================================================
 function getResetCycleKey(now, resetHour) {
     const boundary = new Date(now);
@@ -76,30 +88,13 @@ async function handleDailyReset(now) {
             `[Scheduler] Reset detected for user ${userId} -> ${currentResetKey}`
         );
 
-        // New reset cycle -> user must handle repeat tasks again
+        // New reset cycle detected for this user
         await User.findByIdAndUpdate(user._id, {
-            repeatCycleAcknowledged: null,
             lastResetCycleKey: currentResetKey
         });
 
         // Run daily stats (already per-user internally)
         await runDailyStats();
-
-        const snapshotResult = await syncFailedTaskSnapshotForCycle({
-            userId: user._id,
-            cycleKey: currentResetKey,
-            resetAt: now
-        });
-
-        if (snapshotResult.taskCount === 0) {
-            console.log(
-                `[Scheduler] No Failed Tasks for user ${userId} -> snapshot cleared`
-            );
-        } else {
-            console.log(
-                `[Scheduler] Failed task snapshot synced for user ${userId} | Count: ${snapshotResult.taskCount} | Source: ${snapshotResult.source}`
-            );
-        }
     }
 }
 

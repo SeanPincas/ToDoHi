@@ -1,3 +1,11 @@
+// ============================================================================
+// File Name: repeatReview.js
+// Purpose:
+// - Builds the backend payload for the daily repeat/review step.
+// - Returns repeatable completed/failed tasks plus review metadata.
+// - Supports a calmer review flow without embedding UI-specific copy here.
+// ============================================================================
+
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
 const { computeRepeatCycleKey } = require("./repeatTasks");
@@ -42,9 +50,8 @@ async function getRepeatReviewForUser({ userId, limit = DEFAULT_REVIEW_LIMIT }) 
     const summary = buildRepeatReviewSummary(repeatableTasks);
 
     return {
-        reviewRequired: repeatableTasks.length > 0 && user.repeatCycleAcknowledged !== currentCycleKey,
+        reviewRequired: repeatableTasks.length > 0,
         cycleKey: currentCycleKey,
-        repeatCycleAcknowledged: user.repeatCycleAcknowledged,
         retentionDays,
         archiveLabel: DEFAULT_ARCHIVE_LABEL,
         summary,

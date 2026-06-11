@@ -10,8 +10,8 @@ import { useMemoContext } from "../../context/MemoContext";
 // Shared modal base styles
 import {
     modalOverlayStyle,
-    modalCardBaseStyle,
 } from "../../styles/modalStyles";
+import "../common/modals/modalBaseTheme.css";
 
 // Icons + shared button styles
 import { Icons } from "../../styles/iconLibrary";
@@ -60,8 +60,7 @@ const DeleteConfirmMemoModal = () => {
             onMouseDown={closeModal}
         >
             <div
-                className="delete-memo-modal-card"
-                style={modalCardBaseStyle}
+                className="modal-card-base delete-memo-modal-card"
                 onMouseDown={(e) => e.stopPropagation()}
             >
 

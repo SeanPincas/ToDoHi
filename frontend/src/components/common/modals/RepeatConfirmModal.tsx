@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useTodo } from "../../../context/TodoContext";
 import { repeatTaskApi } from "../../../api/taskApi";
-import { modalOverlayStyle, modalCardBaseStyle } from "../../../styles/modalStyles";
+import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
 
 import "./RepeatConfirmModal.css";
+import "./modalBaseTheme.css";
+import "./taskManagementModalTheme.css";
 
 // ------------------------------ TYPES ------------------------------
 type RepeatConfirmMode = "repeatAll" | "confirmSelected";
@@ -40,8 +42,8 @@ const RepeatConfirmModal: React.FC = () => {
         : "Repeat Selected Tasks?";
 
     const message = isRepeatAll
-        ? "Are you sure you want to repeat all completed and failed tasks?\n\nRepeated tasks can be manually deleted later if needed."
-        : "Are you sure you want to repeat only the selected tasks?\n\nUnselected tasks will be permanently deleted.";
+        ? "This will create fresh active copies of all completed and failed tasks in the review list.\n\nSource items will move out of the active list after processing."
+        : "This will create fresh active copies of the selected tasks only.\n\nUnselected failed tasks will move to Failed Task Archive instead of being deleted immediately.";
 
     // ------------------ HANDLERS ------------------
     /* Cancel returns user back to RepeatTaskModal. We DO NOT close everything */
@@ -79,18 +81,19 @@ const RepeatConfirmModal: React.FC = () => {
             className="repeat-confirm-overlay"
         >
             <div
-                style={modalCardBaseStyle}
-                className="repeat-confirm-card"
+                className="modal-card-base repeat-confirm-card task-management-modal"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= HEADER ================= */}
-                <div className="repeat-confirm-header">
-                    <Icons.Warning />
-                    <h3>{title}</h3>
+                <div className="repeat-confirm-header task-management-modal-header">
+                    <div className="task-management-modal-title-group">
+                        <Icons.Warning />
+                        <h3>{title}</h3>
+                    </div>
                 </div>
 
                 {/* ================= MESSAGE ================= */}
-                <p className="repeat-confirm-message">
+                <p className="repeat-confirm-message task-management-modal-subtitle">
                     {message.split("\n").map((line, idx) => (
                         <span key={idx}>
                             {line}
@@ -102,7 +105,7 @@ const RepeatConfirmModal: React.FC = () => {
                 {/* ================= ACTIONS ================= */}
                 <div className="repeat-confirm-actions">
                     <button
-                        className="btn-cancel"
+                        className="btn-secondary-rect"
                         onClick={handleCancel}
                         disabled={loading}
                     >
@@ -110,7 +113,7 @@ const RepeatConfirmModal: React.FC = () => {
                     </button>
 
                     <button
-                        className="btn-primary"
+                        className="btn-primary-rect"
                         onClick={handleConfirm}
                         disabled={loading}
                     >

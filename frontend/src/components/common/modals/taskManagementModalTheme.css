@@ -1,0 +1,119 @@
+.task-management-modal {
+    --paper-attach-border: #c8bba4;
+    --paper-attach-border-soft: #d7ccb8;
+    --paper-attach-shadow: rgba(196, 184, 162, 0.65);
+    --paper-attach-shadow-deep: rgba(178, 165, 141, 0.5);
+
+    width: min(560px, 92vw);
+    max-width: 92vw;
+    color: var(--text-main);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 26%),
+        var(--paper-bg);
+    border: 1.5px solid var(--paper-attach-border);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.45) inset,
+        inset -6px 0 10px -10px var(--paper-attach-shadow-deep),
+        5px 0 8px -7px var(--paper-attach-shadow),
+        0 6px 10px -6px var(--paper-attach-shadow),
+        0 14px 18px -12px var(--paper-attach-shadow-deep);
+}
+
+.task-management-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.task-management-modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 2px;
+}
+
+.task-management-modal-title-group svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: color-mix(in srgb, var(--blue-dark) 78%, #5f4a28 22%);
+}
+
+.task-management-modal-header h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    line-height: 1.15;
+}
+
+.task-management-modal-subtitle {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text-main) 86%, #6f6658 14%);
+}
+
+.task-management-modal-note {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, var(--paper-attach-border, #c8bba4) 74%, #fff 26%);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--sheet-bg) 90%, #fff 10%);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.task-management-modal-note strong {
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.task-management-modal-panel {
+    border: 1px solid color-mix(in srgb, var(--paper-attach-border, #c8bba4) 74%, #fff 26%);
+    border-radius: 10px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 26%),
+        color-mix(in srgb, var(--sheet-bg) 93%, #fff 7%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.52),
+        0 4px 12px -10px rgba(94, 72, 33, 0.42);
+}
+
+.task-management-modal-section-label {
+    margin: 0 0 6px;
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+}
+
+.task-management-modal-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.task-management-modal-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 5px 12px;
+    border: 1px solid color-mix(in srgb, var(--paper-attach-border, #c8bba4) 76%, #fff 24%);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--paper-bg) 88%, #fff 12%);
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    line-height: 1.1;
+}
+
+.task-management-modal-actions {
+    display: grid;
+    gap: 10px;
+}
+
+@media (max-width: 640px) {
+    .task-management-modal {
+        width: min(94vw, 94vw);
+    }
+}
