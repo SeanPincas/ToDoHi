@@ -1,7 +1,14 @@
+// ============================================================================
+// File Name: taskArchiveActions.js
+// Purpose:
+// - Handles user actions against TaskArchive records.
+// - Supports repeat-as-new-task and manual archive deletion.
+// - Preserves the rule that archive records remain history, not restored live
+//   task identities.
+// ============================================================================
+
 const Task = require("../models/taskModel");
 const TaskArchive = require("../models/taskArchiveModel");
-const User = require("../models/userModel");
-const { syncFailedTaskSnapshotForCycle } = require("./failedTaskSnapshot");
 const { computeRepeatDeadline, buildRepeatedTaskPayload } = require("./repeatTasks");
 const { DEFAULT_ARCHIVE_LABEL } = require("./repeatReviewConstants");
 
@@ -50,7 +57,6 @@ async function repeatTaskArchiveEntryForUser({ userId, archiveEntryId }) {
 }
 
 async function deleteTaskArchiveEntryForUser({ userId, archiveEntryId }) {
-    const user = await User.findById(userId, "failedTaskSnapshot.cycleKey");
     const archiveEntry = await TaskArchive.findOneAndDelete({
         _id: archiveEntryId,
         userId
@@ -62,18 +68,6 @@ async function deleteTaskArchiveEntryForUser({ userId, archiveEntryId }) {
             statusCode: 404,
             body: { message: "Task Archive entry not found" }
         };
-    }
-
-    if (
-        archiveEntry.archiveType === "failed" &&
-        archiveEntry.sourceCycleKey &&
-        user?.failedTaskSnapshot?.cycleKey === archiveEntry.sourceCycleKey
-    ) {
-        await syncFailedTaskSnapshotForCycle({
-            userId,
-            cycleKey: archiveEntry.sourceCycleKey,
-            resetAt: new Date()
-        });
     }
 
     return {

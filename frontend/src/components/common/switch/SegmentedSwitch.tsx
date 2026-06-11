@@ -1,4 +1,3 @@
-import React from "react";
 import "./switchStyles.css";
 
 export interface SegmentedSwitchOption<T extends string> {

@@ -28,11 +28,6 @@
 .todo-modal-card {
     width: 420px;
     max-width: 90%;
-    background: var(--paper-bg);
-    border: 2px solid var(--blue-dark);
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     animation: popIn 0.18s ease-out;
 }
 

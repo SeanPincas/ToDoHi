@@ -8,10 +8,10 @@ import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
 
 import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
-import { getCurrentResetCycleKey } from '../utils/resetCycle';
+import { getRepeatReviewApi } from "../api/taskApi";
 
 const Dashboard: React.FC = () => {
-    const { tasks, openModal } = useTodo();
+    const { openModal } = useTodo();
     const { user } = useAuthContext();
 
     const [time12, setTime12] = useState("");
@@ -20,35 +20,34 @@ const Dashboard: React.FC = () => {
     const [repeatChecked, setRepeatChecked] = useState(false);
 
     useEffect(() => {
-        if (!user || !tasks || tasks.length === 0) return;
+        if (!user) return;
         if (repeatChecked) return;
 
-        const repeatableTasks = tasks.filter(
-            (task) => task.status === "completed" || task.status === "failed"
-        );
+        const checkRepeatReview = async () => {
+            try {
+                const review = await getRepeatReviewApi();
 
-        if (repeatableTasks.length === 0) {
-            setRepeatChecked(true);
-            return;
-        }
+                if (!review.reviewRequired || review.tasks.length === 0) {
+                    setRepeatChecked(true);
+                    return;
+                }
 
-        const resetHour = typeof user.preference?.resetHour === "number"
-            ? user.preference.resetHour
-            : 0;
+                openModal("repeat", {
+                    tasks: review.tasks,
+                    cycleKey: review.cycleKey,
+                    retentionDays: review.retentionDays,
+                    archiveLabel: review.archiveLabel,
+                    summary: review.summary,
+                });
+            } catch (err) {
+                console.error("[DashboardPage] Failed loading repeat review:", err);
+            } finally {
+                setRepeatChecked(true);
+            }
+        };
 
-        const currentCycleKey = getCurrentResetCycleKey(resetHour);
-
-        if (user.repeatCycleAcknowledged === currentCycleKey) {
-            setRepeatChecked(true);
-            return;
-        }
-
-        openModal("repeat", {
-            tasks: repeatableTasks,
-        });
-
-        setRepeatChecked(true);
-    }, [tasks, user, repeatChecked, openModal]);
+        checkRepeatReview();
+    }, [user, repeatChecked, openModal]);
 
     useEffect(() => {
         const updateClock = () => {

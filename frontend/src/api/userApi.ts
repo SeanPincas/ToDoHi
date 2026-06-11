@@ -21,8 +21,9 @@ export const getMe = async () => {
 // --------------------------- UPDATE USER PREFERENCES ---------------------------
 export const updateUserPreferences = async (data: {
     resetHour?: number;
+    dayTaskDelete?: 3 | 7 | 15 | 30;
     theme?: "light" | "dark";
-    quoteCategoryPreferences?: string[];
+    quoteCategory?: string[];
 }) => {
     const res = await axios.patch(
         `${USER_API_URL}/preference`,

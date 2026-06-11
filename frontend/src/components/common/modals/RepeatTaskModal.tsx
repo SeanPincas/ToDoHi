@@ -6,11 +6,13 @@
 import React, { useMemo, useState } from "react";
 import { useTodo } from "../../../context/TodoContext";
 
-import { modalOverlayStyle, modalCardBaseStyle } from "../../../styles/modalStyles";
+import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
 import type { Task } from "../../../api/taskApi";
 
 import "./RepeatTaskModal.css";
+import "./modalBaseTheme.css";
+import "./taskManagementModalTheme.css";
 
 // ------------------------------ TYPES ------------------------------
 type FilterType = "all" | "completed" | "failed";
@@ -18,7 +20,7 @@ type FilterType = "all" | "completed" | "failed";
 // ------------------------------ COMPONENT ------------------------------
 const RepeatTaskModal: React.FC = () => {
     // Extract Data
-    const { modal, openModal } = useTodo();
+    const { modal, openModal, closeModal } = useTodo();
 
     // ------------------ LOCAL STATE ------------------
     const [filter, setFilter] = useState<FilterType>("all");
@@ -26,6 +28,13 @@ const RepeatTaskModal: React.FC = () => {
 
     const modalData = modal.type === "repeat" ? modal.data : null;
     const tasks = (modalData?.tasks ?? []) as Task[];
+    const archiveLabel = modalData?.archiveLabel ?? "Failed Task Archive";
+    const retentionDays = modalData?.retentionDays ?? 30;
+    const summary = modalData?.summary ?? {
+        total: tasks.length,
+        completed: tasks.filter((task) => task.status === "completed").length,
+        failed: tasks.filter((task) => task.status === "failed").length,
+    };
 
     // ------------------ DERIVED STATE ------------------
     const visibleTasks = useMemo(() => {
@@ -88,32 +97,52 @@ const RepeatTaskModal: React.FC = () => {
         );
     };
 
+    const handleDismiss = () => {
+        closeModal();
+    };
+
     return (
         <div
             style={modalOverlayStyle}
             className="repeat-modal-overlay"
+            onMouseDown={handleDismiss}
         >
             <div
-                style={modalCardBaseStyle}
-                className="repeat-modal-card"
-                onMouseDown={(e) => e.stopPropagation}
+                className="modal-card-base repeat-modal-card task-management-modal paper-sheet-lines"
+                onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= TITLE ================= */}
-                <div className="repeat-modal-header">
-                    <Icons.Repeat />
-                    <h3>Repeat Tasks</h3>
+                <div className="repeat-modal-header task-management-modal-header">
+                    <div className="task-management-modal-title-group">
+                        <Icons.Repeat />
+                        <h3>Review Yesterday&apos;s Tasks</h3>
+                    </div>
+                    <button
+                        type="button"
+                        className="icon-btn-square repeat-modal-close-btn"
+                        onClick={handleDismiss}
+                        aria-label="Close review task modal"
+                    >
+                        <Icons.Close />
+                    </button>
                 </div>
 
                 {/* ================= DESCRIPTION ================= */}
-                <p className="repeat-modal-description">
-                    These are your <strong>Completed </strong>and <strong>Failed </strong>tasks from the previous day.
-                    <br />
-                    <strong>Choose </strong>which task/s you would like to repeat for <strong>Today</strong>.
-                    <br />
-                    The <strong>UNSELECTED </strong>tasks will be <strong>Permanently Deleted</strong>.
-                    <br />
-                    Cannot move to the Main Page, without taking <strong>ACTION</strong>.
-                </p>
+                <div className="repeat-modal-copy-block">
+                    <p className="repeat-modal-description task-management-modal-subtitle">
+                        Choose which completed or failed tasks you want to bring into today as fresh tasks.
+                    </p>
+
+                    <p className="repeat-modal-sub-instruction">
+                        <strong>Unselected Failed/Completed tasks</strong> move to <strong>{archiveLabel}</strong> and stay there for up to <strong>{retentionDays} days</strong>.
+                    </p>
+
+                    <div className="repeat-modal-summary">
+                        <span>Total: {summary.total}</span>
+                        <span>Completed: {summary.completed}</span>
+                        <span>Failed: {summary.failed}</span>
+                    </div>
+                </div>
 
                 {/* ================= FILTER TABS ================= */}
                 <div className="repeat-filter-tabs">
@@ -130,7 +159,7 @@ const RepeatTaskModal: React.FC = () => {
                 </div>
 
                 {/* ================= TASK LIST ================= */}
-                <div className="repeat-task-list-wrapper">
+                <div className="repeat-task-list-wrapper task-management-modal-panel">
                     <div className="repeat-task-list">
                         {visibleTasks.map((task: Task) => {
                             const isSelected = selected.has(task._id);
@@ -156,13 +185,19 @@ const RepeatTaskModal: React.FC = () => {
                                         />
                                     </div>
 
-                                    <div className="task-info">
-                                        <span className="task-title">
+                                    <div className="repeat-task-body">
+                                        <span className="repeat-task-title">
                                             {task.title}
                                         </span>
-                                        <span className="repeat-task-meta">
-                                            {task.category} * {task.status}
-                                        </span>
+                                        <div className="repeat-task-subinfo-right">
+                                            <span className="repeat-task-meta-label">
+                                                {task.category}
+                                            </span>
+                                            <span className="repeat-task-meta-separator">&bull;</span>
+                                            <span className="repeat-task-meta-label">
+                                                {task.status}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -171,7 +206,14 @@ const RepeatTaskModal: React.FC = () => {
                 </div>
 
                 {/* ================= ACTIONS ================= */}
-                <div className="repeat-actions">
+                <div className="repeat-actions task-management-modal-actions">
+                    <button
+                        className="btn-secondary-rect"
+                        onClick={handleDismiss}
+                    >
+                        Dismiss
+                    </button>
+
                     <button
                         className="btn-danger-rect" onClick={handleDeleteAll}>
                         Delete All
@@ -196,3 +238,4 @@ const RepeatTaskModal: React.FC = () => {
 };
 
 export default RepeatTaskModal;
+

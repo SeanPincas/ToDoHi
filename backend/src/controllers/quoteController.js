@@ -42,7 +42,7 @@ exports.updatePreferences = async (req, res) => {
         }
 
         await User.findByIdAndUpdate(userId, {
-            $set: { quoteCategoryPreferences: preferences }
+            $set: { "preference.quoteCategory": preferences }
         });
 
         res.json({ message: "Quote preferences updated.", preferences });
@@ -58,7 +58,7 @@ exports.getRandomQuote = async (req, res) => {
         const userId = req.user._id;
         const user = await User.findById(userId);
 
-        let chosenCategories = user.quoteCategoryPreferences || [];
+        let chosenCategories = user.preference?.quoteCategory || [];
 
         // Remove RANDOM token if present
         chosenCategories = chosenCategories.filter(

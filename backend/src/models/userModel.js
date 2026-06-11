@@ -34,23 +34,19 @@ const userSchema = new mongoose.Schema({
     preference: {
         resetHour: { type: Number, default: 0 },
         dayTaskDelete: { type: Number, enum: [3, 7, 15, 30], default: 30 },
-        theme: { type: String, enum: ['light', 'dark'], default: 'light' }
-    },
-    quoteCategoryPreferences: {
-        type: [String],
-        validate: {
-            validator: arr => arr.length <= 3,
-            message: "You can select up to 3 quote categories."
-        },
-        default: []
+        theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+        quoteCategory: {
+            type: [String],
+            validate: {
+                validator: arr => arr.length <= 3,
+                message: "You can select up to 3 quote categories."
+            },
+            default: []
+        }
     },
     profilePicture: {
         type: String,
         default: ""
-    },
-    repeatCycleAcknowledged: {
-        type: String,
-        default: null
     },
     lastResetCycleKey: {
         type: String,
@@ -68,39 +64,6 @@ const userSchema = new mongoose.Schema({
         // streak tracking
         dailyStreak: { type: Number, default: 0 },
         longestStreak: { type: Number, default: 0 },
-    },
-    failedTaskSnapshot: {
-        cycleKey: {
-            type: String
-        },
-        resetAt: {
-            type: Date
-        },
-        tasks: [
-            {
-                _id: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    required: true
-                },
-                title: {
-                    type: String,
-                    required: true
-                },
-                category: {
-                    type: String,
-                    default: "others"
-                },
-                containerColor: {
-                    type: String,
-                    default: "#ffffff"
-                },
-                status: {
-                    type: String,
-                    enum: ["failed"],
-                    required: true
-                }
-            }
-        ]
     },
     createdAt: {
         type: Date,

@@ -1,7 +1,10 @@
 // ============================================================================
 // dailyStats.js
-// Computes daily stats based on USER resetHour (NOT calendar midnight)
-// Scheduler calls this at each reset cycle
+// File Name: dailyStats.js
+// Purpose:
+// - Computes backend reset-hour-based stats and streak values.
+// - Called by the scheduler at each detected reset cycle.
+// - Should own stats-window calculations, not repeat/archive flow decisions.
 // ============================================================================
 
 const Task = require("../models/taskModel.js");
@@ -11,6 +14,10 @@ const DailyPlan = require("../models/dailyPlanModel.js");
 // ============================================================================
 // HELPER: Get reset window for a user
 // Returns { start, end, yesterdayStart }
+//
+// Improvement note:
+//   This reset-window math overlaps conceptually with scheduler.js and
+//   repeatTasks.js. A shared reset-cycle/date utility would reduce duplication.
 // ============================================================================
 function getResetWindow(resetHour) {
     const now = new Date();
@@ -61,7 +68,17 @@ exports.runDailyStats = async () => {
             });
 
             // ============================================================
-            // 2. DAILY PLAN STREAK LOGIC (RESET-HOUR AWARE)
+            // 2. FAILED TASKS FROM THE PREVIOUS RESET WINDOW
+            // This now replaces the old failedTaskSnapshot dependency.
+            // ============================================================
+            const tasksFailedYesterday = await Task.countDocuments({
+                userId,
+                status: "failed",
+                updatedAt: { $gte: yesterdayStart, $lt: start }
+            });
+
+            // ============================================================
+            // 3. DAILY PLAN STREAK LOGIC (RESET-HOUR AWARE)
             // ============================================================
             const yesterdayDateKey = yesterdayStart
                 .toISOString()
@@ -83,11 +100,12 @@ exports.runDailyStats = async () => {
             }
 
             // ============================================================
-            // 3. UPDATE USER STATS
+            // 4. UPDATE USER STATS
             // ============================================================
             await User.findByIdAndUpdate(userId, {
                 $set: {
                     "stats.tasksCompletedToday": tasksCompletedToday,
+                    "stats.tasksFailedYesterday": tasksFailedYesterday,
                     "stats.dailyStreak": dailyStreak,
                     "stats.longestStreak": longestStreak
                 }

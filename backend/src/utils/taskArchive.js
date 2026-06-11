@@ -1,3 +1,11 @@
+// ============================================================================
+// File Name: taskArchive.js
+// Purpose:
+// - Builds and writes TaskArchive records from live Task documents.
+// - Applies retention-day rules at archive time.
+// - Keeps archive records self-sufficient after live tasks are removed.
+// ============================================================================
+
 const TaskArchive = require("../models/taskArchiveModel");
 const { archiveTypeList, archiveReasonList } = require("./taskArchiveConstants");
 
@@ -44,6 +52,9 @@ function buildArchiveRecord(task, options = {}) {
     const resolvedRetentionDays = normalizeArchiveRetentionDays(
         retentionDays ?? userPreference?.dayTaskDelete
     );
+    // Retention is fixed at archive time.
+    // Later preference changes should affect only newly archived tasks,
+    // not retroactively rewrite older TaskArchive countdowns.
 
     return {
         userId: task.userId,

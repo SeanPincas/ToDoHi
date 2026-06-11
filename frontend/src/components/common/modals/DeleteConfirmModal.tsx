@@ -1,9 +1,10 @@
 import React from "react";
 import { useTodo } from "../../../context/TodoContext";
-import { modalOverlayStyle, modalCardBaseStyle } from "../../../styles/modalStyles";
+import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
 
 import "./DeleteConfirmModal.css";
+import "./modalBaseTheme.css";
 
 // ------------------------------ COMPONENT ------------------------------
 const DeleteConfirmModal: React.FC = () => {
@@ -41,9 +42,7 @@ const DeleteConfirmModal: React.FC = () => {
             onMouseDown={closeModal}
         >
             <div
-                // Stop click from closing modal when clicking inside
-                style={modalCardBaseStyle}
-                className="delete-confirm-card"
+                className="modal-card-base delete-confirm-card"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= HEADER ================= */}

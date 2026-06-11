@@ -23,6 +23,63 @@ export interface Task {
     containerColor: string;
 }
 
+export interface RepeatReviewSummary {
+    total: number;
+    completed: number;
+    failed: number;
+}
+
+export interface RepeatReviewResponse {
+    message: string;
+    reviewRequired: boolean;
+    cycleKey: string;
+    retentionDays: number;
+    archiveLabel: string;
+    summary: RepeatReviewSummary;
+    tasks: Task[];
+}
+
+export interface TaskArchiveEntry {
+    _id: string;
+    userId: string;
+    originalTaskId?: string | null;
+    title: string;
+    description?: string;
+    category: TaskCategory | (string & {});
+    status: TaskStatus | (string & {});
+    createdAt: string;
+    deadline?: string | null;
+    orderIndex: number;
+    isExpired: boolean;
+    memoId?: string | null;
+    containerColor: string;
+    archivedAt: string;
+    archiveType: "failed" | "completed";
+    archiveReason: string;
+    sourceCycleKey?: string | null;
+    repeatedIntoTaskId?: string | null;
+    retentionDeleteAt?: string | null;
+}
+
+export interface TaskArchiveResponse {
+    message: string;
+    filters: {
+        archiveType: string;
+        archiveReason: string;
+        cycleKey: string | null;
+        limit: number;
+    };
+    totalCount: number;
+    entries: TaskArchiveEntry[];
+}
+
+export interface TaskArchiveQueryParams {
+    archiveType?: "failed" | "completed" | "all";
+    archiveReason?: string;
+    cycleKey?: string;
+    limit?: number;
+}
+
 // ------------------------------ API CALLS ------------------------------
 
 // GET all tasks
@@ -68,6 +125,41 @@ export const repeatTaskApi = async (repeatTaskIds: string[]) => {
     const res = await axios.post(
         `${API_URL}/repeat`,
         { repeatTaskIds },
+        authHeaders()
+    );
+    return res.data;
+};
+
+export const getRepeatReviewApi = async (limit?: number): Promise<RepeatReviewResponse> => {
+    const res = await axios.get(`${API_URL}/review`, {
+        ...authHeaders(),
+        params: limit ? { limit } : undefined,
+    });
+    return res.data;
+};
+
+export const getTaskArchiveApi = async (
+    params: TaskArchiveQueryParams = {}
+): Promise<TaskArchiveResponse> => {
+    const res = await axios.get(`${API_URL}/archive`, {
+        ...authHeaders(),
+        params,
+    });
+    return res.data;
+};
+
+export const repeatTaskArchiveEntryApi = async (archiveEntryId: string) => {
+    const res = await axios.post(
+        `${API_URL}/archive/${archiveEntryId}/repeat`,
+        {},
+        authHeaders()
+    );
+    return res.data;
+};
+
+export const deleteTaskArchiveEntryApi = async (archiveEntryId: string) => {
+    const res = await axios.delete(
+        `${API_URL}/archive/${archiveEntryId}`,
         authHeaders()
     );
     return res.data;

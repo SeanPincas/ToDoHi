@@ -38,7 +38,7 @@ const DashboardStats: React.FC = () => {
         },
         {
             label: "Failed Tasks Yesterday",
-            value: user?.failedTaskSnapshot?.tasks?.length ?? 0,
+            value: user?.stats?.tasksFailedYesterday ?? 0,
         },
 
         {
