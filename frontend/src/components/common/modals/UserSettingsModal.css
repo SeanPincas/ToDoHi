@@ -41,7 +41,7 @@
     background: color-mix(in srgb, var(--paper-bg) 94%, #fff 6%);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.48),
-        0 4px 10px -8px rgba(94, 72, 33, 0.45);
+        0 4px 10px -8px var(--modal-paper-shadow-deep);
 }
 
 .user-settings-modal-label {

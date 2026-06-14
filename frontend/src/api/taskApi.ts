@@ -14,6 +14,8 @@ export interface Task {
     description: string;
     category: TaskCategory | (string & {});
     status: TaskStatus | (string & {});
+    completedAt?: string | null;
+    failedAt?: string | null;
     createdAt: string;
     updatedAt: string;
     deadline?: string | null;
@@ -47,6 +49,8 @@ export interface TaskArchiveEntry {
     description?: string;
     category: TaskCategory | (string & {});
     status: TaskStatus | (string & {});
+    completedAt?: string | null;
+    failedAt?: string | null;
     createdAt: string;
     deadline?: string | null;
     orderIndex: number;

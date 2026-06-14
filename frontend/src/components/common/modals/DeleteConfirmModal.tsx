@@ -13,7 +13,7 @@ const DeleteConfirmModal: React.FC = () => {
     // ------------------ GUARD ------------------
     if (!modal.isOpen || modal.type !== "deleteConfirm") return null;
 
-    const { taskIds = [], } = modal.data || {};
+    const { taskIds = [], onAfterDelete } = modal.data || {};
     const count = taskIds.length;
 
     // ------------------ CONFIRM DELETE ------------------
@@ -26,6 +26,10 @@ const DeleteConfirmModal: React.FC = () => {
             }
 
             await fetchTasks();
+
+            if (typeof onAfterDelete === "function") {
+                await onAfterDelete();
+            }
 
             closeModal();
         } catch (err) {

@@ -9,6 +9,7 @@
 
 const Task = require("../models/taskModel");
 const TaskArchive = require("../models/taskArchiveModel");
+const User = require("../models/userModel");
 const { computeRepeatDeadline, buildRepeatedTaskPayload } = require("./repeatTasks");
 const { DEFAULT_ARCHIVE_LABEL } = require("./repeatReviewConstants");
 

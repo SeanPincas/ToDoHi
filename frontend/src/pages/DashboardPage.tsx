@@ -10,6 +10,8 @@ import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
 import { getRepeatReviewApi } from "../api/taskApi";
 
+const TASK_REVIEW_MODAL_SNOOZE_KEY = "todohi_task_review_modal_snoozed_until";
+
 const Dashboard: React.FC = () => {
     const { openModal } = useTodo();
     const { user } = useAuthContext();
@@ -25,6 +27,18 @@ const Dashboard: React.FC = () => {
 
         const checkRepeatReview = async () => {
             try {
+                const snoozedUntilRaw = localStorage.getItem(TASK_REVIEW_MODAL_SNOOZE_KEY);
+                const snoozedUntil = snoozedUntilRaw ? Number(snoozedUntilRaw) : 0;
+
+                if (Number.isFinite(snoozedUntil) && snoozedUntil > Date.now()) {
+                    setRepeatChecked(true);
+                    return;
+                }
+
+                if (snoozedUntilRaw && (!Number.isFinite(snoozedUntil) || snoozedUntil <= Date.now())) {
+                    localStorage.removeItem(TASK_REVIEW_MODAL_SNOOZE_KEY);
+                }
+
                 const review = await getRepeatReviewApi();
 
                 if (!review.reviewRequired || review.tasks.length === 0) {

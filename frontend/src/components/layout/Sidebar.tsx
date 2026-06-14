@@ -22,6 +22,7 @@ import {
 import ResetHourHelpIcon from "../common/icons/ResetHourHelpIcon";
 import ResetHourGuideModal from "../common/modals/ResetHourGuideModal";
 import UserSettingsModal from "../common/modals/UserSettingsModal";
+import { useTodo } from "../../context/TodoContext";
 
 const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map((_, i) => ({
     value: String(i),
@@ -46,6 +47,7 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, theme, toggleTheme } = useAuthContext();
+    const { openModal } = useTodo();
 
     const [failedTasksYesterday, setFailedTasksYesterday] = useState<FailedYesterdayItem[]>([]);
 
@@ -73,7 +75,7 @@ const Sidebar = () => {
         clearHoverTimeout();
         hoverCollapseTimeout.current = window.setTimeout(() => {
             setHoveredTab(null);
-        }, 1500);
+        }, 1150);
     };
 
     useEffect(() => {
@@ -179,7 +181,7 @@ const Sidebar = () => {
     return (
         <>
             <aside className={`sidebar ${open ? "open" : "collapsed"}`}>
-                <div className="sidebar-tab" aria-label="Sidebar quick actions">
+                <div className="sidebar-tab sidebar-tab-top" aria-label="Sidebar quick actions">
                     <button
                         className={`sidebar-rail-btn sidebar-rail-toggle ${hoveredTab === "settings" ? "hover-stretch" : ""}`}
                         onClick={toggleSidebar}
@@ -214,6 +216,19 @@ const Sidebar = () => {
                         <span className={`sidebar-rail-btn-label ${hoveredTab === "memo" ? "visible" : ""}`}>Memo Board</span>
                     </button>
                     <button
+                        className={`sidebar-rail-btn ${hoveredTab === "task-archive" ? "hover-stretch" : ""}`}
+                        onClick={() => openModal("taskArchive")}
+                        aria-label="Open Task Archive"
+                        onMouseEnter={() => handleTabHoverStart("task-archive")}
+                        onMouseLeave={handleTabHoverEnd}
+                    >
+                        <Icons.Archive />
+                        <span className={`sidebar-rail-btn-label ${hoveredTab === "task-archive" ? "visible" : ""}`}>Task Archive</span>
+                    </button>
+                </div>
+
+                <div className="sidebar-tab sidebar-tab-bottom-group" aria-label="Sidebar account quick actions">
+                    <button
                         className={`sidebar-rail-btn ${hoveredTab === "user-settings" ? "hover-stretch" : ""}`}
                         onClick={() => setShowUserSettingsModal(true)}
                         aria-label="Open user settings"
@@ -224,7 +239,7 @@ const Sidebar = () => {
                         <span className={`sidebar-rail-btn-label ${hoveredTab === "user-settings" ? "visible" : ""}`}>User Settings</span>
                     </button>
                     <button
-                        className={`sidebar-rail-btn sidebar-rail-btn-bottom ${hoveredTab === "logout" ? "hover-stretch" : ""}`}
+                        className={`sidebar-rail-btn sidebar-rail-btn-logout ${hoveredTab === "logout" ? "hover-stretch" : ""}`}
                         onClick={logout}
                         aria-label="Logout"
                         onMouseEnter={() => handleTabHoverStart("logout")}

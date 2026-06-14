@@ -2,7 +2,7 @@
 //                            TODO PREVIEW (DASHBOARD)
 // =================================================================================
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./TodoPreview.css";
 
 // dnd-kit imports
@@ -32,20 +32,46 @@ import { Icons } from "../../styles/iconLibrary";
 import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
 import { SegmentedSwitch } from "../common/switch/SegmentedSwitch";
 import bougainvilleaImage from "../../assets/bougainvillea.webp";
+import {
+    getYesterdayTasksPreview,
+    type YesterdayPreviewStatus,
+    type YesterdayPreviewTask,
+} from "../../utils/repeatReview";
 
 // Task utilities
 import {
     TASK_CATEGORIES,
     CATEGORY_LABELS,
     TASK_CATEGORY_ICON_MAP,
-    TASK_TABS,
-    TASK_TAB_LABELS,
     TASK_COLORS,
-    type TaskTab,
+    resolveTaskContainerColorToHex,
     type TaskCategory,
 } from "../../utils/taskUtils";
 
 import "../../styles/buttonStyles.css"
+
+const TODO_PREVIEW_TABS = ["all", "pending", "completed"] as const;
+type TodoPreviewTab = (typeof TODO_PREVIEW_TABS)[number];
+
+const TODO_PREVIEW_TAB_LABELS: Record<TodoPreviewTab, string> = {
+    all: "All",
+    pending: "Ongoing",
+    completed: "Completed",
+};
+
+const YESTERDAY_FILTER_OPTIONS = [
+    { value: "hide", label: "Hide" },
+    { value: "all", label: "All" },
+    { value: "completed", label: "Completed" },
+    { value: "failed", label: "Failed" },
+] as const;
+
+const YESTERDAY_FILTER_TRIGGER_LABELS: Record<YesterdayPreviewStatus, string> = {
+    hide: "Hide Yesterday",
+    all: "All Yesterday",
+    completed: "Completed Yest.",
+    failed: "Failed Yest.",
+};
 
 // ------------------------------ COMPONENT START ------------------------------
 const TodoPreview: React.FC = () => {
@@ -53,20 +79,19 @@ const TodoPreview: React.FC = () => {
         filterAll,
         filterPending,
         filterCompleted,
-        filterFailed,
         reorderTasks,
         updateTask,
-        deleteTask,
         openModal,
-        closeModal,
     } = useTodo();
 
     // =====================================================================
     //                              UI STATES
     // =====================================================================
-    const [activeTab, setActiveTab] = useState<TaskTab>("all");
+    const [activeTab, setActiveTab] = useState<TodoPreviewTab>("all");
     const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
     const [activeContainerColor, setActiveContainerColor] = useState<"all" | string>("all");
+    const [activeYesterdayFilter, setActiveYesterdayFilter] = useState<YesterdayPreviewStatus>("all");
+    const [yesterdayTasks, setYesterdayTasks] = useState<YesterdayPreviewTask[]>([]);
 
     const [isRearrangeMode, setIsRearrangeMode] = useState(false);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -80,16 +105,59 @@ const TodoPreview: React.FC = () => {
             case "all": return filterAll;
             case "pending": return filterPending;
             case "completed": return filterCompleted;
-            case "failed": return filterFailed;
             default: return filterPending;
         }
     };
 
-    const tasks = getActiveList().filter((task) => {
+    const todayTasks = getActiveList().filter((task) => {
         const categoryMatch = activeCategory === "all" ? true : task.category === activeCategory;
-        const colorMatch = activeContainerColor === "all" ? true : task.containerColor === activeContainerColor;
+        const colorMatch = activeContainerColor === "all"
+            ? true
+            : resolveTaskContainerColorToHex(task.containerColor) === resolveTaskContainerColorToHex(activeContainerColor);
         return categoryMatch && colorMatch;
     });
+
+    const filteredYesterdayTasks = useMemo(() => (
+        yesterdayTasks.filter((task) => {
+            const statusMatch = activeYesterdayFilter === "hide"
+                ? false
+                : activeYesterdayFilter === "all"
+                    ? true
+                    : task.status === activeYesterdayFilter;
+            const categoryMatch = activeCategory === "all" ? true : task.category === activeCategory;
+            const colorMatch = activeContainerColor === "all"
+                ? true
+                : resolveTaskContainerColorToHex(task.containerColor) === resolveTaskContainerColorToHex(activeContainerColor);
+            return statusMatch && categoryMatch && colorMatch;
+        })
+    ), [activeCategory, activeContainerColor, activeYesterdayFilter, yesterdayTasks]);
+
+    const displayTasks = useMemo(() => {
+        if (isRearrangeMode) {
+            return todayTasks;
+        }
+
+        const prioritizedTodayTasks = [...todayTasks].sort((a, b) => {
+            const getPriority = (status: Task["status"]) => {
+                switch (status) {
+                    case "pending":
+                        return 0;
+                    case "completed":
+                        return 1;
+                    default:
+                        return 2;
+                }
+            };
+
+            return getPriority(a.status) - getPriority(b.status);
+        });
+
+        if (isDeleteMode) {
+            return prioritizedTodayTasks;
+        }
+
+        return [...prioritizedTodayTasks, ...filteredYesterdayTasks];
+    }, [filteredYesterdayTasks, isDeleteMode, isRearrangeMode, todayTasks]);
 
     const colorOptions = Object.entries(TASK_COLORS).flatMap(([colorName, shades]) => ([
         { value: `${colorName}-light`, label: `${colorName} light`, swatch: shades.light },
@@ -105,6 +173,20 @@ const TodoPreview: React.FC = () => {
             iconKey: TASK_CATEGORY_ICON_MAP[cat],
         })),
     ];
+
+    useEffect(() => {
+        const loadYesterdayTasks = async () => {
+            try {
+                const preview = await getYesterdayTasksPreview("all");
+                setYesterdayTasks(preview);
+            } catch (err) {
+                console.error("[TodoPreview] Failed loading yesterday tasks preview:", err);
+                setYesterdayTasks([]);
+            }
+        };
+
+        loadYesterdayTasks();
+    }, []);
 
     // =====================================================================
     //                            DND-KIT SETUP
@@ -122,10 +204,10 @@ const TodoPreview: React.FC = () => {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
 
-        const oldIndex = tasks.findIndex((t) => t._id === active.id);
-        const newIndex = tasks.findIndex((t) => t._id === over.id);
+        const oldIndex = todayTasks.findIndex((t) => t._id === active.id);
+        const newIndex = todayTasks.findIndex((t) => t._id === over.id);
 
-        const newOrder = arrayMove(tasks, oldIndex, newIndex);
+        const newOrder = arrayMove(todayTasks, oldIndex, newIndex);
         reorderTasks(newOrder);
     };
 
@@ -156,24 +238,12 @@ const TodoPreview: React.FC = () => {
 
         openModal("deleteConfirm", {
             taskIds: selectedToDelete,
-            onConfirm: handleConfirmDelete,
+            onAfterDelete: () => {
+                setIsDeleteMode(false);
+                setSelectedToDelete([]);
+            },
         });
     };
-
-    const handleConfirmDelete = async (taskIds: string[]) => {
-        try {
-            for (const id of taskIds) {
-                await deleteTask(id)
-            }
-
-            // EXIT delete mode 
-            setIsDeleteMode(false);
-
-            closeModal();
-        } catch (err) {
-            console.error("Bulk delete Failed: ", err)
-        }
-    }
 
     // =====================================================================
     //                        OPEN VIEW TASK MODAL
@@ -266,13 +336,24 @@ const TodoPreview: React.FC = () => {
             <div className="todo-tabs">
                 <SegmentedSwitch
                     value={activeTab}
-                    options={TASK_TABS.map((tab) => ({
+                    options={TODO_PREVIEW_TABS.map((tab) => ({
                         value: tab,
-                        label: TASK_TAB_LABELS[tab],
+                        label: TODO_PREVIEW_TAB_LABELS[tab],
                     }))}
                     onChange={setActiveTab}
                     className="todo-status-switch"
                 />
+
+                <div className="todo-yesterday-menu">
+                    <DropdownMenu
+                        label=""
+                        value={YESTERDAY_FILTER_TRIGGER_LABELS[activeYesterdayFilter]}
+                        selectedValue={activeYesterdayFilter}
+                        options={[...YESTERDAY_FILTER_OPTIONS]}
+                        onChange={(value) => setActiveYesterdayFilter(value as YesterdayPreviewStatus)}
+                        maxHeight={180}
+                    />
+                </div>
 
                 <div className="todo-category-menu">
                     <DropdownMenu
@@ -349,16 +430,18 @@ const TodoPreview: React.FC = () => {
                     onDragEnd={handleDragEnd}
                 >
                     <SortableContext
-                        items={tasks.map((t) => t._id)}
+                        items={displayTasks.map((t) => t._id)}
                         strategy={verticalListSortingStrategy}
                     >
                         <div className="todo-list">
-                            {tasks.map(task => (
+                            {displayTasks.map(task => (
                                 <SortableTaskItem
                                     key={task._id}
                                     task={task}
                                     isRearrangeMode={isRearrangeMode}
                                     isDeleteMode={isDeleteMode}
+                                    isReadOnly={Boolean((task as YesterdayPreviewTask).previewOrigin === "yesterday")}
+                                    badgeLabel={(task as YesterdayPreviewTask).previewOrigin === "yesterday" ? "Task Yesterday" : undefined}
                                     selectedToDelete={selectedToDelete}
                                     toggleDeleteSelection={toggleDeleteSelection}
                                     toggleCompletion={toggleCompletion}

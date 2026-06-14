@@ -67,7 +67,7 @@ const DropdownMenu = ({
     // --------------------------- RENDER ---------------------------
     return (
         <div className="dropdown-wrapper" ref={wrapperRef}>
-            <label className="dropdown-label">{label}</label>
+            {label ? <label className="dropdown-label">{label}</label> : null}
 
             {/* ---------- CLOSED VIEW ---------- */}
             <button
