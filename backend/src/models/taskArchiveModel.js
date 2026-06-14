@@ -34,6 +34,14 @@ const taskArchiveSchema = new mongoose.Schema({
         enum: archiveTypeList,
         required: true
     },
+    completedAt: {
+        type: Date,
+        default: null
+    },
+    failedAt: {
+        type: Date,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

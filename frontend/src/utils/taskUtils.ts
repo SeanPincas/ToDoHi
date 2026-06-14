@@ -192,6 +192,18 @@ export const getContainerHex = (colorName: string): string => {
     return found ? found.hex : TASK_COLORS.white.light;
 };
 
+export const resolveTaskContainerColorToHex = (containerColor?: string | null): string => {
+    if (!containerColor) return TASK_COLORS.white.light;
+
+    const normalized = containerColor.trim().toLowerCase();
+
+    if (normalized.startsWith("#")) {
+        return normalized;
+    }
+
+    return getContainerHex(normalized);
+};
+
 export const getTaskTextColor = (containerColor: string): string => {
     const [base, shade] = containerColor.split("-");
 

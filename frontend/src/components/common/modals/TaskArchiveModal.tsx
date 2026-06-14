@@ -1,0 +1,342 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useAuthContext } from "../../../context/AuthContext";
+import { useTodo } from "../../../context/TodoContext";
+import {
+    deleteTaskArchiveEntryApi,
+    getTaskArchiveApi,
+    repeatTaskArchiveEntryApi,
+    type TaskArchiveEntry,
+} from "../../../api/taskApi";
+import { modalOverlayStyle } from "../../../styles/modalStyles";
+import { Icons } from "../../../styles/iconLibrary";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import { SegmentedSwitch } from "../switch/SegmentedSwitch";
+import {
+    CATEGORY_LABELS,
+    TASK_CATEGORIES,
+    TASK_CATEGORY_ICON_MAP,
+    TASK_COLORS,
+    getTaskCategoryIconKey,
+    resolveTaskContainerColorToHex,
+    safeCategoryLabel,
+    safeStatusLabel,
+    type TaskCategory,
+} from "../../../utils/taskUtils";
+
+import "../../../styles/buttonStyles.css";
+import "./modalBaseTheme.css";
+import "./taskManagementModalTheme.css";
+import "./TaskArchiveModal.css";
+
+type ArchiveStatusTab = "all" | "completed" | "failed";
+
+const ARCHIVE_TABS: ArchiveStatusTab[] = ["all", "completed", "failed"];
+
+const ARCHIVE_TAB_LABELS: Record<ArchiveStatusTab, string> = {
+    all: "All",
+    completed: "Completed",
+    failed: "Failed",
+};
+
+const TaskArchiveModal: React.FC = () => {
+    const { refreshUser } = useAuthContext();
+    const { modal, closeModal, fetchTasks, openModal } = useTodo();
+
+    const [entries, setEntries] = useState<TaskArchiveEntry[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [busyEntryId, setBusyEntryId] = useState<string | null>(null);
+
+    const [activeTab, setActiveTab] = useState<ArchiveStatusTab>("all");
+    const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
+    const [activeContainerColor, setActiveContainerColor] = useState<"all" | string>("all");
+
+    const isOpen = modal.isOpen && modal.type === "taskArchive";
+    const modalData = modal.type === "taskArchive" ? modal.data ?? {} : {};
+
+    const colorOptions = Object.entries(TASK_COLORS).flatMap(([colorName, shades]) => ([
+        { value: `${colorName}-light`, label: `${colorName} light`, swatch: shades.light },
+        { value: `${colorName}-normal`, label: `${colorName} normal`, swatch: shades.normal },
+        { value: `${colorName}-dark`, label: `${colorName} dark`, swatch: shades.dark },
+    ]));
+
+    const categoryOptions = [
+        { value: "all", label: "All", iconKey: "List" as const },
+        ...TASK_CATEGORIES.map((cat) => ({
+            value: cat,
+            label: CATEGORY_LABELS[cat],
+            iconKey: TASK_CATEGORY_ICON_MAP[cat],
+        })),
+    ];
+
+    const loadArchive = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await getTaskArchiveApi({
+                archiveType: "all",
+                limit: 200,
+            });
+
+            setEntries(response.entries);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed loading archive:", err);
+            setError("Could not load the archive right now.");
+            setEntries([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredEntries = useMemo(() => (
+        entries.filter((entry) => {
+            const statusMatch = activeTab === "all" ? true : entry.archiveType === activeTab;
+            const categoryMatch = activeCategory === "all" ? true : entry.category === activeCategory;
+            const colorMatch = activeContainerColor === "all"
+                ? true
+                : resolveTaskContainerColorToHex(entry.containerColor) === resolveTaskContainerColorToHex(activeContainerColor);
+
+            return statusMatch && categoryMatch && colorMatch;
+        })
+    ), [entries, activeTab, activeCategory, activeContainerColor]);
+
+    const summary = useMemo(() => ({
+        total: entries.length,
+        completed: entries.filter((entry) => entry.archiveType === "completed").length,
+        failed: entries.filter((entry) => entry.archiveType === "failed").length,
+    }), [entries]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setActiveTab("all");
+        setActiveCategory("all");
+        setActiveContainerColor("all");
+        loadArchive();
+    }, [isOpen]);
+
+    const handleClose = () => {
+        if (modalData?.returnTo === "repeat" && modalData?.returnContext) {
+            openModal("repeat", modalData.returnContext);
+            return;
+        }
+
+        closeModal();
+    };
+
+    if (!isOpen) return null;
+
+    const getDaysLeftLabel = (retentionDeleteAt?: string | null) => {
+        if (!retentionDeleteAt) return "No expiry";
+
+        const diffMs = new Date(retentionDeleteAt).getTime() - Date.now();
+        const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+        return `${diffDays} day${diffDays === 1 ? "" : "s"} left`;
+    };
+
+    const handleRepeatEntry = async (archiveEntryId: string) => {
+        try {
+            setBusyEntryId(archiveEntryId);
+            await repeatTaskArchiveEntryApi(archiveEntryId);
+            await Promise.all([fetchTasks(), refreshUser(), loadArchive()]);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed repeating archive entry:", err);
+        } finally {
+            setBusyEntryId(null);
+        }
+    };
+
+    const handleDeleteEntry = async (archiveEntryId: string) => {
+        try {
+            setBusyEntryId(archiveEntryId);
+            await deleteTaskArchiveEntryApi(archiveEntryId);
+            await Promise.all([refreshUser(), loadArchive()]);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed deleting archive entry:", err);
+        } finally {
+            setBusyEntryId(null);
+        }
+    };
+
+    return (
+        <div
+            style={modalOverlayStyle}
+            className="task-archive-overlay"
+            onMouseDown={handleClose}
+        >
+            <div
+                className="modal-card-base task-archive-card task-management-modal paper-sheet-lines"
+                onMouseDown={(e) => e.stopPropagation()}
+            >
+                <div className="task-archive-header task-management-modal-header">
+                    <div className="task-management-modal-title-group task-archive-title-group">
+                        <Icons.Notebook />
+                        <h3>Task Archive</h3>
+                    </div>
+                    <button
+                        type="button"
+                        className="icon-btn-square task-archive-close-btn"
+                        onClick={handleClose}
+                        aria-label="Close task archive"
+                    >
+                        <Icons.Close />
+                    </button>
+                </div>
+
+                <div className="task-archive-copy-block">
+                    <p className="task-archive-description task-management-modal-subtitle">
+                        Archived completed and failed tasks live here until their retention window ends. You can repeat them as fresh tasks or remove them manually.
+                    </p>
+                    <div className="task-archive-summary">
+                        <span>Total: {summary.total}</span>
+                        <span>Completed: {summary.completed}</span>
+                        <span>Failed: {summary.failed}</span>
+                    </div>
+                </div>
+
+                <div className="todo-tabs task-archive-filters">
+                    <SegmentedSwitch
+                        value={activeTab}
+                        options={ARCHIVE_TABS.map((tab) => ({
+                            value: tab,
+                            label: ARCHIVE_TAB_LABELS[tab],
+                        }))}
+                        onChange={(value) => setActiveTab(value as ArchiveStatusTab)}
+                        className="todo-status-switch"
+                    />
+
+                    <div className="todo-category-menu task-archive-category-menu">
+                        <DropdownMenu
+                            label="Category"
+                            value={activeCategory === "all" ? "All Categories" : CATEGORY_LABELS[activeCategory]}
+                            selectedValue={activeCategory}
+                            options={categoryOptions}
+                            onChange={(value) => setActiveCategory(value as "all" | TaskCategory)}
+                            maxHeight={235}
+                            renderOption={(option) => {
+                                const IconComp = option.iconKey ? Icons[option.iconKey] : null;
+                                return (
+                                    <span className="todo-category-option">
+                                        {IconComp && <IconComp className="todo-category-option-icon" />}
+                                        <span>{option.label}</span>
+                                    </span>
+                                );
+                            }}
+                        />
+                    </div>
+
+                    <div className="todo-color-menu task-archive-color-menu">
+                        <DropdownMenu
+                            label="Container Color"
+                            value="Container Color"
+                            selectedValue={activeContainerColor}
+                            options={[
+                                { value: "all", label: "All", swatch: "transparent" },
+                                ...colorOptions,
+                            ]}
+                            onChange={(value) => setActiveContainerColor(value)}
+                            maxHeight={260}
+                            menuClassName="todo-color-grid-menu"
+                            itemClassName="todo-color-grid-item"
+                            renderValue={(selected) => {
+                                const swatchColor = selected?.value === "all" ? "transparent" : selected?.swatch;
+                                return (
+                                    <span className="todo-color-trigger-value">
+                                        <span
+                                            className={`todo-color-trigger-swatch ${selected?.value === "all" ? "all" : ""}`}
+                                            style={swatchColor ? { backgroundColor: swatchColor } : undefined}
+                                        />
+                                        <span className="todo-filter-text">
+                                            {selected?.value === "all" || !selected ? "All Colors" : "Color"}
+                                        </span>
+                                    </span>
+                                );
+                            }}
+                            renderOption={(option, isActive) => (
+                                option.value === "all" ? (
+                                    <span className={`todo-color-all-option ${isActive ? "active" : ""}`}>
+                                        All
+                                    </span>
+                                ) : (
+                                    <span
+                                        className={`todo-color-option-fill ${isActive ? "active" : ""}`}
+                                        style={{ backgroundColor: option.swatch }}
+                                    />
+                                )
+                            )}
+                        />
+                    </div>
+                </div>
+
+                <div className="task-archive-list-wrapper task-management-modal-panel">
+                    <div className="task-archive-list">
+                        {loading && <div className="task-archive-empty-state">Loading archive...</div>}
+                        {!loading && error && <div className="task-archive-empty-state">{error}</div>}
+                        {!loading && !error && filteredEntries.length === 0 && (
+                            <div className="task-archive-empty-state">No archived tasks match the current filters.</div>
+                        )}
+
+                        {!loading && !error && filteredEntries.map((entry) => {
+                            const CategoryIcon = Icons[getTaskCategoryIconKey(entry.category)];
+                            const archiveAccent = entry.archiveType === "completed"
+                                ? "var(--success-accent)"
+                                : "var(--btn-danger)";
+                            const isBusy = busyEntryId === entry._id;
+
+                            return (
+                                <div
+                                    key={entry._id}
+                                    className={`task-archive-item ${entry.archiveType}`}
+                                >
+                                    <div className="task-archive-item-main">
+                                        <span className="task-archive-title">{entry.title}</span>
+                                        <span
+                                            className="task-archive-color-line"
+                                            style={{ backgroundColor: entry.containerColor || archiveAccent }}
+                                            aria-hidden="true"
+                                        />
+                                        <div className="task-archive-subinfo-right">
+                                            <span className="task-archive-meta-label">
+                                                {safeCategoryLabel(entry.category)}
+                                            </span>
+                                            <CategoryIcon className="task-archive-meta-icon" />
+                                            <span className={`task-archive-meta-label task-archive-status-label ${entry.archiveType}`}>
+                                                {safeStatusLabel(entry.archiveType)}
+                                            </span>
+                                            <span className="task-archive-retention-label">
+                                                {getDaysLeftLabel(entry.retentionDeleteAt)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="task-archive-item-actions">
+                                        <button
+                                            type="button"
+                                            className="btn-green-rect task-archive-action-btn"
+                                            disabled={isBusy}
+                                            onClick={() => handleRepeatEntry(entry._id)}
+                                        >
+                                            <Icons.Repeat />
+                                            <span>{isBusy ? "Working..." : "Repeat"}</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
+                                            disabled={isBusy}
+                                            onClick={() => handleDeleteEntry(entry._id)}
+                                        >
+                                            <Icons.Delete />
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TaskArchiveModal;

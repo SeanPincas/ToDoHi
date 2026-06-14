@@ -1,41 +1,103 @@
 /* ==========================================================================
    RepeatConfirmModal.css
-   Confirmation modal for repeating tasks
+   Paper-styled confirmation modal for repeat actions
    ========================================================================== */
 
-/* ---------------- OVERLAY ---------------- */
-
 .repeat-confirm-overlay {
-    z-index: 1000; /* above RepeatTaskModal */
+    z-index: 1000;
 }
-
-/* ---------------- CARD ---------------- */
 
 .repeat-confirm-card {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 20px;
+    gap: 10px;
+    width: min(92vw, 520px);
+    max-width: 520px;
+    padding: 22px 22px 20px;
 }
 
-/* ---------------- HEADER ---------------- */
+.repeat-confirm-card.task-management-modal.paper-sheet-lines {
+    --page-line-gap: 28px;
+    --page-line-color: rgba(107, 126, 145, 0.32);
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.02) 24%),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(var(--page-line-gap) - 1px),
+            var(--page-line-color) calc(var(--page-line-gap) - 1px),
+            var(--page-line-color) var(--page-line-gap)
+        );
+    background-size: 100% 100%, 100% var(--page-line-gap);
+    background-position: top left, top left;
+    background-color: var(--paper-bg);
+    background-repeat: no-repeat, repeat;
+}
 
 .repeat-confirm-header {
     margin: 0;
+}
+
+.repeat-confirm-title-group {
+    padding-top: 0;
+    align-items: center;
+}
+
+.repeat-confirm-title-group svg {
+    color: color-mix(in srgb, var(--btn-danger) 54%, var(--blue-dark) 46%);
 }
 
 .repeat-confirm-header h3 {
     margin: 0;
 }
 
-/* ---------------- MESSAGE ---------------- */
+.repeat-confirm-close-btn {
+    align-self: flex-start;
+}
+
+.repeat-confirm-close-btn:hover,
+.repeat-confirm-close-btn:focus-visible,
+.repeat-confirm-close-btn:active {
+    color: color-mix(in srgb, var(--btn-danger) 82%, #84281f 18%);
+    border-color: color-mix(in srgb, var(--btn-danger) 48%, #fff 52%);
+    background: color-mix(in srgb, var(--btn-danger) 16%, var(--paper-bg) 84%);
+}
+
+.repeat-confirm-copy-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 10px 12px 9px;
+    border: 1.5px solid color-mix(in srgb, var(--paper-attach-border) 86%, #fff 14%);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--paper-bg) 84%, #fff 16%);
+    box-shadow:
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
 
 .repeat-confirm-message {
     margin: 0;
     padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
 }
 
-/* ---------------- ACTIONS ---------------- */
+.repeat-confirm-message span:last-child br {
+    display: none;
+}
+
+.repeat-confirm-archive-note {
+    margin: 0;
+    padding: 0;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    text-align: center;
+    color: var(--red-accent);
+}
 
 .repeat-confirm-actions {
     display: grid;
@@ -44,20 +106,99 @@
     margin-top: 2px;
 }
 
-/* ---------------- RESPONSIVE ---------------- */
+.repeat-confirm-action-btn {
+    min-height: 52px;
+    border-radius: 10px;
+    border: 1px solid var(--paper-attach-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-main);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.42),
+        0 3px 0 color-mix(in srgb, var(--modal-paper-shadow-ledge) 72%, transparent 28%);
+    transition:
+        background-color 0.16s ease,
+        border-color 0.16s ease,
+        color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.12s ease;
+}
+
+.repeat-confirm-action-btn span {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    transform: translateY(1px);
+}
+
+.repeat-confirm-action-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.repeat-confirm-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.repeat-confirm-action-btn:active {
+    transform: translateY(0);
+}
+
+.repeat-confirm-action-btn-cancel {
+    background: color-mix(in srgb, var(--paper-bg) 90%, #fff 10%);
+    border-color: color-mix(in srgb, var(--paper-attach-border) 86%, #fff 14%);
+    color: color-mix(in srgb, var(--text-main) 90%, #23384d 10%);
+}
+
+.repeat-confirm-action-btn-cancel:hover {
+    background: color-mix(in srgb, var(--paper-bg) 78%, #fff 22%);
+}
+
+.repeat-confirm-action-btn-confirm {
+    background: var(--button-success-bg);
+    border-color: color-mix(in srgb, var(--success-accent) 78%, #4a7443 22%);
+    color: color-mix(in srgb, #163117 78%, var(--text-main) 22%);
+}
+
+.repeat-confirm-action-btn-confirm:hover {
+    background: var(--button-success-hover);
+}
+
+.repeat-confirm-action-btn:disabled {
+    background: color-mix(in srgb, var(--paper-bg) 72%, #c7d3e3 28%);
+    border-color: color-mix(in srgb, var(--paper-attach-border) 72%, #b3bfd0 28%);
+    color: color-mix(in srgb, var(--text-main) 45%, #9aa4b0 55%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 3px 0 color-mix(in srgb, var(--modal-paper-shadow-ledge) 78%, transparent 22%);
+    transform: none;
+}
+
+@media (max-width: 480px) {
+    .repeat-confirm-card {
+        width: min(94vw, 94vw);
+        padding: 20px 18px 18px;
+    }
+
+    .repeat-confirm-actions {
+        grid-template-columns: 1fr;
+    }
+}
 
 @media (max-width: 360px) {
     .repeat-confirm-header h3 {
-        font-size: 16px;
+        font-size: 1.08rem;
     }
 
     .repeat-confirm-message {
         font-size: 0.92rem;
-    }
-}
-
-@media (min-width: 1351px) {
-    .repeat-confirm-card {
-        max-width: 460px;
     }
 }

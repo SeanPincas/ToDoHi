@@ -12,35 +12,8 @@ const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
 const { buildArchiveRecord } = require("./taskArchive");
 const { DEFAULT_ARCHIVE_LABEL } = require("./repeatReviewConstants");
-
-// Improvement note:
-//   computeRepeatDeadline and computeRepeatCycleKey should eventually be moved
-//   into a shared reset-cycle/date utility instead of living beside flow logic.
-function computeRepeatDeadline(resetHour, now = new Date()) {
-    const deadline = new Date(now);
-    deadline.setHours(resetHour, 0, 0, 0);
-
-    if (now >= deadline) {
-        deadline.setDate(deadline.getDate() + 1);
-    }
-
-    return deadline;
-}
-
-function computeRepeatCycleKey(resetHour, now = new Date()) {
-    const boundary = new Date(now);
-    boundary.setHours(resetHour, 0, 0, 0);
-
-    if (now < boundary) {
-        boundary.setDate(boundary.getDate() - 1);
-    }
-
-    const yyyy = boundary.getFullYear();
-    const mm = String(boundary.getMonth() + 1).padStart(2, "0");
-    const dd = String(boundary.getDate()).padStart(2, "0");
-
-    return `${yyyy}-${mm}-${dd}@${resetHour}`;
-}
+const { computeRepeatDeadline, computeRepeatCycleKey } = require("./resetCycle");
+const { getRepeatableTasksForUser } = require("./repeatReview");
 
 function buildRepeatedTaskPayload(task, userId, deadline) {
     return {
@@ -50,6 +23,8 @@ function buildRepeatedTaskPayload(task, userId, deadline) {
         category: task.category,
         containerColor: task.containerColor,
         status: "pending",
+        completedAt: null,
+        failedAt: null,
         deadline
     };
 }
@@ -61,10 +36,11 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
         throw new Error("User not found");
     }
 
-    const oldTasks = await Task.find({
+    const resetHour = user.preference?.resetHour ?? 0;
+    const { tasks: oldTasks } = await getRepeatableTasksForUser({
         userId,
-        status: { $in: ["completed", "failed"] }
-    }).sort({ createdAt: 1, orderIndex: 1 });
+        resetHour
+    });
 
     if (oldTasks.length === 0) {
         return {
@@ -74,7 +50,6 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
         };
     }
 
-    const resetHour = user.preference?.resetHour ?? 0;
     const now = new Date();
     const newDeadline = computeRepeatDeadline(resetHour, now);
     const cycleKey = computeRepeatCycleKey(resetHour, now);
