@@ -63,6 +63,12 @@
     --border-width-soft: 1px;
     --shadow-soft: 0 3px 10px rgba(34, 49, 65, 0.1);
     --shadow-paper-lift: 0 10px 22px rgba(34, 49, 65, 0.12);
+    --dashboard-paper-shadow: rgba(196, 184, 162, 0.65);
+    --dashboard-paper-shadow-deep: rgba(178, 165, 141, 0.5);
+    --modal-paper-shadow: rgba(110, 88, 52, 0.12);
+    --modal-paper-shadow-side: rgba(110, 88, 52, 0.08);
+    --modal-paper-shadow-deep: rgba(101, 79, 46, 0.38);
+    --modal-paper-shadow-ledge: rgba(143, 123, 91, 0.22);
 
     /* ===================== MEMO BOARD THEME ===================== */
 
@@ -212,6 +218,12 @@ body[data-theme="dark"] {
     --border-width-soft: 1px;
     --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.36);
     --shadow-paper-lift: 0 10px 24px rgba(0, 0, 0, 0.34);
+    --dashboard-paper-shadow: rgba(34, 47, 63, 0.56);
+    --dashboard-paper-shadow-deep: rgba(10, 18, 28, 0.5);
+    --modal-paper-shadow: rgba(0, 0, 0, 0.22);
+    --modal-paper-shadow-side: rgba(0, 0, 0, 0.16);
+    --modal-paper-shadow-deep: rgba(0, 0, 0, 0.34);
+    --modal-paper-shadow-ledge: rgba(0, 0, 0, 0.2);
 
     /* ----------------------- MEMO BOARD (DARK) ----------------------------- */
 

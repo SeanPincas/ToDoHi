@@ -1,11 +1,49 @@
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
+const { repeatTasksForUser } = require("../utils/repeatTasks.js");
+const { getTaskArchiveEntriesForUser } = require("../utils/taskArchiveQuery.js");
+const { getRepeatReviewForUser } = require("../utils/repeatReview.js");
+const {
+    repeatTaskArchiveEntryForUser,
+    deleteTaskArchiveEntryForUser
+} = require("../utils/taskArchiveActions.js");
 
 const {
     validCategories,
     isToday,
     isYesterday
 } = require("../utils/helpers.js");
+
+function buildStatusTimestampUpdates(existingTask, nextStatus, now = new Date()) {
+    if (!nextStatus || nextStatus === existingTask.status) {
+        return {};
+    }
+
+    if (nextStatus === "completed") {
+        return {
+            completedAt: now,
+            failedAt: null,
+            isExpired: false
+        };
+    }
+
+    if (nextStatus === "failed") {
+        return {
+            completedAt: null,
+            failedAt: now
+        };
+    }
+
+    if (nextStatus === "pending") {
+        return {
+            completedAt: null,
+            failedAt: null,
+            isExpired: false
+        };
+    }
+
+    return {};
+}
 
 // --------------------------- CREATE NEW TASK ---------------------------
 exports.createTask = async (req, res) => {
@@ -45,11 +83,70 @@ exports.getTasks = async (req, res) => {
     }
 };
 
+// --------------------------- GET TASK ARCHIVE ---------------------------
+exports.getTaskArchive = async (req, res) => {
+    try {
+        const archiveResult = await getTaskArchiveEntriesForUser({
+            userId: req.user._id,
+            archiveType: req.query.archiveType,
+            archiveReason: req.query.archiveReason,
+            cycleKey: req.query.cycleKey,
+            limit: req.query.limit
+        });
+
+        res.json({
+            message: "Task Archive fetched successfully",
+            ...archiveResult
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Error Fetching Task Archive", error: err.message });
+    }
+};
+
+// --------------------------- GET REPEAT REVIEW ---------------------------
+exports.getRepeatReview = async (req, res) => {
+    try {
+        const review = await getRepeatReviewForUser({
+            userId: req.user._id,
+            limit: req.query.limit
+        });
+
+        res.json({
+            message: "Repeat review fetched successfully",
+            ...review
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Error Fetching Repeat Review", error: err.message });
+    }
+};
+
+// --------------------------- REPEAT TASK ARCHIVE ENTRY ---------------------------
+exports.repeatTaskArchiveEntry = async (req, res) => {
+    try {
+        const result = await repeatTaskArchiveEntryForUser({
+            userId: req.user._id,
+            archiveEntryId: req.params.id
+        });
+
+        if (!result.ok) {
+            return res.status(result.statusCode).json(result.body);
+        }
+
+        res.status(result.statusCode).json(result.body);
+    } catch (err) {
+        res.status(500).json({ message: "Error Repeating Task Archive Entry", error: err.message });
+    }
+};
+
 // --------------------------- UPDATE TASK -----------------------------
 exports.updateTask = async (req, res) => {
     try {
         const { id } = req.params;
         const { title, description, category, containerColor, status, deadline } = req.body;
+
+        const existing = await Task.findOne({ _id: id, userId: req.user._id });
+
+        if (!existing) return res.status(404).json({ message: "Task Not Found" });
 
         const updates = {
             title,
@@ -60,6 +157,8 @@ exports.updateTask = async (req, res) => {
             category: validCategories.includes(category) ? category : undefined
         }
 
+        Object.assign(updates, buildStatusTimestampUpdates(existing, status));
+
         // Remove undefined fields
         Object.keys(updates).forEach(key => updates[key] === undefined && delete updates[key])
 
@@ -68,8 +167,6 @@ exports.updateTask = async (req, res) => {
             updates,
             { new: true }
         )
-
-        if (!updated) return res.status(404).json({ message: "Task Not Found" });
 
         res.json({ message: "Task Updated", task: updated });
     } catch (err) {
@@ -89,6 +186,24 @@ exports.deleteTask = async (req, res) => {
         res.json({ message: "Task Deleted" })
     } catch (err) {
         res.status(500).json({ message: "Error Deleting Task", error: err.message });
+    }
+};
+
+// --------------------------- DELETE TASK ARCHIVE ENTRY -----------------------------
+exports.deleteTaskArchiveEntry = async (req, res) => {
+    try {
+        const result = await deleteTaskArchiveEntryForUser({
+            userId: req.user._id,
+            archiveEntryId: req.params.id
+        });
+
+        if (!result.ok) {
+            return res.status(result.statusCode).json(result.body);
+        }
+
+        res.status(result.statusCode).json(result.body);
+    } catch (err) {
+        res.status(500).json({ message: "Error Deleting Task Archive Entry", error: err.message });
     }
 };
 
@@ -116,6 +231,9 @@ exports.markComplete = async (req, res) => {
 
         // Mark completed
         existing.status = "completed";
+        existing.completedAt = new Date();
+        existing.failedAt = null;
+        existing.isExpired = false;
         await existing.save();
 
         // ---------------- STATS: increment totalTasksCompleted ----------------
@@ -159,96 +277,16 @@ exports.reorderTasks = async (req, res) => {
 // --------------------------- REPEAT /RECREATE TASKS -----------------------------
 exports.repeatTasks = async (req, res) => {
     try {
-        const userId = req.user._id;
-        const { repeatTaskIds } = req.body;
-
-        // fetch all old tasks
-        const oldTasks = await Task.find({
-            userId,
-            status: { $in: ["completed", "failed"] }
+        const result = await repeatTasksForUser({
+            userId: req.user._id,
+            repeatTaskIds: req.body.repeatTaskIds || []
         });
 
-        // no tasks → dont open repeatTaskModal
-        if (oldTasks.length === 0) {
-            return res.status(400).json({
-                message: "No Completed or Failed Tasks to Repeat"
-            });
+        if (!result.ok) {
+            return res.status(result.statusCode).json(result.body);
         }
 
-        // Filter Only: User picked tasks will be recreated
-        const tasksToRepeat = oldTasks.filter(task => repeatTaskIds.includes(task._id.toString()));
-
-        // Compute NEW DEADLINE using resetHour
-        const user = await User.findById(userId);
-        const resetHour = user.preference?.resetHour ?? 0;
-
-        const now = new Date();
-        const newDeadline = new Date(now);
-        newDeadline.setHours(resetHour, 0, 0, 0);
-
-        // resetHour passed? then deadline Tomorrow
-        if (now >= newDeadline) {
-            newDeadline.setDate(newDeadline.getDate() + 1);
-        }
-
-        // RECREATE  NEW TASKS
-        const newTasks = tasksToRepeat.map(task => ({
-            userId,
-            title: task.title,
-            description: task.description,
-            category: task.category,
-            containerColor: task.containerColor,
-            status: "pending",
-            deadline: newDeadline
-        }));
-
-        await Task.insertMany(newTasks);
-
-        // ---------------- STATS: increment totalTasksCreated for repeated tasks ----------------
-        await User.findByIdAndUpdate(userId, {
-            $inc: {
-                "stats.totalTasksCreated": newTasks.length
-            }
-        });
-
-        // DELETE ALL unwanted tasks
-        await Task.deleteMany({
-            userId,
-            status: { $in: ["completed", "failed"] }
-        });
-
-        // We MUST compute the SAME reset-cycle key as the scheduler
-        const boundary = new Date();
-        boundary.setHours(resetHour, 0, 0, 0);
-
-        // If resetHour has NOT been reached yet today,
-        // then the active cycle actually started YESTERDAY
-        if (new Date() < boundary) {
-            boundary.setDate(boundary.getDate() - 1);
-        }
-
-        // Build cycle key: YYYY-MM-DD@resetHour
-        const yyyy = boundary.getFullYear();
-        const mm = String(boundary.getMonth() + 1).padStart(2, "0");
-        const dd = String(boundary.getDate()).padStart(2, "0");
-
-        const cycleKey = `${yyyy}-${mm}-${dd}@${resetHour}`;
-
-        // ---------------- DEBUG LOG: repeat cycle acknowledgement ----------------
-        console.log("[repeatTasks] repeatCycleAcknowledged → writing:", {
-            userId,
-            cycleKey
-        });
-
-        // Store acknowledgement on USER document
-        await User.findByIdAndUpdate(userId, {
-            repeatCycleAcknowledged: cycleKey
-        });
-
-        res.json({
-            message: "Tasks repeated successfully",
-            repeatedCount: newTasks.length
-        });
+        res.status(result.statusCode).json(result.body);
     } catch (err) {
         console.log("[repeatTasks] Error:", err);
         res.status(500).json({ message: "Error Repeating Tasks", error: err.message })

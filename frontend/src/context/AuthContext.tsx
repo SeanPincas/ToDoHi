@@ -23,10 +23,10 @@ interface User {
 
     preference?: {
         resetHour: number;
+        dayTaskDelete?: 3 | 7 | 15 | 30;
         theme: "light" | "dark";
+        quoteCategory?: string[];
     };
-
-    quoteCategoryPreferences?: string[];
 
     stats?: {
         totalTasksCreated: number;
@@ -40,15 +40,6 @@ interface User {
     };
 
     profilePicture?: string;
-    repeatCycleAcknowledged: string;
-    failedTaskSnapshot?: {
-        resetAt?: string;
-        tasks: {
-            _id: string;
-            title: string;
-            status: string;
-        }[];
-    };
 }
 
 type ThemeType = "light" | "dark";

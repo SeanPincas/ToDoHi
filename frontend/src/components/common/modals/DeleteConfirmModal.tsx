@@ -1,9 +1,10 @@
 import React from "react";
 import { useTodo } from "../../../context/TodoContext";
-import { modalOverlayStyle, modalCardBaseStyle } from "../../../styles/modalStyles";
+import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
 
 import "./DeleteConfirmModal.css";
+import "./modalBaseTheme.css";
 
 // ------------------------------ COMPONENT ------------------------------
 const DeleteConfirmModal: React.FC = () => {
@@ -12,7 +13,7 @@ const DeleteConfirmModal: React.FC = () => {
     // ------------------ GUARD ------------------
     if (!modal.isOpen || modal.type !== "deleteConfirm") return null;
 
-    const { taskIds = [], } = modal.data || {};
+    const { taskIds = [], onAfterDelete } = modal.data || {};
     const count = taskIds.length;
 
     // ------------------ CONFIRM DELETE ------------------
@@ -25,6 +26,10 @@ const DeleteConfirmModal: React.FC = () => {
             }
 
             await fetchTasks();
+
+            if (typeof onAfterDelete === "function") {
+                await onAfterDelete();
+            }
 
             closeModal();
         } catch (err) {
@@ -41,9 +46,7 @@ const DeleteConfirmModal: React.FC = () => {
             onMouseDown={closeModal}
         >
             <div
-                // Stop click from closing modal when clicking inside
-                style={modalCardBaseStyle}
-                className="delete-confirm-card"
+                className="modal-card-base delete-confirm-card"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= HEADER ================= */}

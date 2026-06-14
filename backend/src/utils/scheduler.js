@@ -1,14 +1,17 @@
+// ============================================================================
+// File Name: scheduler.js
+// Purpose:
+// - Orchestrates scheduled backend jobs.
+// - Owns task expiry, per-user reset-cycle handling, and archive cleanup.
+// - Should coordinate time-based jobs, not become the single home of every
+//   date utility used elsewhere in the repeat/archive domain.
+// ============================================================================
+
 const cron = require("node-cron");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 const { runDailyStats } = require("./dailyStats.js");
-
-// ============================================================================
-// INTERNAL STATE (in-memory)
-// Tracks last reset cycle PER USER
-// NOTE: Resets on server restart — acceptable for now
-// ============================================================================
-const lastResetKeys = new Map();
+const { cleanupExpiredTaskArchives } = require("./taskArchiveCleanup.js");
 
 // ============================================================================
 // HELPER: Compute reset-cycle key for a user
@@ -19,12 +22,16 @@ const lastResetKeys = new Map();
 //
 // Meaning:
 //   This uniquely identifies ONE reset window for ONE user
+//
+// Improvement note:
+//   This reset-cycle math is also mirrored in repeatTasks.js and frontend
+//   resetCycle helpers. A shared reset-cycle utility would be cleaner later.
 // ============================================================================
 function getResetCycleKey(now, resetHour) {
     const boundary = new Date(now);
     boundary.setHours(resetHour, 0, 0, 0);
 
-    // If resetHour not reached yet today → cycle started yesterday
+    // If resetHour not reached yet today -> cycle started yesterday
     if (now < boundary) {
         boundary.setDate(boundary.getDate() - 1);
     }
@@ -50,13 +57,12 @@ async function expireTasks(now) {
             deadline: { $exists: true, $ne: null, $lte: now }
         },
         {
-            $set: { status: "failed", isExpired: true }
+            $set: { status: "failed", isExpired: true, failedAt: now, completedAt: null }
         }
     );
 
     console.log(
-        `[Scheduler] Task Expiry @ ${now.toISOString()} | Updated: ${res.modifiedCount ?? res.nModified
-        }`
+        `[Scheduler] Task Expiry @ ${now.toISOString()} | Updated: ${res.modifiedCount ?? res.nModified}`
     );
 }
 
@@ -66,72 +72,44 @@ async function expireTasks(now) {
 // - Runs dailyStats ONLY once per cycle per user
 // ============================================================================
 async function handleDailyReset(now) {
-    const users = await User.find({}, "_id preference.resetHour");
+    const users = await User.find({}, "_id preference.resetHour lastResetCycleKey");
 
     for (const user of users) {
         const userId = user._id.toString();
         const resetHour = user.preference?.resetHour ?? 0;
 
         const currentResetKey = getResetCycleKey(now, resetHour);
-        const lastKey = lastResetKeys.get(userId);
+        const lastKey = user.lastResetCycleKey ?? null;
 
-        // Already reset for this cycle → skip
+        // Already reset for this cycle -> skip
         if (lastKey === currentResetKey) continue;
 
         console.log(
-            `[Scheduler] Reset detected for user ${userId} → ${currentResetKey}`
+            `[Scheduler] Reset detected for user ${userId} -> ${currentResetKey}`
         );
 
-        // New reset cycle → user must handle repeat tasks again
+        // New reset cycle detected for this user
         await User.findByIdAndUpdate(user._id, {
-            repeatCycleAcknowledged: null
+            lastResetCycleKey: currentResetKey
         });
 
         // Run daily stats (already per-user internally)
         await runDailyStats();
-
-        // Failed Tasks Snapshot Logic
-        const failedTasks = await Task.find(
-            {
-                userId: user._id,
-                status: "failed"
-            },
-            "title status" // projection: only fields we care about
-        );
-
-        if (failedTasks.length === 0) {
-            // If no failed tasks: remove snapshot / "undefined"
-            await User.findByIdAndUpdate(user._id, {
-                $unset: { failedTaskSnapshot: "" }
-            });
-
-            console.log(
-                `[Scheduler] No Failed Tasks for user ${userId} → snapshot cleared`
-            );
-
-        } else {
-            // Failed Tasks found: get Title, Status
-            const snapshotTasks = failedTasks.map(task => ({
-                _id: task._id,
-                title: task.title,
-                status: task.status
-            }));
-
-            await User.findByIdAndUpdate(user._id, {
-                failedTaskSnapshot: {
-                    resetAt: now,
-                    tasks: snapshotTasks
-                }
-            });
-
-            console.log(
-                `[Scheduler] Failed task snapshot created for user ${userId} | Count: ${snapshotTasks.length}`
-            );
-        }
-
-        // Mark this reset cycle as processed for this user
-        lastResetKeys.set(userId, currentResetKey);
     }
+}
+
+// ============================================================================
+// JOB #3: CLEAN EXPIRED TASK ARCHIVES
+// Rule:
+//   - retentionDeleteAt exists
+//   - retentionDeleteAt <= now
+// ============================================================================
+async function cleanupTaskArchives(now) {
+    const { deletedCount } = await cleanupExpiredTaskArchives(now);
+
+    console.log(
+        `[Scheduler] Task Archive Cleanup @ ${now.toISOString()} | Deleted: ${deletedCount}`
+    );
 }
 
 // ============================================================================
@@ -141,11 +119,14 @@ async function schedulerTick() {
     try {
         const now = new Date();
 
-        // 1️⃣ Expire overdue tasks
+        // 1. Expire overdue tasks
         await expireTasks(now);
 
-        // 2️⃣ Handle per-user daily reset
+        // 2. Handle per-user daily reset
         await handleDailyReset(now);
+
+        // 3. Clean expired task archives
+        await cleanupTaskArchives(now);
 
     } catch (err) {
         console.error("[Scheduler] Error:", err);
@@ -158,7 +139,7 @@ async function schedulerTick() {
 function startScheduler(options = {}) {
     const {
         enabled = true,
-        schedule = "*/5 * * * *" // every 5 minutes
+        schedule = "*/5 * * * *"
     } = options;
 
     if (!enabled) {
@@ -168,7 +149,6 @@ function startScheduler(options = {}) {
 
     console.log("[Scheduler] Starting unified per-user scheduler...");
 
-    // Run immediately on server start
     schedulerTick();
 
     cron.schedule(
@@ -183,9 +163,7 @@ function startScheduler(options = {}) {
     console.log(`[Scheduler] Running every ${schedule}`);
 }
 
-// ============================================================================
-// EXPORTS
-// ============================================================================
 module.exports = {
-    startScheduler
+    startScheduler,
+    schedulerTick
 };

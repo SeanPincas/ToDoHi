@@ -15,7 +15,8 @@ import {
 
 import { computeDeadline } from "../../utils/computeDeadline";
 import { Icons } from "../../styles/iconLibrary";
-import { modalOverlayStyle, modalCardBaseStyle } from "../../styles/modalStyles";
+import { modalOverlayStyle } from "../../styles/modalStyles";
+import "../common/modals/modalBaseTheme.css";
 
 import "./AddTaskModal.css";
 
@@ -114,8 +115,7 @@ const AddTaskModal: React.FC = () => {
             onMouseDown={handleClose}
         >
             <div
-                className="todo-modal-card"
-                style={modalCardBaseStyle}
+                className="modal-card-base todo-modal-card"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ------------------ HEADER ------------------ */}

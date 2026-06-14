@@ -5,8 +5,9 @@
 import React, { useEffect, useState } from "react";
 import { useMemoContext } from "../../context/MemoContext";
 
-import { modalOverlayStyle, modalCardBaseStyle } from "../../styles/modalStyles";
+import { modalOverlayStyle } from "../../styles/modalStyles";
 import "../../styles/ButtonStyles.css"
+import "../common/modals/modalBaseTheme.css";
 
 import {
     memoPinColors,
@@ -90,7 +91,7 @@ const AddMemoModal: React.FC = () => {
     // --------------------- RENDER ------------------------------
     return (
         <div style={modalOverlayStyle} onClick={handleClose}>
-            <div style={modalCardBaseStyle} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-card-base memo-modal-card" onClick={(e) => e.stopPropagation()}>
 
                 {/* ================= HEADER ================= */}
                 <div className="memo-header">

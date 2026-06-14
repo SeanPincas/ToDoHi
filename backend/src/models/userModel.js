@@ -33,21 +33,22 @@ const userSchema = new mongoose.Schema({
     },
     preference: {
         resetHour: { type: Number, default: 0 },
-        theme: { type: String, enum: ['light', 'dark'], default: 'light' }
-    },
-    quoteCategoryPreferences: {
-        type: [String],
-        validate: {
-            validator: arr => arr.length <= 3,
-            message: "You can select up to 3 quote categories."
-        },
-        default: []
+        dayTaskDelete: { type: Number, enum: [3, 7, 15, 30], default: 30 },
+        theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+        quoteCategory: {
+            type: [String],
+            validate: {
+                validator: arr => arr.length <= 3,
+                message: "You can select up to 3 quote categories."
+            },
+            default: []
+        }
     },
     profilePicture: {
         type: String,
         default: ""
     },
-    repeatCycleAcknowledged: {
+    lastResetCycleKey: {
         type: String,
         default: null
     },
@@ -55,34 +56,14 @@ const userSchema = new mongoose.Schema({
         totalTasksCreated: { type: Number, default: 0 },
         totalTasksCreatedToday: { type: Number, default: 0},
         totalTasksCompleted: { type: Number, default: 0 },
+        tasksCompletedToday: { type: Number, default: 0 },
+        tasksFailedYesterday: { type: Number, default: 0 },
         totalMemosCreated: { type: Number, default: 0 },
         totalDailyPlanCompleted: { type: Number, default: 0 },
 
         // streak tracking
         dailyStreak: { type: Number, default: 0 },
         longestStreak: { type: Number, default: 0 },
-    },
-    failedTaskSnapshot: {
-        resetAt: {
-            type: Date
-        },
-        tasks: [
-            {
-                _id: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    required: true
-                },
-                title: {
-                    type: String,
-                    required: true
-                },
-                status: {
-                    type: String,
-                    enum: ["failed"],
-                    required: true
-                }
-            }
-        ]
     },
     createdAt: {
         type: Date,

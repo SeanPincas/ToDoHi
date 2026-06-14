@@ -17,6 +17,8 @@ interface SortableTaskProps {
     task: Task;
     isRearrangeMode: boolean;
     isDeleteMode: boolean;
+    isReadOnly?: boolean;
+    badgeLabel?: string;
     selectedToDelete: string[];
 
     toggleDeleteSelection: (taskId: string) => void;
@@ -29,6 +31,8 @@ export const SortableTaskItem = ({
     task,
     isRearrangeMode,
     isDeleteMode,
+    isReadOnly = false,
+    badgeLabel,
     selectedToDelete,
     toggleDeleteSelection,
     toggleCompletion,
@@ -73,6 +77,7 @@ export const SortableTaskItem = ({
     const isSelectedForDelete = selectedToDelete.includes(task._id);
 
     const handleContainerClick = () => {
+        if (isReadOnly) return;
         if (isRearrangeMode) return;
 
         if (isDeleteMode) {
@@ -87,15 +92,16 @@ export const SortableTaskItem = ({
         <div
             ref={setNodeRef}
             style={rowStyle}
-            className={`task-item-container ${isDragging ? "dragging" : ""} ${isRearrangeMode ? "rearrange-row" : ""}`}
+            className={`task-item-container ${isDragging ? "dragging" : ""} ${isRearrangeMode ? "rearrange-row" : ""} ${isReadOnly ? "read-only-row" : ""}`}
             onClick={handleContainerClick}
         >
             <div className="task-left-section">
                 {!isDeleteMode && !isRearrangeMode && (
                     <div
-                        className="task-checkbox"
+                        className={`task-checkbox ${isReadOnly ? "disabled" : ""}`}
                         onClick={(e) => {
                             e.stopPropagation();
+                            if (isReadOnly) return;
                             toggleCompletion(task);
                         }}
                     >
@@ -133,8 +139,12 @@ export const SortableTaskItem = ({
             <div className="task-body">
                 <p className={`task-title ${task.status}`}>{task.title}</p>
 
+                {badgeLabel && (
+                    <span className="task-origin-badge">{badgeLabel}</span>
+                )}
+
                 <span
-                    className="task-color-swatch"
+                    className="task-color-line"
                     style={{ backgroundColor: accentColor }}
                     aria-hidden="true"
                     title={`Task color: ${task.containerColor}`}
@@ -147,11 +157,11 @@ export const SortableTaskItem = ({
 
                     <CategoryIcon className="task-meta-icon task-category-icon" />
 
-                    <span className="task-meta-label task-status-label">
+                    <span className={`task-meta-label task-status-label ${task.status}`}>
                         {safeStatusLabel(task.status)}
                     </span>
 
-                    <StatusIcon className="task-meta-icon task-status-icon" />
+                    <StatusIcon className={`task-meta-icon task-status-icon ${task.status}`} />
                 </div>
             </div>
         </div>

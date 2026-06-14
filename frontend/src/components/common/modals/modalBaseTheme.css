@@ -1,0 +1,16 @@
+.modal-card-base {
+    width: min(420px, 90vw);
+    max-width: 90vw;
+    box-sizing: border-box;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1.5px solid var(--paper-attach-border, #c8bba4);
+    background: var(--paper-bg);
+    color: var(--text-main);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.45) inset,
+        inset -6px 0 10px -10px var(--modal-paper-shadow-deep),
+        5px 0 8px -7px var(--modal-paper-shadow-side),
+        0 6px 10px -6px var(--modal-paper-shadow-side),
+        0 14px 18px -12px var(--modal-paper-shadow-deep);
+}

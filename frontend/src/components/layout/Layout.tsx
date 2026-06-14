@@ -15,10 +15,10 @@ const Layout: React.FC<LayoutProps> = ({ children, showSidebar = true }) => {
     return (
         <div className={`layout-wrapper ${showSidebar ? "sidebar-open" : ""}`}>
             <div className="book-shell">
-                <div className={`notebook-sheet ${showSidebar ? "with-sidebar" : "no-sidebar"}`}>
-                    {/* Sidebar (optional) */}
-                    {showSidebar && <Sidebar />}
+                {/* Sidebar (optional): external book tab rail */}
+                {showSidebar && <Sidebar />}
 
+                <div className={`notebook-sheet ${showSidebar ? "with-sidebar" : "no-sidebar"}`}>
                     {/* Page content */}
                     <div className="layout-content">
                         {children}
