@@ -57,7 +57,7 @@ async function expireTasks(now) {
             deadline: { $exists: true, $ne: null, $lte: now }
         },
         {
-            $set: { status: "failed", isExpired: true }
+            $set: { status: "failed", isExpired: true, failedAt: now, completedAt: null }
         }
     );
 

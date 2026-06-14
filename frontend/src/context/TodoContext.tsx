@@ -22,7 +22,7 @@ import {
 } from "../api/taskApi.ts";
 
 // ------------------------------ MODAL TYPES --------------------------------------
-export type ModalType = "add" | "edit" | "view" | "deleteConfirm" | "repeat" | "repeatConfirm";
+export type ModalType = "add" | "edit" | "view" | "deleteConfirm" | "repeat" | "repeatConfirm" | "taskArchive";
 
 // What the modal state looks like
 interface ModalState {
@@ -72,7 +72,7 @@ export const useTodo = () => {
 //                                   PROVIDER START                                    
 // ====================================================================================
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
-    const { refreshUser } = useAuthContext();
+    const { token, user, loading: authLoading, refreshUser } = useAuthContext();
 
     // =================================================================================================
     //                                       REACT STATES
@@ -111,6 +111,11 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     //                                      FETCH TASKS FROM BACKEND
     // =================================================================================================
     const fetchTasks = async () => {
+        if (!token) {
+            setTasks([]);
+            return;
+        }
+
         try {
             setLoading(true);
             const data = await getAllTasks();
@@ -126,8 +131,15 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
+        if (authLoading) return;
+
+        if (!token || !user) {
+            setTasks([]);
+            return;
+        }
+
         fetchTasks();
-    }, []);
+    }, [authLoading, token, user?._id]);
 
     // =================================================================================================
     //                                   FILTERING LOGIC

@@ -14,6 +14,37 @@ const {
     isYesterday
 } = require("../utils/helpers.js");
 
+function buildStatusTimestampUpdates(existingTask, nextStatus, now = new Date()) {
+    if (!nextStatus || nextStatus === existingTask.status) {
+        return {};
+    }
+
+    if (nextStatus === "completed") {
+        return {
+            completedAt: now,
+            failedAt: null,
+            isExpired: false
+        };
+    }
+
+    if (nextStatus === "failed") {
+        return {
+            completedAt: null,
+            failedAt: now
+        };
+    }
+
+    if (nextStatus === "pending") {
+        return {
+            completedAt: null,
+            failedAt: null,
+            isExpired: false
+        };
+    }
+
+    return {};
+}
+
 // --------------------------- CREATE NEW TASK ---------------------------
 exports.createTask = async (req, res) => {
     try {
@@ -113,6 +144,10 @@ exports.updateTask = async (req, res) => {
         const { id } = req.params;
         const { title, description, category, containerColor, status, deadline } = req.body;
 
+        const existing = await Task.findOne({ _id: id, userId: req.user._id });
+
+        if (!existing) return res.status(404).json({ message: "Task Not Found" });
+
         const updates = {
             title,
             description,
@@ -122,6 +157,8 @@ exports.updateTask = async (req, res) => {
             category: validCategories.includes(category) ? category : undefined
         }
 
+        Object.assign(updates, buildStatusTimestampUpdates(existing, status));
+
         // Remove undefined fields
         Object.keys(updates).forEach(key => updates[key] === undefined && delete updates[key])
 
@@ -130,8 +167,6 @@ exports.updateTask = async (req, res) => {
             updates,
             { new: true }
         )
-
-        if (!updated) return res.status(404).json({ message: "Task Not Found" });
 
         res.json({ message: "Task Updated", task: updated });
     } catch (err) {
@@ -196,6 +231,9 @@ exports.markComplete = async (req, res) => {
 
         // Mark completed
         existing.status = "completed";
+        existing.completedAt = new Date();
+        existing.failedAt = null;
+        existing.isExpired = false;
         await existing.save();
 
         // ---------------- STATS: increment totalTasksCompleted ----------------

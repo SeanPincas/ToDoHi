@@ -6,9 +6,9 @@ import { repeatTaskApi } from "../../../api/taskApi";
 import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
 
-import "./RepeatConfirmModal.css";
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
+import "./RepeatConfirmModal.css";
 
 // ------------------------------ TYPES ------------------------------
 type RepeatConfirmMode = "repeatAll" | "confirmSelected";
@@ -43,7 +43,9 @@ const RepeatConfirmModal: React.FC = () => {
 
     const message = isRepeatAll
         ? "This will create fresh active copies of all completed and failed tasks in the review list.\n\nSource items will move out of the active list after processing."
-        : "This will create fresh active copies of the selected tasks only.\n\nUnselected failed tasks will move to Failed Task Archive instead of being deleted immediately.";
+        : "This will create fresh active copies of the selected tasks only.";
+
+    const archiveNote = "Rest Assured. Tasks you don’t reuse today will be moved to the archive for up to 30 days.";
 
     // ------------------ HANDLERS ------------------
     /* Cancel returns user back to RepeatTaskModal. We DO NOT close everything */
@@ -79,45 +81,61 @@ const RepeatConfirmModal: React.FC = () => {
         <div
             style={modalOverlayStyle}
             className="repeat-confirm-overlay"
+            onMouseDown={handleCancel}
         >
             <div
-                className="modal-card-base repeat-confirm-card task-management-modal"
+                className="modal-card-base repeat-confirm-card task-management-modal paper-sheet-lines"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ================= HEADER ================= */}
                 <div className="repeat-confirm-header task-management-modal-header">
-                    <div className="task-management-modal-title-group">
+                    <div className="task-management-modal-title-group repeat-confirm-title-group">
                         <Icons.Warning />
                         <h3>{title}</h3>
                     </div>
+                    <button
+                        type="button"
+                        className="icon-btn-square repeat-confirm-close-btn"
+                        onClick={handleCancel}
+                        aria-label="Close repeat confirm modal"
+                    >
+                        <Icons.Close />
+                    </button>
                 </div>
 
                 {/* ================= MESSAGE ================= */}
-                <p className="repeat-confirm-message task-management-modal-subtitle">
-                    {message.split("\n").map((line, idx) => (
-                        <span key={idx}>
-                            {line}
-                            <br />
-                        </span>
-                    ))}
-                </p>
+                <div className="repeat-confirm-copy-block">
+                    <p className="repeat-confirm-message task-management-modal-subtitle">
+                        {message.split("\n").map((line, idx) => (
+                            <span key={idx}>
+                                {line}
+                                <br />
+                            </span>
+                        ))}
+                    </p>
+                    <p className="repeat-confirm-archive-note">
+                        {archiveNote}
+                    </p>
+                </div>
 
                 {/* ================= ACTIONS ================= */}
                 <div className="repeat-confirm-actions">
                     <button
-                        className="btn-secondary-rect"
+                        className="repeat-confirm-action-btn repeat-confirm-action-btn-cancel"
                         onClick={handleCancel}
                         disabled={loading}
                     >
-                        Cancel
+                        <Icons.Close />
+                        <span>Cancel</span>
                     </button>
 
                     <button
-                        className="btn-primary-rect"
+                        className="repeat-confirm-action-btn repeat-confirm-action-btn-confirm"
                         onClick={handleConfirm}
                         disabled={loading}
                     >
-                        {loading ? "Processing..." : "Yes, Continue"}
+                        <Icons.Repeat />
+                        <span>{loading ? "Processing..." : "Yes, Continue"}</span>
                     </button>
                 </div>
             </div>

@@ -8,49 +8,74 @@
 .sidebar {
     --rail-width: var(--sidebar-rail-size, clamp(46px, 3.2vw, 58px));
     --panel-width: clamp(220px, 18vw, 264px);
+    --sidebar-tab-top-bg: #D9A84E;
+    --sidebar-tab-top-border: #9A6A24;
+    --sidebar-tab-top-hover: #E8BF68;
+    --sidebar-tab-top-text: #5A3A12;
+    --sidebar-tab-bottom-bg: #E6C982;
+    --sidebar-tab-bottom-border: #A77A2E;
+    --sidebar-tab-bottom-hover: #F0D894;
+    --sidebar-tab-bottom-text: #5A3A12;
     position: absolute;
     top: calc(var(--book-shell-pad, 12px) + clamp(24px, 2.2vw, 36px));
+    bottom: calc(var(--book-shell-pad, 12px) + clamp(16px, 1.8vw, 24px));
     /* Constrained anchor: right edge aligns to page edge (no page overlap) */
     left: calc(var(--book-shell-pad, 12px) - var(--rail-width));
-    height: auto;
     width: var(--rail-width);
 
     box-sizing: border-box;
 
-    display: flex;
+    display: block;
     z-index: 30;
     overflow: visible;
     transition: none;
 }
 
 .sidebar-tab {
+    --sidebar-tab-bg: var(--sidebar-tab-top-bg);
+    --sidebar-tab-border: var(--sidebar-tab-top-border);
+    --sidebar-tab-hover: var(--sidebar-tab-top-hover);
+    --sidebar-tab-text: var(--sidebar-tab-top-text);
     width: var(--rail-width);
-    height: auto;
     box-sizing: border-box;
     padding: 10px 6px;
-    border: 1px solid #a77a2f;
-    border-right-color: #c6a163;
+    border: 1px solid var(--sidebar-tab-border);
+    border-right-color: color-mix(in srgb, var(--sidebar-tab-bg) 72%, #fff 28%);
     border-top-left-radius: 14px;
     border-bottom-left-radius: 14px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    background: linear-gradient(180deg, #f0c978 0%, #dfad57 55%, #cf953f 100%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--sidebar-tab-bg) 86%, #fff 14%) 0%,
+        var(--sidebar-tab-bg) 58%,
+        color-mix(in srgb, var(--sidebar-tab-bg) 88%, #8d6221 12%) 100%
+    );
     display: flex;
     flex-direction: column;
     gap: 8px;
-    box-shadow: 6px 2px 14px rgba(111, 78, 22, 0.28);
-    position: relative;
+    box-shadow: 6px 2px 14px rgba(111, 78, 22, 0.22);
+    position: absolute;
 }
 
+.sidebar-tab-top {
+    top: 0;
+}
+
+.sidebar-tab-bottom-group {
+    --sidebar-tab-bg: var(--sidebar-tab-bottom-bg);
+    --sidebar-tab-border: var(--sidebar-tab-bottom-border);
+    --sidebar-tab-hover: var(--sidebar-tab-bottom-hover);
+    --sidebar-tab-text: var(--sidebar-tab-bottom-text);
+    bottom: 0;
+}
 
 .sidebar.collapsed {
     width: var(--rail-width);
-    height: auto;
 }
 
 .sidebar.open {
     width: var(--rail-width);
-    height: auto;
 }
 
 .sidebar.open .sidebar-tab {
@@ -62,9 +87,13 @@
     width: 34px;
     align-self: center;
     padding: 0;
-    border: 1px solid rgba(159, 114, 40, 0.45);
-    background: linear-gradient(180deg, rgba(255, 246, 213, 0.9), rgba(244, 221, 168, 0.88));
-    color: #7b4e1e;
+    border: 1px solid color-mix(in srgb, var(--sidebar-tab-border) 64%, #fff 36%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--sidebar-tab-bg) 34%, #fff 66%),
+        color-mix(in srgb, var(--sidebar-tab-bg) 56%, #fff 44%)
+    );
+    color: var(--sidebar-tab-text);
     border-radius: 10px;
     cursor: pointer;
     display: inline-flex;
@@ -81,7 +110,11 @@
 }
 
 .sidebar-rail-btn:hover {
-    background: linear-gradient(180deg, rgba(255, 250, 227, 0.94), rgba(246, 228, 181, 0.92));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--sidebar-tab-hover) 42%, #fff 58%),
+        color-mix(in srgb, var(--sidebar-tab-hover) 68%, #fff 32%)
+    );
     transform: translateY(-1px);
     box-shadow: var(--button-shadow-hover, 0 2px 6px rgba(95, 66, 18, 0.2));
 }
@@ -92,8 +125,12 @@
     flex-shrink: 0;
 }
 
-.sidebar-rail-btn-bottom {
-    margin-top: 0;
+.sidebar-rail-btn-logout {
+    color: var(--red-accent);
+}
+
+.sidebar-rail-btn-logout svg {
+    color: var(--red-accent);
 }
 
 .sidebar-rail-toggle {
@@ -556,6 +593,7 @@
         --panel-width: min(90vw, 286px);
         left: calc(var(--book-shell-pad, 8px) - var(--rail-width));
         top: calc(var(--book-shell-pad, 8px) + 10px);
+        bottom: calc(var(--book-shell-pad, 8px) + 10px);
     }
 
     .sidebar-rail-btn {

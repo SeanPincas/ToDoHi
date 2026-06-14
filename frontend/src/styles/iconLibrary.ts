@@ -51,7 +51,8 @@ import {
     PiBatteryFullDuotone,
     PiHandWaving,
     PiPower,
-    PiShapes
+    PiShapes,
+    PiArchiveDuotone
 } from "react-icons/pi";
 
 // ============================================================================
@@ -121,5 +122,6 @@ export const Icons = {
     List: PiList,
     HandWaving: PiHandWaving,
     Off: PiPower,
-    Shapes: PiShapes
+    Shapes: PiShapes,
+    Archive: PiArchiveDuotone
 };

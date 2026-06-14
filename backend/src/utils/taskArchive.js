@@ -63,6 +63,8 @@ function buildArchiveRecord(task, options = {}) {
         description: task.description ?? "",
         category: task.category ?? "others",
         status: task.status,
+        completedAt: task.completedAt ?? null,
+        failedAt: task.failedAt ?? null,
         createdAt: task.createdAt ?? new Date(),
         deadline: task.deadline ?? null,
         orderIndex: task.orderIndex ?? 0,
