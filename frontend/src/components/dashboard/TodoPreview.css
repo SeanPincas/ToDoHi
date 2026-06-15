@@ -460,13 +460,13 @@
 .todo-list-add-btn.btn-primary-rect:not(.todo-list-mode-btn) {
     background: #7FAF7A;
     border-color: #4F7F4C;
-    color: #FFFFFF;
+    color: var(--text-main);
 }
 
 .todo-list-add-btn.btn-primary-rect:not(.todo-list-mode-btn):hover {
     background: #6B9E68;
     border-color: #4F7F4C;
-    color: #FFFFFF;
+    color: var(--text-main);
 }
 
 .todo-list-mode-btn {

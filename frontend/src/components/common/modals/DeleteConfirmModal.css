@@ -1,83 +1,100 @@
-/* ============================================================================
-   DeleteConfirmModal.css
-
-   PURPOSE:
-   - Style the delete confirmation modal
-   - Match existing modal look & feel
-   - Emphasize "danger" action without being noisy
-   ============================================================================ */
-
-
-/* ---------------- OVERLAY ---------------- */
-/* Uses shared modalOverlayStyle for layout.
-   We only reinforce stacking here. */
 .delete-confirm-overlay {
-    z-index: 9999; /* Must be above sidebar + other modals */
+    z-index: 999;
 }
 
-
-/* ---------------- CARD ---------------- */
-/* The base shape comes from modal-card-base.
-   These styles refine spacing and alignment. */
 .delete-confirm-card {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 9px;
+    width: min(94vw, 520px);
+    max-width: 94vw;
+    padding: 22px 22px 20px;
 }
 
-
-/* ---------------- HEADER ---------------- */
-/* Icon + title aligned horizontally */
-.delete-confirm-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.delete-confirm-card.task-management-modal.paper-sheet-lines {
+    --page-line-gap: 28px;
+    --page-line-color: rgba(107, 126, 145, 0.34);
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.02) 24%),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent calc(var(--page-line-gap) - 1px),
+            var(--page-line-color) calc(var(--page-line-gap) - 1px),
+            var(--page-line-color) var(--page-line-gap)
+        );
+    background-size: 100% 100%, 100% var(--page-line-gap);
+    background-position: top left, top left;
+    background-color: var(--paper-bg);
+    background-repeat: no-repeat, repeat;
 }
 
-/* Warning icon should stand out, but not scream */
+.delete-confirm-title-group {
+    padding-top: 0;
+}
+
 .warning-icon {
-    color: var(--danger, #e74c3c);
-    font-size: 22px;
-    flex-shrink: 0;
+    color: var(--red-accent);
 }
 
-/* Title styling consistent with other modals */
-.delete-confirm-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-
-/* ---------------- MESSAGE ---------------- */
-/* Main explanatory text */
-.delete-confirm-message {
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--text-main, #333);
-    margin: 0;
-}
-
-/* Emphasize irreversible action */
-.delete-confirm-message strong {
-    color: var(--danger, #e74c3c);
-    font-weight: 600;
-}
-
-
-/* ---------------- ACTION BUTTONS ---------------- */
-/* Right-aligned buttons, consistent with other modals */
-.delete-confirm-actions {
+.delete-confirm-copy-block {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 8px 12px 7px;
+    border: 1.5px solid color-mix(in srgb, var(--paper-attach-border) 86%, #fff 14%);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--paper-bg) 84%, #fff 16%);
+    box-shadow:
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
 }
 
+.delete-confirm-message {
+    margin: 0;
+    text-align: center;
+}
 
-/* ---------------- BUTTON SAFETY ---------------- */
-/* Prevent weird hover/click states while loading */
-.delete-confirm-actions button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.delete-confirm-note {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--red-accent);
+    font-family: var(--font-heading);
+}
+
+.delete-confirm-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 2px;
+}
+
+.delete-confirm-action-btn {
+    min-height: 48px;
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    line-height: 1.05;
+}
+
+.delete-confirm-action-btn span {
+    transform: translateY(1px);
+}
+
+@media (max-width: 640px) {
+    .delete-confirm-card {
+        width: min(94vw, 94vw);
+        padding: 20px 18px 18px;
+    }
+
+    .delete-confirm-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .delete-confirm-action-btn {
+        min-height: 44px;
+    }
 }

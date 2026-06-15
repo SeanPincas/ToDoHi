@@ -1,0 +1,89 @@
+.profile-picture-crop-modal {
+    width: min(560px, 94vw);
+    max-width: 94vw;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
+        var(--paper-bg);
+}
+
+.profile-picture-crop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.profile-picture-crop-header h3 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+}
+
+.profile-picture-crop-subtitle {
+    margin: 0 0 12px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--text-main) 86%, #756a5b 14%);
+}
+
+.profile-picture-crop-viewport {
+    position: relative;
+    width: min(220px, 62vw);
+    aspect-ratio: 1;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 2px solid var(--paper-attach-border, #c8bba4);
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.92), rgba(238, 232, 219, 0.88));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side);
+    touch-action: none;
+    cursor: grab;
+}
+
+.profile-picture-crop-viewport.dragging {
+    cursor: grabbing;
+}
+
+.profile-picture-crop-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+    user-select: none;
+    pointer-events: none;
+}
+
+.profile-picture-crop-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.profile-picture-crop-controls label {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+}
+
+.profile-picture-crop-controls input[type="range"] {
+    width: 100%;
+    accent-color: var(--btn-primary, #7ea5d8);
+}
+
+.profile-picture-crop-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+@media (max-width: 640px) {
+    .profile-picture-crop-actions {
+        grid-template-columns: 1fr;
+    }
+}

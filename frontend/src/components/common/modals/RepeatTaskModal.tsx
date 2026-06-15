@@ -174,7 +174,7 @@ const RepeatTaskModal: React.FC = () => {
                     </div>
                     <button
                         type="button"
-                        className="icon-btn-square repeat-modal-close-btn"
+                        className="icon-btn-square task-management-modal-close-btn"
                         onClick={handleDismiss}
                         aria-label="Close review task modal"
                     >

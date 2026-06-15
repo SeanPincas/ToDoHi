@@ -51,18 +51,6 @@
     margin: 0;
 }
 
-.repeat-confirm-close-btn {
-    align-self: flex-start;
-}
-
-.repeat-confirm-close-btn:hover,
-.repeat-confirm-close-btn:focus-visible,
-.repeat-confirm-close-btn:active {
-    color: color-mix(in srgb, var(--btn-danger) 82%, #84281f 18%);
-    border-color: color-mix(in srgb, var(--btn-danger) 48%, #fff 52%);
-    background: color-mix(in srgb, var(--btn-danger) 16%, var(--paper-bg) 84%);
-}
-
 .repeat-confirm-copy-block {
     display: flex;
     flex-direction: column;

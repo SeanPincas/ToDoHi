@@ -13,6 +13,7 @@ import {
 } from "../api/taskApi";
 
 export type YesterdayPreviewStatus = "hide" | "all" | "completed" | "failed";
+export const REPEAT_REVIEW_REFRESH_EVENT = "todohi:repeat-review-refresh";
 
 export interface FailedYesterdayItem {
     _id: string;
