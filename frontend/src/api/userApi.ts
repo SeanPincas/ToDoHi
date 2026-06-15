@@ -23,6 +23,8 @@ export const updateUserPreferences = async (data: {
     resetHour?: number;
     dayTaskDelete?: 3 | 7 | 15 | 30;
     theme?: "light" | "dark";
+    bookmarkStyle?: string;
+    wallpaperStyle?: string;
     quoteCategory?: string[];
 }) => {
     const res = await axios.patch(
@@ -30,5 +32,44 @@ export const updateUserPreferences = async (data: {
         data,
         authHeaders()
     );
+    return res.data;
+};
+
+export const updateUserProfile = async (data: { username: string }) => {
+    const res = await axios.patch(
+        `${USER_API_URL}/profile`,
+        data,
+        authHeaders()
+    );
+    return res.data;
+};
+
+export const changeUserPassword = async (data: {
+    currentPassword: string;
+    newPassword: string;
+}) => {
+    const res = await axios.patch(
+        `${USER_API_URL}/change-password`,
+        data,
+        authHeaders()
+    );
+    return res.data;
+};
+
+export const uploadUserProfilePicture = async (file: File) => {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+
+    const res = await axios.patch(
+        `${USER_API_URL}/upload-profile`,
+        formData,
+        {
+            headers: {
+                ...authHeaders().headers,
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+
     return res.data;
 };

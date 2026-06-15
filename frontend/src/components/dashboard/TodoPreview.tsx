@@ -34,6 +34,7 @@ import { SegmentedSwitch } from "../common/switch/SegmentedSwitch";
 import bougainvilleaImage from "../../assets/bougainvillea.webp";
 import {
     getYesterdayTasksPreview,
+    REPEAT_REVIEW_REFRESH_EVENT,
     type YesterdayPreviewStatus,
     type YesterdayPreviewTask,
 } from "../../utils/repeatReview";
@@ -185,7 +186,16 @@ const TodoPreview: React.FC = () => {
             }
         };
 
+        const handleRepeatReviewRefresh = () => {
+            loadYesterdayTasks();
+        };
+
         loadYesterdayTasks();
+        window.addEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
+
+        return () => {
+            window.removeEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
+        };
     }, []);
 
     // =====================================================================

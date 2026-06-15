@@ -1,58 +1,65 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./Sidebar.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Icons } from "../../styles/iconLibrary";
 
-import DropdownMenu from "../common/dropdownMenu/DropdownMenu";
-import type { DropdownOption } from "../common/dropdownMenu/DropdownMenu";
-
-import { QUOTE_CATEGORIES, type QuoteCategory } from "../../utils/quoteUtils";
-import { getFailedTasksYesterdayPreview, type FailedYesterdayItem } from "../../utils/repeatReview";
+import { type QuoteCategory } from "../../utils/quoteUtils";
+import {
+    getFailedTasksYesterdayPreview,
+    REPEAT_REVIEW_REFRESH_EVENT,
+    type FailedYesterdayItem
+} from "../../utils/repeatReview";
 
 import { useAuthContext } from "../../context/AuthContext";
-import { getMe, updateUserPreferences } from "../../api/userApi";
+import { getMe } from "../../api/userApi";
 
 import ThemeToggle from "../common/themeToggle/ThemeToggle";
 import {
-    updateQuotePreferencesApi,
     getRandomQuoteApi,
     getQuotesByCategoryApi,
 } from "../../api/quoteApi";
+import { getBookmarkTheme } from "../../utils/bookmarkStyles";
+import anahawImage from "../../assets/anahaw.webp";
 
-import ResetHourHelpIcon from "../common/icons/ResetHourHelpIcon";
-import ResetHourGuideModal from "../common/modals/ResetHourGuideModal";
 import UserSettingsModal from "../common/modals/UserSettingsModal";
 import { useTodo } from "../../context/TodoContext";
 
-const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map((_, i) => ({
-    value: String(i),
-    label: `${i}:00`,
-}));
-
-const QUOTE_OPTIONS: DropdownOption[] = QUOTE_CATEGORIES.map((cat) => ({
-    value: cat,
-    label: cat,
-}));
+const getProfilePictureSrc = (profilePicture?: string) => {
+    if (!profilePicture) return "/default-profile.webp";
+    if (profilePicture.startsWith("http")) return profilePicture;
+    return `http://localhost:3500${profilePicture}`;
+};
 
 const Sidebar = () => {
     const [open, setOpen] = useState(false);
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
     const [username, setUsername] = useState("Username");
-    const [resetHour, setResetHour] = useState("0");
-    const [quotePref, setQuotePref] = useState<QuoteCategory>("Motivation");
     const [currentQuote, setCurrentQuote] = useState<string>("Loading quote...");
-    const [showResetHourGuide, setShowResetHourGuide] = useState(false);
     const [showUserSettingsModal, setShowUserSettingsModal] = useState(false);
+    const [sidebarMetrics, setSidebarMetrics] = useState<React.CSSProperties>({});
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout, theme, toggleTheme } = useAuthContext();
+    const { logout, theme, toggleTheme, user } = useAuthContext();
     const { openModal } = useTodo();
+    const bookmarkTheme = getBookmarkTheme(user?.preference?.bookmarkStyle);
 
     const [failedTasksYesterday, setFailedTasksYesterday] = useState<FailedYesterdayItem[]>([]);
 
-    const saveTimeout = useRef<number | null>(null);
     const hoverCollapseTimeout = useRef<number | null>(null);
+    const sidebarRef = useRef<HTMLElement | null>(null);
+    const dragStateRef = useRef<{
+        startX: number;
+        startOffset: number;
+        minOffset: number;
+        maxOffset: number;
+    } | null>(null);
+    const dragBoundsRef = useRef({
+        minOffset: -64,
+        maxOffset: 0,
+    });
 
     const toggleSidebar = () => setOpen((prev) => !prev);
     const closeSidebar = () => setOpen(false);
@@ -87,14 +94,9 @@ const Sidebar = () => {
                     setUsername(user.username);
                 }
 
-                if (typeof user?.preference?.resetHour === "number") {
-                    setResetHour(String(user.preference.resetHour));
-                }
-
                 if (Array.isArray(user?.preference?.quoteCategory)) {
                     const preferred = user.preference.quoteCategory[0];
                     const selected = preferred ? preferred : "Random";
-                    setQuotePref(selected as QuoteCategory);
                     fetchQuote(selected as QuoteCategory);
                 }
 
@@ -106,6 +108,16 @@ const Sidebar = () => {
         };
 
         loadUser();
+
+        const handleRepeatReviewRefresh = () => {
+            loadUser();
+        };
+
+        window.addEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
+
+        return () => {
+            window.removeEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
+        };
     }, []);
 
     useEffect(() => {
@@ -124,6 +136,112 @@ const Sidebar = () => {
             clearHoverTimeout();
         };
     }, []);
+
+    const measureSidebarBounds = useCallback(() => {
+        const shell = sidebarRef.current?.closest(".book-shell") as HTMLElement | null;
+        const dashboardContainer = document.querySelector(".dashboard-container") as HTMLElement | null;
+        const notebookSheet = document.querySelector(".notebook-sheet") as HTMLElement | null;
+        const targetSource = dashboardContainer ?? notebookSheet;
+        const railAnchorSource = notebookSheet ?? targetSource;
+
+        if (!shell || !targetSource || !railAnchorSource) return;
+
+        const shellRect = shell.getBoundingClientRect();
+        const targetRect = targetSource.getBoundingClientRect();
+        const railAnchorRect = railAnchorSource.getBoundingClientRect();
+        const computedSidebar = sidebarRef.current ? window.getComputedStyle(sidebarRef.current) : null;
+        const railWidth = computedSidebar ? Number.parseFloat(computedSidebar.getPropertyValue("--rail-width")) || 58 : 58;
+        const railEdgeOverlap = computedSidebar ? Number.parseFloat(computedSidebar.getPropertyValue("--rail-edge-overlap")) || 1 : 1;
+        const panelWidth = computedSidebar ? Number.parseFloat(computedSidebar.getPropertyValue("--panel-width")) || 264 : 264;
+        const topPx = Math.max(0, targetRect.top - shellRect.top);
+        const heightPx = Math.max(0, targetRect.height);
+        const baseLeft = railAnchorRect.left - shellRect.left - railWidth - railEdgeOverlap;
+        const minLeft = targetRect.left - shellRect.left - railWidth - Math.min(Math.max(railWidth * 0.9, 44), railWidth + 18);
+        const maxLeft = Math.max(
+            baseLeft,
+            targetRect.right - shellRect.left - railWidth - panelWidth - 6
+        );
+        const minOffset = minLeft - baseLeft;
+        const maxOffset = maxLeft - baseLeft;
+
+        dragBoundsRef.current = {
+            minOffset,
+            maxOffset,
+        };
+
+        setSidebarMetrics({
+            ["--sidebar-top" as string]: `${topPx}px`,
+            ["--sidebar-height" as string]: `${heightPx}px`,
+            ["--sidebar-base-left" as string]: `${baseLeft}px`,
+            ["--sidebar-min-offset" as string]: `${minOffset}px`,
+            ["--sidebar-max-offset" as string]: `${maxOffset}px`,
+        });
+
+        setDragOffset((currentOffset) => Math.min(maxOffset, Math.max(minOffset, currentOffset)));
+    }, []);
+
+    useEffect(() => {
+        measureSidebarBounds();
+
+        const shell = sidebarRef.current?.closest(".book-shell") as HTMLElement | null;
+        const dashboardContainer = document.querySelector(".dashboard-container") as HTMLElement | null;
+        const notebookSheet = document.querySelector(".notebook-sheet") as HTMLElement | null;
+        const observedNodes = [shell, dashboardContainer, notebookSheet].filter(Boolean) as HTMLElement[];
+
+        if (observedNodes.length === 0) return;
+
+        const resizeObserver = new ResizeObserver(() => {
+            measureSidebarBounds();
+        });
+
+        observedNodes.forEach((node) => resizeObserver.observe(node));
+        window.addEventListener("resize", measureSidebarBounds);
+
+        return () => {
+            resizeObserver.disconnect();
+            window.removeEventListener("resize", measureSidebarBounds);
+        };
+    }, [measureSidebarBounds, location.pathname]);
+
+    useEffect(() => {
+        if (!isDragging) return;
+
+        const handlePointerMove = (event: PointerEvent) => {
+            const dragState = dragStateRef.current;
+            if (!dragState) return;
+
+            const nextOffset = dragState.startOffset + (event.clientX - dragState.startX);
+            setDragOffset(Math.min(dragState.maxOffset, Math.max(dragState.minOffset, nextOffset)));
+        };
+
+        const handlePointerUp = () => {
+            dragStateRef.current = null;
+            setIsDragging(false);
+        };
+
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+
+        return () => {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+        };
+    }, [isDragging]);
+
+    const handleDragStart = (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (event.button !== 0) return;
+
+        dragStateRef.current = {
+            startX: event.clientX,
+            startOffset: dragOffset,
+            minOffset: dragBoundsRef.current.minOffset,
+            maxOffset: dragBoundsRef.current.maxOffset,
+        };
+
+        setIsDragging(true);
+        event.currentTarget.setPointerCapture(event.pointerId);
+        event.preventDefault();
+    };
 
     const fetchQuote = async (category: QuoteCategory) => {
         try {
@@ -144,43 +262,22 @@ const Sidebar = () => {
         }
     };
 
-    const handleResetHourChange = (val: string) => {
-        setResetHour(val);
-
-        if (saveTimeout.current) {
-            clearTimeout(saveTimeout.current);
-        }
-
-        saveTimeout.current = window.setTimeout(() => {
-            updateUserPreferences({
-                resetHour: Number(val),
-            }).catch(console.error);
-        }, 600);
-    };
-
-    const handleQuotePrefChange = (val: string) => {
-        const selected = val as QuoteCategory;
-
-        setQuotePref(selected);
-        fetchQuote(selected);
-
-        if (saveTimeout.current) {
-            clearTimeout(saveTimeout.current);
-        }
-
-        saveTimeout.current = window.setTimeout(async () => {
-            if (selected === "Random") {
-                updateQuotePreferencesApi([]).catch(console.error);
-                return;
-            }
-
-            updateQuotePreferencesApi([selected]).catch(console.error);
-        }, 600);
-    };
-
     return (
         <>
-            <aside className={`sidebar ${open ? "open" : "collapsed"}`}>
+            <aside
+                ref={sidebarRef}
+                className={`sidebar ${open ? "open" : "collapsed"} ${isDragging ? "dragging" : ""}`}
+                style={{
+                    ...sidebarMetrics,
+                    ["--sidebar-drag-offset" as string]: `${dragOffset}px`,
+                }}
+            >
+                <button
+                    type="button"
+                    className="sidebar-drag-handle"
+                    aria-label="Drag sidebar bookmark horizontally"
+                    onPointerDown={handleDragStart}
+                />
                 <div className="sidebar-tab sidebar-tab-top" aria-label="Sidebar quick actions">
                     <button
                         className={`sidebar-rail-btn sidebar-rail-toggle ${hoveredTab === "settings" ? "hover-stretch" : ""}`}
@@ -250,15 +347,59 @@ const Sidebar = () => {
                     </button>
                 </div>
 
-                <div className="sidebar-panel">
+                <div
+                    className="sidebar-panel"
+                    style={{
+                        ["--sidebar-bookmark-image" as string]: `url("${bookmarkTheme.image}")`,
+                        ["--sidebar-bookmark-overlay-top" as string]: bookmarkTheme.overlayTop,
+                        ["--sidebar-bookmark-overlay-bottom" as string]: bookmarkTheme.overlayBottom,
+                        ["--sidebar-bookmark-ink" as string]: bookmarkTheme.ink,
+                        ["--sidebar-bookmark-muted-ink" as string]: bookmarkTheme.mutedInk,
+                        ["--sidebar-bookmark-border" as string]: bookmarkTheme.border,
+                        ["--sidebar-bookmark-surface" as string]: bookmarkTheme.surface,
+                        ["--sidebar-bookmark-surface-hover" as string]: bookmarkTheme.surfaceHover,
+                        ["--sidebar-bookmark-soft-surface" as string]: bookmarkTheme.softSurface,
+                        ["--sidebar-bookmark-surface-ink" as string]: bookmarkTheme.surfaceInk,
+                        ["--sidebar-bookmark-surface-muted-ink" as string]: bookmarkTheme.surfaceMutedInk,
+                        ["--sidebar-bookmark-surface-border" as string]: bookmarkTheme.surfaceBorder,
+                        ["--sidebar-bookmark-divider" as string]: bookmarkTheme.divider,
+                        ["--sidebar-bookmark-burger-icon" as string]: bookmarkTheme.burgerIcon,
+                        ["--sidebar-bookmark-burger-hover" as string]: bookmarkTheme.burgerHover,
+                        ["--sidebar-bookmark-drag-idle" as string]: bookmarkTheme.dragHandleIdle,
+                        ["--sidebar-bookmark-drag-hover" as string]: bookmarkTheme.dragHandleHover,
+                        ["--sidebar-bookmark-guide" as string]: bookmarkTheme.guide,
+                        ["--sidebar-bookmark-guide-hover" as string]: bookmarkTheme.guideHover,
+                        ["--blue-dark" as string]: bookmarkTheme.surfaceBorder,
+                        ["--text-main" as string]: bookmarkTheme.surfaceInk,
+                        ["--white" as string]: bookmarkTheme.surface,
+                        ["--blue-light" as string]: bookmarkTheme.softSurface,
+                        ["--btn-primary-hover" as string]: bookmarkTheme.surfaceHover,
+                        ["--paper-bg" as string]: bookmarkTheme.surface,
+                        ["--guide-accent" as string]: bookmarkTheme.guide,
+                        ["--guide-accent-hover" as string]: bookmarkTheme.guideHover,
+                    }}
+                >
+                    <button
+                        className="sidebar-panel-burger"
+                        onClick={closeSidebar}
+                        aria-label="Collapse sidebar"
+                        title="Collapse sidebar"
+                    >
+                        <Icons.Menu />
+                    </button>
 
                     <div className="sidebar-section logo-section">
+                        <div className="sidebar-logo-wrapper" aria-hidden="true" />
                         <img src="/logo.webp" alt="ToDoHi Logo" className="sidebar-logo" />
-                        <p className="sidebar-quote">"{currentQuote}"</p>
+                        <div className="sidebar-quote-shell">
+                            <p className="sidebar-quote">"{currentQuote}"</p>
+                        </div>
                     </div>
 
+                    <div className="sidebar-divider" aria-hidden="true" />
+
                     <div className="sidebar-section">
-                        <p className="sidebar-panel-section-label">Navigation</p>
+                        <h4 className="section-title">Navigation</h4>
                         <button
                             className="sidebar-btn"
                             onClick={() => {
@@ -279,33 +420,23 @@ const Sidebar = () => {
                         </button>
                     </div>
 
+                    <div className="sidebar-divider" aria-hidden="true" />
+
                     <div className="sidebar-section">
-                        <p className="sidebar-panel-section-label">Settings</p>
-                        <div className="reset-hour-wrapper">
-                            <DropdownMenu
-                                label="Reset Hour"
-                                value={`${resetHour}:00`}
-                                options={RESET_HOUR_OPTIONS}
-                                onChange={handleResetHourChange}
-                                maxHeight={180}
-                            />
-
-                            <div className="reset-hour-help">
-                                <ResetHourHelpIcon onClick={() => setShowResetHourGuide(true)} />
-                            </div>
-                        </div>
-
-                        <DropdownMenu
-                            label="Quote Preferences"
-                            value={quotePref}
-                            options={QUOTE_OPTIONS}
-                            onChange={handleQuotePrefChange}
-                            maxHeight={240}
-                        />
+                        <button
+                            className="sidebar-btn"
+                            onClick={() => {
+                                closeSidebar();
+                                openModal("taskArchive");
+                            }}
+                        >
+                            Task Archive
+                        </button>
                     </div>
 
+                    <div className="sidebar-divider" aria-hidden="true" />
+
                     <div className="sidebar-section failed-section">
-                        <p className="sidebar-panel-section-label">Status</p>
                         <h4 className="section-title">Failed Tasks Yesterday</h4>
                         <div className="failed-task-container">
                             <ul className="failed-task-list">
@@ -320,17 +451,30 @@ const Sidebar = () => {
                     </div>
 
                     <div className="sidebar-bottom">
-                        <div className="profile-row">
-                            <img src="/default-profile.webp" alt="Profile" className="sidebar-profile-pic" />
-                            <p className="profile-name">{username}</p>
+                        <div className="sidebar-account-wrapper">
+                            <button
+                                type="button"
+                                className="profile-row"
+                                onClick={() => setShowUserSettingsModal(true)}
+                                aria-label="Open user settings"
+                            >
+                                <img
+                                    src={getProfilePictureSrc(user?.profilePicture)}
+                                    alt="Profile"
+                                    className="sidebar-profile-pic"
+                                />
+                                <p className="profile-name">{username}</p>
+                                <img src={anahawImage} alt="" className="profile-anahaw-icon" aria-hidden="true" />
+                            </button>
+
+                            <button className="logout-btn" onClick={logout}>
+                                Logout
+                            </button>
                         </div>
 
-                        <button className="logout-btn" onClick={logout}>
-                            Logout
-                        </button>
-
                         <div className="sidebar-footer-row">
-                            <footer className="sidebar-footer">© 2025 ToDoHi</footer>
+                            <footer className="sidebar-footer">� 2025 ToDoHi</footer>
+                            <span className="sidebar-footer-separator" aria-hidden="true">|</span>
                             <div className="sidebar-theme-toggle">
                                 <ThemeToggle theme={theme} onToggle={toggleTheme} />
                             </div>
@@ -338,23 +482,15 @@ const Sidebar = () => {
                     </div>
                 </div>
 
-                <button
-                    className="sidebar-close-notch"
-                    onClick={closeSidebar}
-                    aria-label="Collapse sidebar"
-                    title="Collapse sidebar"
-                >
-                    <Icons.Menu />
-                </button>
             </aside>
 
-            {showResetHourGuide && <ResetHourGuideModal onClose={() => setShowResetHourGuide(false)} />}
             {showUserSettingsModal && <UserSettingsModal onClose={() => setShowUserSettingsModal(false)} />}
         </>
     );
 };
 
 export default Sidebar;
+
 
 
 

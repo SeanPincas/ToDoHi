@@ -7,7 +7,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import { updateMemoLayout } from "../api/memoApi";
 import { useMemoContext } from "../context/MemoContext";
+import { useAuthContext } from "../context/AuthContext";
 import { Icons } from "../styles/iconLibrary";
+import { getWallpaperStyleAsset } from "../utils/wallpaperStyles";
 
 import "./MemoBoardPage.css";
 
@@ -20,6 +22,7 @@ import { computeNewPinPct } from "../utils/memoUtils/memoPosition";
 // ----------------------------------------------------------------------------
 
 const MemoBoardPage: React.FC = () => {
+    const { user } = useAuthContext();
     const {
         memos,
         loading,
@@ -39,6 +42,8 @@ const MemoBoardPage: React.FC = () => {
 
         buildLayoutPayload,
     } = useMemoContext();
+
+    const memoWallpaper = getWallpaperStyleAsset(user?.preference?.wallpaperStyle);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -172,7 +177,12 @@ const MemoBoardPage: React.FC = () => {
     // -------------------------------------------------------------------------
 
     return (
-        <div className="memo-board-page">
+        <div
+            className="memo-board-page"
+            style={{
+                ["--memo-page-wallpaper" as string]: `url("${memoWallpaper}")`,
+            }}
+        >
             <div className="memo-board-frame">
 
                 {/* ======================= HEADER ======================= */}

@@ -1,41 +1,27 @@
-// =====================================================================================================
-//                                             REGISTER PAGE
-// =====================================================================================================
-// Clean + Modern + Aligned With LoginPage Refactor
-// Uses centralized Icons + improved validation flow
-// =====================================================================================================
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-
-// global icon library
+import { useTodo } from "../context/TodoContext";
 import { Icons } from "../styles/iconLibrary";
-
+import "../components/common/modals/modalBaseTheme.css";
+import "../components/common/modals/taskManagementModalTheme.css";
+import "./AuthPages.css";
 import "./RegisterPage.css";
 
-// ------------------------------ COMPONENT START ------------------------------
 const RegisterPage = () => {
-
-    // --------------------------- CONTROLLED INPUTS ---------------------------
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    // For showing backend or validation errors
     const [error, setError] = useState("");
 
     const navigate = useNavigate();
     const { register } = useAuthContext();
+    const { openModal } = useTodo();
 
-    // =======================================================================
-    //                               HANDLE SUBMIT
-    // =======================================================================
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
-        // --------------------- VALIDATION ---------------------
         if (!username.trim() || !email.trim() || !password.trim()) {
             setError("All fields are required.");
             return;
@@ -48,10 +34,7 @@ const RegisterPage = () => {
 
         try {
             await register(username.trim(), email.trim(), password.trim());
-
-            // After registering → go to Login Page
             navigate("/login", { replace: true });
-
         } catch (err: any) {
             setError(
                 err?.response?.data?.message ||
@@ -60,73 +43,80 @@ const RegisterPage = () => {
         }
     };
 
-    // =======================================================================
-    //                                      UI
-    // =======================================================================
     return (
-        <div className="register-page-wrap">
-
-            {/* ---------------------- STICKY NOTE CARD ---------------------- */}
-            <div className="register-card paper-border">
-                <h2 className="register-title">Create Account</h2>
-
-                {/* Error message box */}
-                {error && <div className="register-error">{error}</div>}
-
-                {/* ---------------------- FORM ---------------------- */}
-                <form onSubmit={handleSubmit} className="register-form">
-
-                    {/* USERNAME */}
-                    <label className="register-label">Username</label>
-                    <div className="register-input-wrap">
-                        <Icons.User className="register-input-icon" />
-                        <input
-                            type="text"
-                            className="register-input"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
+        <div className="auth-page register-page-wrap">
+            <div className="auth-book-shell">
+                <div className="auth-cover-content">
+                    <div className="auth-brand">
+                        <img src="/logo.webp" alt="ToDoHi Logo" className="auth-brand-logo" />
                     </div>
+                    <p className="auth-brand-tagline">Your notebook for tasks and planning for steady daily progress.</p>
 
-                    {/* EMAIL */}
-                    <label className="register-label">Email</label>
-                    <div className="register-input-wrap">
-                        <Icons.User className="register-input-icon" />
-                        <input
-                            type="email"
-                            className="register-input"
-                            placeholder="email@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                    <div className="auth-card register-card modal-card-base task-management-modal paper-sheet-lines">
+                        <div className="auth-card-header">
+                            <h2 className="auth-title">Create Account</h2>
+                            <p className="auth-subtitle">Start your notebook with a fresh page and a clear routine.</p>
+                        </div>
+
+                        {error && <div className="auth-error">{error}</div>}
+
+                        <form onSubmit={handleSubmit} className="auth-form">
+                            <label className="auth-label">Username</label>
+                            <div className="auth-input-wrap">
+                                <Icons.User className="auth-input-icon" />
+                                <input
+                                    type="text"
+                                    className="auth-input"
+                                    placeholder="Username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+
+                            <label className="auth-label">Email</label>
+                            <div className="auth-input-wrap">
+                                <Icons.User className="auth-input-icon" />
+                                <input
+                                    type="email"
+                                    className="auth-input"
+                                    placeholder="email@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <label className="auth-label">Password</label>
+                            <div className="auth-input-wrap">
+                                <Icons.Lock className="auth-input-icon" />
+                                <input
+                                    type="password"
+                                    className="auth-input"
+                                    placeholder="8-16 characters"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+
+                            <button type="submit" className="btn-primary auth-submit-btn register-btn">
+                                <Icons.Add className="register-btn-icon" /> Register
+                            </button>
+
+                            <p className="auth-footer register-bottom-text">
+                                Already have an account?{" "}
+                                <Link to="/login" className="auth-footer-link register-link">Login</Link>
+                            </p>
+                            <div className="auth-legal-links">
+                                <button type="button" className="auth-legal-link-btn" onClick={() => openModal("privacyPolicy")}>
+                                    Privacy Policy
+                                </button>
+                                <span className="auth-legal-separator">|</span>
+                                <button type="button" className="auth-legal-link-btn" onClick={() => openModal("termsConditions")}>
+                                    Terms &amp; Conditions
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    {/* PASSWORD */}
-                    <label className="register-label">Password</label>
-                    <div className="register-input-wrap">
-                        <Icons.Lock className="register-input-icon" />
-                        <input
-                            type="password"
-                            className="register-input"
-                            placeholder="8–16 characters"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-
-                    {/* SUBMIT BUTTON */}
-                    <button type="submit" className="register-btn">
-                        <Icons.Add className="register-btn-icon" /> Register
-                    </button>
-
-                    {/* NAVIGATION TEXT */}
-                    <p className="register-bottom-text">
-                        Already have an account?{" "}
-                        <Link to="/login" className="register-link">Login</Link>
-                    </p>
-
-                </form>
+                </div>
             </div>
         </div>
     );

@@ -5,6 +5,7 @@
 
 .memo-board-page {
     --memo-page-pad: clamp(8px, 1.1vw, 18px);
+    --memo-page-wallpaper: url("../assets/wallpaper/wallpaper-1.webp");
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -16,7 +17,7 @@
     box-sizing: border-box;
     background:
         linear-gradient(rgba(247, 242, 232, 0.14), rgba(247, 242, 232, 0.14)),
-        url("../assets/wallpaper.webp");
+        var(--memo-page-wallpaper);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

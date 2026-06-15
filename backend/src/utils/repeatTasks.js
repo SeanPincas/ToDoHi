@@ -70,20 +70,16 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
     });
 
     const archivedAt = new Date();
-    const archiveRecords = oldTasks.map(task => {
-        const wasSelected = repeatIdSet.has(task._id.toString());
-
-        return buildArchiveRecord(task, {
+    const archiveRecords = oldTasks
+        .filter(task => !repeatIdSet.has(task._id.toString()))
+        .map(task => buildArchiveRecord(task, {
             archiveType: task.status,
-            archiveReason: wasSelected ? "repeat-selected-source" : "repeat-unselected",
+            archiveReason: "repeat-unselected",
             sourceCycleKey: cycleKey,
-            repeatedIntoTaskId: wasSelected
-                ? repeatedTaskIdMap.get(task._id.toString()) ?? null
-                : null,
+            repeatedIntoTaskId: null,
             archivedAt,
             userPreference: user.preference
-        });
-    });
+        }));
 
     if (archiveRecords.length > 0) {
         await TaskArchive.insertMany(archiveRecords);

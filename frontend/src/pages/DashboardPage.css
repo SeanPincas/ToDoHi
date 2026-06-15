@@ -271,6 +271,13 @@
     border-bottom: 0;
 }
 
+@media (min-width: 2200px) {
+    .dashboard-header-logo {
+        width: clamp(110px, 9vw, 176px);
+        max-width: 20%;
+    }
+}
+
 @media (max-width: 1400px) {
     .opened-book-spread {
         --book-spine-width: 6px;
