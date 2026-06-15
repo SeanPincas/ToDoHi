@@ -22,8 +22,11 @@
     gap: 7px;
     width: min(94vw, var(--repeat-modal-max-desktop));
     max-width: 94vw;
-    min-height: min(720px, 88vh);
+    height: min(720px, 88vh);
+    max-height: 88vh;
+    min-height: 0;
     padding: 24px 24px 22px;
+    overflow: hidden;
 }
 
 .repeat-modal-card.task-management-modal.paper-sheet-lines {
@@ -363,24 +366,25 @@
    ========================================================================== */
 
 .repeat-task-list-wrapper {
-    /* Prevent modal collapse even if list is empty */
-    min-height: 395px;
-
-    /* Visual separation from description & buttons */
+    flex: 1 1 auto;
+    min-height: 0;
     padding: 2px 2px 2px;
     margin-bottom: 4px;
     box-shadow:
         5px 6px 10px var(--modal-paper-shadow),
         2px 0 6px var(--modal-paper-shadow-side),
         0 1px 0 rgba(255, 255, 255, 0.55) inset;
+    display: flex;
+    overflow: hidden;
 }
 
 .repeat-task-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
-
-    max-height: min(410px, 46vh);
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
     overflow-y: auto;
 }
 
@@ -640,18 +644,6 @@
         0 3px 0 color-mix(in srgb, var(--modal-paper-shadow-ledge) 78%, transparent 22%);
 }
 
-.repeat-modal-close-btn {
-    align-self: flex-start;
-}
-
-.repeat-modal-close-btn:hover,
-.repeat-modal-close-btn:focus-visible,
-.repeat-modal-close-btn:active {
-    color: color-mix(in srgb, var(--btn-danger) 82%, #84281f 18%);
-    border-color: color-mix(in srgb, var(--btn-danger) 48%, #fff 52%);
-    background: color-mix(in srgb, var(--btn-danger) 16%, var(--paper-bg) 84%);
-}
-
 /* ==========================================================================
    RESPONSIVE (MATCH TODO PREVIEW BREAKPOINTS)
    ========================================================================== */
@@ -674,7 +666,8 @@
     .repeat-modal-card {
         width: min(92vw, 740px);
         max-width: 740px;
-        min-height: min(700px, 88vh);
+        height: min(700px, 88vh);
+        max-height: 88vh;
         padding: 22px 22px 20px;
     }
 
@@ -688,20 +681,14 @@
         font-size: 10.5px;
     }
 
-    .repeat-task-list-wrapper {
-        min-height: 360px;
-    }
-
-    .repeat-task-list {
-        max-height: min(380px, 44vh);
-    }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
     .repeat-modal-card {
         width: min(94vw, 700px);
         max-width: 700px;
-        min-height: min(680px, 90vh);
+        height: min(680px, 90vh);
+        max-height: 90vh;
         padding: 20px 18px 18px;
     }
 
@@ -724,14 +711,6 @@
         justify-content: center;
     }
 
-    .repeat-task-list-wrapper {
-        min-height: 340px;
-    }
-
-    .repeat-task-list {
-        max-height: min(360px, 42vh);
-    }
-
     .repeat-task-title {
         max-width: 42%;
     }
@@ -746,7 +725,9 @@
     .repeat-modal-card {
         width: min(96vw, 620px);
         max-width: 96vw;
-        min-height: auto;
+        height: min(92vh, 680px);
+        max-height: 92vh;
+        min-height: 0;
         padding: 18px 16px 18px;
         gap: 6px;
     }
@@ -778,14 +759,6 @@
     .repeat-modal-filters {
         flex-wrap: wrap;
         justify-content: flex-start;
-    }
-
-    .repeat-task-list-wrapper {
-        min-height: 300px;
-    }
-
-    .repeat-task-list {
-        max-height: min(320px, 40vh);
     }
 
     .repeat-task-item {
@@ -871,18 +844,12 @@
         font-size: 10px;
     }
 
-    .repeat-task-list-wrapper {
-        min-height: 272px;
-    }
-
-    .repeat-task-list {
-        max-height: min(292px, 38vh);
-    }
 }
 
 @media (max-width: 360px) {
     .repeat-modal-card {
-        min-height: auto;
+        height: min(94vh, 640px);
+        max-height: 94vh;
         padding: 14px 10px 14px;
     }
 

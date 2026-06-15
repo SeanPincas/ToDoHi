@@ -5,6 +5,7 @@ import { useTodo } from "../../../context/TodoContext";
 import { repeatTaskApi } from "../../../api/taskApi";
 import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
+import { REPEAT_REVIEW_REFRESH_EVENT } from "../../../utils/repeatReview";
 
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
@@ -68,6 +69,7 @@ const RepeatConfirmModal: React.FC = () => {
 
             await fetchTasks();
             await refreshUser();
+            window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
 
             // Close everything after success
             closeModal();
@@ -95,7 +97,7 @@ const RepeatConfirmModal: React.FC = () => {
                     </div>
                     <button
                         type="button"
-                        className="icon-btn-square repeat-confirm-close-btn"
+                        className="icon-btn-square task-management-modal-close-btn"
                         onClick={handleCancel}
                         aria-label="Close repeat confirm modal"
                     >

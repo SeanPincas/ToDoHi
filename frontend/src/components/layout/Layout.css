@@ -2,7 +2,7 @@
 .layout-wrapper {
     --layout-mobile-padding: 6px;
     --layout-tablet-padding: 12px;
-    --layout-desktop-padding: 20px;
+    --layout-desktop-padding: 15px;
     --book-shell-max-sm: 100%;
     --book-shell-max-md: 740px;
     --book-shell-max-lg: 980px;

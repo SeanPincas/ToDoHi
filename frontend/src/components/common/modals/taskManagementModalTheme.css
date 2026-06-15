@@ -1,6 +1,12 @@
 .task-management-modal {
     --paper-attach-border: #c8bba4;
     --paper-attach-border-soft: #d7ccb8;
+    --task-modal-close-hover-text: color-mix(in srgb, var(--red-accent) 82%, #84281f 18%);
+    --task-modal-close-hover-border: color-mix(in srgb, var(--red-accent) 48%, #fff 52%);
+    --task-modal-close-hover-bg: color-mix(in srgb, var(--red-accent) 16%, var(--paper-bg) 84%);
+    --task-modal-close-active-text: color-mix(in srgb, var(--btn-danger-hover) 88%, #6f211b 12%);
+    --task-modal-close-active-border: color-mix(in srgb, var(--btn-danger-hover) 66%, #fff 34%);
+    --task-modal-close-active-bg: color-mix(in srgb, var(--btn-danger-hover) 24%, var(--paper-bg) 76%);
 
     width: min(560px, 92vw);
     max-width: 92vw;
@@ -29,7 +35,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-top: 2px;
+    min-height: 26px;
+    padding-top: 0;
 }
 
 .task-management-modal-title-group svg {
@@ -41,9 +48,30 @@
 
 .task-management-modal-header h3 {
     margin: 0;
+    display: flex;
+    align-items: center;
     font-family: var(--font-heading);
     font-size: 1.35rem;
-    line-height: 1.15;
+    line-height: 1.22;
+    min-height: 24px;
+    padding-top: 2px;
+}
+
+.task-management-modal-close-btn {
+    align-self: flex-start;
+}
+
+.task-management-modal-close-btn:hover,
+.task-management-modal-close-btn:focus-visible {
+    color: var(--task-modal-close-hover-text);
+    border-color: var(--task-modal-close-hover-border);
+    background: var(--task-modal-close-hover-bg);
+}
+
+.task-management-modal-close-btn:active {
+    color: var(--task-modal-close-active-text);
+    border-color: var(--task-modal-close-active-border);
+    background: var(--task-modal-close-active-bg);
 }
 
 .task-management-modal-subtitle {

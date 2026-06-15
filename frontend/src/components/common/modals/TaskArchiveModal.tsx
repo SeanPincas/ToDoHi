@@ -17,6 +17,7 @@ import {
     TASK_CATEGORY_ICON_MAP,
     TASK_COLORS,
     getTaskCategoryIconKey,
+    getTaskStatusIconKey,
     resolveTaskContainerColorToHex,
     safeCategoryLabel,
     safeStatusLabel,
@@ -29,6 +30,8 @@ import "./taskManagementModalTheme.css";
 import "./TaskArchiveModal.css";
 
 type ArchiveStatusTab = "all" | "completed" | "failed";
+type ArchiveDaysLeftSort = "none" | "highToLow" | "lowToHigh";
+type ArchiveSelectionMode = "none" | "repeat" | "delete";
 
 const ARCHIVE_TABS: ArchiveStatusTab[] = ["all", "completed", "failed"];
 
@@ -46,10 +49,14 @@ const TaskArchiveModal: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [busyEntryId, setBusyEntryId] = useState<string | null>(null);
+    const [busyBulkAction, setBusyBulkAction] = useState<"repeat" | "delete" | null>(null);
+    const [selectionMode, setSelectionMode] = useState<ArchiveSelectionMode>("none");
+    const [selectedArchiveIds, setSelectedArchiveIds] = useState<Set<string>>(new Set());
 
     const [activeTab, setActiveTab] = useState<ArchiveStatusTab>("all");
     const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
     const [activeContainerColor, setActiveContainerColor] = useState<"all" | string>("all");
+    const [daysLeftSort, setDaysLeftSort] = useState<ArchiveDaysLeftSort>("none");
 
     const isOpen = modal.isOpen && modal.type === "taskArchive";
     const modalData = modal.type === "taskArchive" ? modal.data ?? {} : {};
@@ -89,8 +96,15 @@ const TaskArchiveModal: React.FC = () => {
         }
     };
 
-    const filteredEntries = useMemo(() => (
-        entries.filter((entry) => {
+    const getDaysLeftValue = (retentionDeleteAt?: string | null) => {
+        if (!retentionDeleteAt) return Number.POSITIVE_INFINITY;
+
+        const diffMs = new Date(retentionDeleteAt).getTime() - Date.now();
+        return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    };
+
+    const filteredEntries = useMemo(() => {
+        const nextEntries = entries.filter((entry) => {
             const statusMatch = activeTab === "all" ? true : entry.archiveType === activeTab;
             const categoryMatch = activeCategory === "all" ? true : entry.category === activeCategory;
             const colorMatch = activeContainerColor === "all"
@@ -98,8 +112,19 @@ const TaskArchiveModal: React.FC = () => {
                 : resolveTaskContainerColorToHex(entry.containerColor) === resolveTaskContainerColorToHex(activeContainerColor);
 
             return statusMatch && categoryMatch && colorMatch;
-        })
-    ), [entries, activeTab, activeCategory, activeContainerColor]);
+        });
+
+        if (daysLeftSort === "none") return nextEntries;
+
+        return [...nextEntries].sort((a, b) => {
+            const aDaysLeft = getDaysLeftValue(a.retentionDeleteAt);
+            const bDaysLeft = getDaysLeftValue(b.retentionDeleteAt);
+
+            return daysLeftSort === "highToLow"
+                ? bDaysLeft - aDaysLeft
+                : aDaysLeft - bDaysLeft;
+        });
+    }, [entries, activeTab, activeCategory, activeContainerColor, daysLeftSort]);
 
     const summary = useMemo(() => ({
         total: entries.length,
@@ -112,8 +137,21 @@ const TaskArchiveModal: React.FC = () => {
         setActiveTab("all");
         setActiveCategory("all");
         setActiveContainerColor("all");
+        setDaysLeftSort("none");
+        setSelectionMode("none");
+        setSelectedArchiveIds(new Set());
         loadArchive();
     }, [isOpen]);
+
+    useEffect(() => {
+        if (selectionMode === "none") return;
+
+        const visibleIds = new Set(filteredEntries.map((entry) => entry._id));
+        setSelectedArchiveIds((prev) => {
+            const next = new Set(Array.from(prev).filter((id) => visibleIds.has(id)));
+            return next.size === prev.size ? prev : next;
+        });
+    }, [filteredEntries, selectionMode]);
 
     const handleClose = () => {
         if (modalData?.returnTo === "repeat" && modalData?.returnContext) {
@@ -129,9 +167,16 @@ const TaskArchiveModal: React.FC = () => {
     const getDaysLeftLabel = (retentionDeleteAt?: string | null) => {
         if (!retentionDeleteAt) return "No expiry";
 
-        const diffMs = new Date(retentionDeleteAt).getTime() - Date.now();
-        const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+        const diffDays = getDaysLeftValue(retentionDeleteAt);
         return `${diffDays} day${diffDays === 1 ? "" : "s"} left`;
+    };
+
+    const handleToggleDaysLeftSort = () => {
+        setDaysLeftSort((prev) => {
+            if (prev === "none") return "highToLow";
+            if (prev === "highToLow") return "lowToHigh";
+            return "none";
+        });
     };
 
     const handleRepeatEntry = async (archiveEntryId: string) => {
@@ -158,6 +203,61 @@ const TaskArchiveModal: React.FC = () => {
         }
     };
 
+    const handleBulkRepeat = async () => {
+        if (selectedArchiveIds.size === 0 || busyBulkAction) return;
+
+        try {
+            setBusyBulkAction("repeat");
+            for (const archiveEntryId of selectedArchiveIds) {
+                await repeatTaskArchiveEntryApi(archiveEntryId);
+            }
+            await Promise.all([fetchTasks(), refreshUser(), loadArchive()]);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed bulk repeating archive entries:", err);
+        } finally {
+            setBusyBulkAction(null);
+            setSelectionMode("none");
+            setSelectedArchiveIds(new Set());
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedArchiveIds.size === 0 || busyBulkAction) return;
+
+        try {
+            setBusyBulkAction("delete");
+            for (const archiveEntryId of selectedArchiveIds) {
+                await deleteTaskArchiveEntryApi(archiveEntryId);
+            }
+            await Promise.all([refreshUser(), loadArchive()]);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed bulk deleting archive entries:", err);
+        } finally {
+            setBusyBulkAction(null);
+            setSelectionMode("none");
+            setSelectedArchiveIds(new Set());
+        }
+    };
+
+    const toggleSelectionMode = (mode: Exclude<ArchiveSelectionMode, "none">) => {
+        setSelectedArchiveIds(new Set());
+        setSelectionMode((prev) => prev === mode ? "none" : mode);
+    };
+
+    const toggleArchiveSelection = (archiveEntryId: string) => {
+        if (selectionMode === "none") return;
+
+        setSelectedArchiveIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(archiveEntryId)) {
+                next.delete(archiveEntryId);
+            } else {
+                next.add(archiveEntryId);
+            }
+            return next;
+        });
+    };
+
     return (
         <div
             style={modalOverlayStyle}
@@ -165,7 +265,7 @@ const TaskArchiveModal: React.FC = () => {
             onMouseDown={handleClose}
         >
             <div
-                className="modal-card-base task-archive-card task-management-modal paper-sheet-lines"
+                className={`modal-card-base task-archive-card task-management-modal paper-sheet-lines ${selectionMode === "repeat" ? "multi-repeat-mode" : ""} ${selectionMode === "delete" ? "multi-delete-mode" : ""}`}
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 <div className="task-archive-header task-management-modal-header">
@@ -175,7 +275,7 @@ const TaskArchiveModal: React.FC = () => {
                     </div>
                     <button
                         type="button"
-                        className="icon-btn-square task-archive-close-btn"
+                        className="icon-btn-square task-management-modal-close-btn"
                         onClick={handleClose}
                         aria-label="Close task archive"
                     >
@@ -266,6 +366,56 @@ const TaskArchiveModal: React.FC = () => {
                             )}
                         />
                     </div>
+
+                    <button
+                        type="button"
+                        className={`icon-btn-square task-archive-sort-btn ${daysLeftSort !== "none" ? "active" : ""}`}
+                        onClick={handleToggleDaysLeftSort}
+                        aria-label={
+                            daysLeftSort === "highToLow"
+                                ? "Days left sorted high to low. Click to sort low to high"
+                                : daysLeftSort === "lowToHigh"
+                                    ? "Days left sorted low to high. Click to clear sorting"
+                                    : "Sort archive tasks by days left"
+                        }
+                        title={
+                            daysLeftSort === "highToLow"
+                                ? "Days left: high to low"
+                                : daysLeftSort === "lowToHigh"
+                                    ? "Days left: low to high"
+                                    : "Days left sort"
+                        }
+                    >
+                        <Icons.Clock />
+                        {daysLeftSort !== "none" && (
+                            <span className={`task-archive-sort-indicator ${daysLeftSort}`}>
+                                <Icons.ArrowUp />
+                            </span>
+                        )}
+                    </button>
+
+                    <div className="task-archive-bulk-actions">
+                        <button
+                            type="button"
+                            className={`icon-btn-square btn-green-rect task-archive-bulk-btn ${selectionMode === "repeat" ? "active" : ""}`}
+                            onClick={() => toggleSelectionMode("repeat")}
+                            disabled={filteredEntries.length === 0 || busyBulkAction !== null}
+                            aria-label={selectionMode === "repeat" ? "Cancel multi-repeat mode" : "Enable multi-repeat mode"}
+                            title={selectionMode === "repeat" ? "Cancel multi-repeat mode" : "Enable multi-repeat mode"}
+                        >
+                            {selectionMode === "repeat" ? <Icons.Close /> : <Icons.Repeat />}
+                        </button>
+                        <button
+                            type="button"
+                            className={`icon-btn-square btn-danger-rect task-archive-bulk-btn task-archive-bulk-delete-btn ${selectionMode === "delete" ? "active" : ""}`}
+                            onClick={() => toggleSelectionMode("delete")}
+                            disabled={filteredEntries.length === 0 || busyBulkAction !== null}
+                            aria-label={selectionMode === "delete" ? "Cancel multi-delete mode" : "Enable multi-delete mode"}
+                            title={selectionMode === "delete" ? "Cancel multi-delete mode" : "Enable multi-delete mode"}
+                        >
+                            {selectionMode === "delete" ? <Icons.Close /> : <Icons.Delete />}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="task-archive-list-wrapper task-management-modal-panel">
@@ -278,6 +428,7 @@ const TaskArchiveModal: React.FC = () => {
 
                         {!loading && !error && filteredEntries.map((entry) => {
                             const CategoryIcon = Icons[getTaskCategoryIconKey(entry.category)];
+                            const StatusIcon = Icons[getTaskStatusIconKey(entry.archiveType)];
                             const archiveAccent = entry.archiveType === "completed"
                                 ? "var(--success-accent)"
                                 : "var(--btn-danger)";
@@ -288,6 +439,19 @@ const TaskArchiveModal: React.FC = () => {
                                     key={entry._id}
                                     className={`task-archive-item ${entry.archiveType}`}
                                 >
+                                    {selectionMode !== "none" && (
+                                        <div
+                                            className="task-archive-select"
+                                            onClick={() => toggleArchiveSelection(entry._id)}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedArchiveIds.has(entry._id)}
+                                                readOnly
+                                            />
+                                        </div>
+                                    )}
+
                                     <div className="task-archive-item-main">
                                         <span className="task-archive-title">{entry.title}</span>
                                         <span
@@ -303,37 +467,64 @@ const TaskArchiveModal: React.FC = () => {
                                             <span className={`task-archive-meta-label task-archive-status-label ${entry.archiveType}`}>
                                                 {safeStatusLabel(entry.archiveType)}
                                             </span>
+                                            <StatusIcon className={`task-archive-meta-icon task-archive-status-icon ${entry.archiveType}`} />
                                             <span className="task-archive-retention-label">
                                                 {getDaysLeftLabel(entry.retentionDeleteAt)}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="task-archive-item-actions">
-                                        <button
-                                            type="button"
-                                            className="btn-green-rect task-archive-action-btn"
-                                            disabled={isBusy}
-                                            onClick={() => handleRepeatEntry(entry._id)}
-                                        >
-                                            <Icons.Repeat />
-                                            <span>{isBusy ? "Working..." : "Repeat"}</span>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
-                                            disabled={isBusy}
-                                            onClick={() => handleDeleteEntry(entry._id)}
-                                        >
-                                            <Icons.Delete />
-                                            <span>Delete</span>
-                                        </button>
-                                    </div>
+                                    {selectionMode === "none" && (
+                                        <div className="task-archive-item-actions">
+                                            <button
+                                                type="button"
+                                                className="btn-green-rect task-archive-action-btn"
+                                                disabled={isBusy}
+                                                onClick={() => handleRepeatEntry(entry._id)}
+                                            >
+                                                <Icons.Repeat />
+                                                <span>{isBusy ? "Working..." : "Repeat"}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
+                                                disabled={isBusy}
+                                                onClick={() => handleDeleteEntry(entry._id)}
+                                            >
+                                                <Icons.Delete />
+                                                <span>Delete</span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
                     </div>
                 </div>
+
+                {selectionMode === "repeat" && (
+                    <button
+                        type="button"
+                        className="btn-green-rect task-archive-mode-action-btn"
+                        disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
+                        onClick={handleBulkRepeat}
+                    >
+                        <Icons.Repeat />
+                        <span>{busyBulkAction === "repeat" ? "Working..." : `Repeat Selected (${selectedArchiveIds.size})`}</span>
+                    </button>
+                )}
+
+                {selectionMode === "delete" && (
+                    <button
+                        type="button"
+                        className="btn-danger-rect task-archive-mode-action-btn task-archive-mode-delete-btn"
+                        disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
+                        onClick={handleBulkDelete}
+                    >
+                        <Icons.Delete />
+                        <span>{busyBulkAction === "delete" ? "Working..." : `Delete Selected (${selectedArchiveIds.size})`}</span>
+                    </button>
+                )}
             </div>
         </div>
     );

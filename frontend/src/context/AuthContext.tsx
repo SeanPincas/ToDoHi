@@ -25,6 +25,8 @@ interface User {
         resetHour: number;
         dayTaskDelete?: 3 | 7 | 15 | 30;
         theme: "light" | "dark";
+        bookmarkStyle?: string;
+        wallpaperStyle?: string;
         quoteCategory?: string[];
     };
 

@@ -3,8 +3,8 @@
 // Purpose:
 // - Handles user actions against TaskArchive records.
 // - Supports repeat-as-new-task and manual archive deletion.
-// - Preserves the rule that archive records remain history, not restored live
-//   task identities.
+// - Archive repeat is consume-and-create: once reused, the archive row is
+//   removed so the archive does not repopulate with the same reusable task.
 // ============================================================================
 
 const Task = require("../models/taskModel");
@@ -36,10 +36,8 @@ async function repeatTaskArchiveEntryForUser({ userId, archiveEntryId }) {
     const taskPayload = buildRepeatedTaskPayload(archiveEntry, userId, deadline);
     const repeatedTask = await Task.create(taskPayload);
 
-    if (!archiveEntry.repeatedIntoTaskId) {
-        archiveEntry.repeatedIntoTaskId = repeatedTask._id;
-        await archiveEntry.save();
-    }
+    const consumedArchiveEntryId = archiveEntry._id;
+    await TaskArchive.deleteOne({ _id: consumedArchiveEntryId, userId });
 
     await User.findByIdAndUpdate(userId, {
         $inc: { "stats.totalTasksCreated": 1 }
@@ -52,7 +50,7 @@ async function repeatTaskArchiveEntryForUser({ userId, archiveEntryId }) {
             message: "Task repeated from archive successfully",
             archiveLabel: DEFAULT_ARCHIVE_LABEL,
             task: repeatedTask,
-            archiveEntryId: archiveEntry._id
+            archiveEntryId: consumedArchiveEntryId
         }
     };
 }

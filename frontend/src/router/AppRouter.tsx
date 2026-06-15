@@ -22,6 +22,7 @@ import DeleteConfirmModal from "../components/common/modals/DeleteConfirmModal";
 import RepeatTaskModal from "../components/common/modals/RepeatTaskModal";
 import RepeatConfirmModal from "../components/common/modals/RepeatConfirmModal";
 import TaskArchiveModal from "../components/common/modals/TaskArchiveModal";
+import LegalDocumentModal from "../components/common/modals/LegalDocumentModal";
 import { MemoProvider } from "../context/MemoContext";
 import AddMemoModal from "../components/memo/AddMemoModal";
 import ViewMemoModal from "../components/memo/ViewMemoModal";
@@ -78,6 +79,7 @@ const AppRouter: React.FC = () => {
                         <RepeatTaskModal />
                         <RepeatConfirmModal />
                         <TaskArchiveModal />
+                        <LegalDocumentModal />
                     </MemoProvider>
                 </TodoProvider>
             </AuthProvider>
