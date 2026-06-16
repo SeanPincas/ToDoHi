@@ -27,6 +27,7 @@ import {
     type TaskCategory,
     type TaskTab,
 } from "../../../utils/taskUtils";
+import { REPEAT_REVIEW_REFRESH_EVENT } from "../../../utils/repeatReview";
 
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
@@ -117,7 +118,10 @@ const RepeatTaskModal: React.FC = () => {
     const handleDeleteAll = () => {
         openModal("deleteConfirm", {
             taskIds: tasks.map(t => t._id),
-            returnContext: modal.data
+            returnContext: modal.data,
+            onAfterDelete: async () => {
+                window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
+            }
         });
         console.log("[RepeatTaskModal] Delete All clicked");
     };

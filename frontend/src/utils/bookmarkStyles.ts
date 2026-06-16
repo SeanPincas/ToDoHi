@@ -24,19 +24,44 @@ export type BookmarkTheme = {
     surfaceMutedInk: string;
     surfaceBorder: string;
     divider: string;
+    headingBorder: string;
     burgerIcon: string;
     burgerHover: string;
     dragHandleIdle: string;
     dragHandleHover: string;
     guide: string;
     guideHover: string;
+    logoHaloInner: string;
+    logoHaloOuter: string;
+    buttonSurface: string;
+    buttonSurfaceHover: string;
+    profileWrapperSurface: string;
+    footerInk: string;
+    toggleBorder: string;
 };
+
+type BookmarkThemeInput = Omit<
+    BookmarkTheme,
+    "image" | "logoHaloInner" | "logoHaloOuter" | "buttonSurface" | "buttonSurfaceHover" | "profileWrapperSurface" | "footerInk" | "toggleBorder"
+> & Partial<
+    Pick<
+        BookmarkTheme,
+        "logoHaloInner" | "logoHaloOuter" | "buttonSurface" | "buttonSurfaceHover" | "profileWrapperSurface" | "footerInk" | "toggleBorder"
+    >
+>;
 
 const createTheme = (
     image: string,
-    theme: Omit<BookmarkTheme, "image">
+    theme: BookmarkThemeInput
 ): BookmarkTheme => ({
     image,
+    logoHaloInner: "rgba(255, 255, 255, 0.98)",
+    logoHaloOuter: "rgba(241, 238, 231, 0.94)",
+    buttonSurface: theme.softSurface,
+    buttonSurfaceHover: theme.surfaceHover,
+    profileWrapperSurface: theme.softSurface,
+    footerInk: theme.mutedInk,
+    toggleBorder: theme.surfaceBorder,
     ...theme,
 });
 
@@ -53,13 +78,19 @@ const darkNavyTheme = (image: string) =>
         surfaceInk: "#17375b",
         surfaceMutedInk: "#49617d",
         surfaceBorder: "#27496b",
-        divider: "#27496b",
-        burgerIcon: "#1f446d",
-        burgerHover: "#153655",
-        dragHandleIdle: "rgba(45, 82, 126, 0.86)",
-        dragHandleHover: "rgba(22, 49, 82, 0.96)",
+        divider: "rgba(255, 250, 241, 0.96)",
+        headingBorder: "#0f2946",
+        burgerIcon: "#163a61",
+        burgerHover: "#0f2946",
+        dragHandleIdle: "rgba(28, 58, 94, 0.92)",
+        dragHandleHover: "rgba(14, 34, 58, 0.98)",
         guide: "rgba(223, 229, 238, 0.86)",
         guideHover: "rgba(247, 250, 255, 0.96)",
+        logoHaloInner: "rgba(246, 251, 255, 0.99)",
+        logoHaloOuter: "rgba(214, 229, 245, 0.95)",
+        buttonSurface: "rgba(244, 250, 255, 0.95)",
+        buttonSurfaceHover: "rgba(219, 234, 247, 0.98)",
+        profileWrapperSurface: "rgba(242, 249, 255, 0.95)",
     });
 
 const airyBlueTheme = (image: string) =>
@@ -76,6 +107,7 @@ const airyBlueTheme = (image: string) =>
         surfaceMutedInk: "#49627f",
         surfaceBorder: "#264a70",
         divider: "#264a70",
+        headingBorder: "#dfeaf7",
         burgerIcon: "#264a70",
         burgerHover: "#173654",
         dragHandleIdle: "rgba(189, 220, 242, 0.88)",
@@ -98,12 +130,17 @@ const forestTheme = (image: string) =>
         surfaceMutedInk: "#486054",
         surfaceBorder: "#285144",
         divider: "#285144",
+        headingBorder: "#d7ead1",
         burgerIcon: "#285144",
         burgerHover: "#1a382d",
-        dragHandleIdle: "rgba(194, 217, 188, 0.88)",
-        dragHandleHover: "rgba(110, 149, 102, 0.96)",
+        dragHandleIdle: "rgba(34, 94, 50, 0.94)",
+        dragHandleHover: "rgba(18, 58, 31, 0.98)",
         guide: "rgba(173, 188, 171, 0.84)",
         guideHover: "rgba(112, 133, 118, 0.94)",
+        logoHaloInner: "rgba(248, 255, 244, 0.99)",
+        logoHaloOuter: "rgba(196, 232, 187, 0.96)",
+        footerInk: "rgba(255, 255, 255, 0.97)",
+        toggleBorder: "#c2e6b8",
     });
 
 const deepRoseTheme = (image: string) =>
@@ -120,6 +157,7 @@ const deepRoseTheme = (image: string) =>
         surfaceMutedInk: "#765766",
         surfaceBorder: "#6d485a",
         divider: "#6d485a",
+        headingBorder: "#f6dcc8",
         burgerIcon: "#6d485a",
         burgerHover: "#563544",
         dragHandleIdle: "rgba(234, 197, 206, 0.88)",
@@ -142,6 +180,7 @@ const sunflowerTheme = (image: string) =>
         surfaceMutedInk: "#75592d",
         surfaceBorder: "#684b1e",
         divider: "#684b1e",
+        headingBorder: "#f1d188",
         burgerIcon: "#684b1e",
         burgerHover: "#4d3614",
         dragHandleIdle: "rgba(239, 221, 168, 0.9)",
@@ -164,6 +203,7 @@ const blossomTheme = (image: string) =>
         surfaceMutedInk: "#826071",
         surfaceBorder: "#775164",
         divider: "#775164",
+        headingBorder: "#f4d5e5",
         burgerIcon: "#775164",
         burgerHover: "#5c3b4d",
         dragHandleIdle: "rgba(236, 206, 223, 0.88)",
@@ -186,6 +226,7 @@ const meadowTheme = (image: string) =>
         surfaceMutedInk: "#616e40",
         surfaceBorder: "#54612b",
         divider: "#54612b",
+        headingBorder: "#ebf0c9",
         burgerIcon: "#54612b",
         burgerHover: "#3f491f",
         dragHandleIdle: "rgba(214, 226, 174, 0.88)",
@@ -208,6 +249,7 @@ const midnightStarTheme = (image: string) =>
         surfaceMutedInk: "#5d6887",
         surfaceBorder: "#3b4d82",
         divider: "#3b4d82",
+        headingBorder: "#f7e7a7",
         burgerIcon: "#3b4d82",
         burgerHover: "#29375f",
         dragHandleIdle: "rgba(206, 216, 248, 0.88)",
@@ -230,6 +272,7 @@ const jewelGlassTheme = (image: string) =>
         surfaceMutedInk: "#586674",
         surfaceBorder: "#35516f",
         divider: "#35516f",
+        headingBorder: "#f0c97d",
         burgerIcon: "#35516f",
         burgerHover: "#243b52",
         dragHandleIdle: "rgba(231, 210, 181, 0.88)",
@@ -252,6 +295,7 @@ const orchardNightTheme = (image: string) =>
         surfaceMutedInk: "#79604a",
         surfaceBorder: "#66462b",
         divider: "#66462b",
+        headingBorder: "#efc787",
         burgerIcon: "#66462b",
         burgerHover: "#4c321e",
         dragHandleIdle: "rgba(206, 225, 204, 0.88)",
@@ -274,6 +318,7 @@ const roseGlassTheme = (image: string) =>
         surfaceMutedInk: "#7d5c70",
         surfaceBorder: "#6b4a62",
         divider: "#6b4a62",
+        headingBorder: "#f2c37b",
         burgerIcon: "#6b4a62",
         burgerHover: "#523549",
         dragHandleIdle: "rgba(234, 210, 226, 0.88)",

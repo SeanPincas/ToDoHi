@@ -270,6 +270,10 @@ const Sidebar = () => {
                 style={{
                     ...sidebarMetrics,
                     ["--sidebar-drag-offset" as string]: `${dragOffset}px`,
+                    ["--sidebar-bookmark-burger-icon" as string]: bookmarkTheme.burgerIcon,
+                    ["--sidebar-bookmark-burger-hover" as string]: bookmarkTheme.burgerHover,
+                    ["--sidebar-bookmark-drag-idle" as string]: bookmarkTheme.dragHandleIdle,
+                    ["--sidebar-bookmark-drag-hover" as string]: bookmarkTheme.dragHandleHover,
                 }}
             >
                 <button
@@ -363,12 +367,16 @@ const Sidebar = () => {
                         ["--sidebar-bookmark-surface-muted-ink" as string]: bookmarkTheme.surfaceMutedInk,
                         ["--sidebar-bookmark-surface-border" as string]: bookmarkTheme.surfaceBorder,
                         ["--sidebar-bookmark-divider" as string]: bookmarkTheme.divider,
-                        ["--sidebar-bookmark-burger-icon" as string]: bookmarkTheme.burgerIcon,
-                        ["--sidebar-bookmark-burger-hover" as string]: bookmarkTheme.burgerHover,
-                        ["--sidebar-bookmark-drag-idle" as string]: bookmarkTheme.dragHandleIdle,
-                        ["--sidebar-bookmark-drag-hover" as string]: bookmarkTheme.dragHandleHover,
+                        ["--sidebar-bookmark-heading-border" as string]: bookmarkTheme.headingBorder,
                         ["--sidebar-bookmark-guide" as string]: bookmarkTheme.guide,
                         ["--sidebar-bookmark-guide-hover" as string]: bookmarkTheme.guideHover,
+                        ["--sidebar-bookmark-logo-halo-inner" as string]: bookmarkTheme.logoHaloInner,
+                        ["--sidebar-bookmark-logo-halo-outer" as string]: bookmarkTheme.logoHaloOuter,
+                        ["--sidebar-bookmark-button-surface" as string]: bookmarkTheme.buttonSurface,
+                        ["--sidebar-bookmark-button-surface-hover" as string]: bookmarkTheme.buttonSurfaceHover,
+                        ["--sidebar-bookmark-profile-surface" as string]: bookmarkTheme.profileWrapperSurface,
+                        ["--sidebar-bookmark-footer-ink" as string]: bookmarkTheme.footerInk,
+                        ["--sidebar-bookmark-toggle-border" as string]: bookmarkTheme.toggleBorder,
                         ["--blue-dark" as string]: bookmarkTheme.surfaceBorder,
                         ["--text-main" as string]: bookmarkTheme.surfaceInk,
                         ["--white" as string]: bookmarkTheme.surface,
@@ -422,7 +430,7 @@ const Sidebar = () => {
 
                     <div className="sidebar-divider" aria-hidden="true" />
 
-                    <div className="sidebar-section">
+                    <div className="sidebar-section sidebar-archive-section">
                         <button
                             className="sidebar-btn"
                             onClick={() => {
@@ -468,6 +476,7 @@ const Sidebar = () => {
                             </button>
 
                             <button className="logout-btn" onClick={logout}>
+                                <Icons.Off />
                                 Logout
                             </button>
                         </div>
