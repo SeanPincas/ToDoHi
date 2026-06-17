@@ -87,6 +87,11 @@ const taskArchiveSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    repeatedAt: {
+        type: Date,
+        default: null,
+        index: true
+    },
     repeatedIntoTaskId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Task",

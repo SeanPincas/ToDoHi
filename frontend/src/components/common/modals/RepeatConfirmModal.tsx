@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import { useAuthContext } from "../../../context/AuthContext";
 import { useTodo } from "../../../context/TodoContext";
-import { repeatTaskApi } from "../../../api/taskApi";
+import { repeatTaskApi, repeatTaskArchiveEntryApi } from "../../../api/taskApi";
 import { modalOverlayStyle } from "../../../styles/modalStyles";
 import { Icons } from "../../../styles/iconLibrary";
-import { REPEAT_REVIEW_REFRESH_EVENT } from "../../../utils/repeatReview";
+import {
+    markTaskReviewCycleHandled,
+    REPEAT_REVIEW_REFRESH_EVENT,
+} from "../../../utils/repeatReview";
 
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
@@ -27,11 +30,13 @@ const RepeatConfirmModal: React.FC = () => {
         mode,
         selectedIds = [],
         allTaskIds = [],
+        reviewSource = "live",
         returnContext,
     } = modal.data as {
         mode: RepeatConfirmMode;
         selectedIds?: string[];
         allTaskIds?: string[];
+        reviewSource?: "live" | "archive";
         returnContext?: any;
     };
 
@@ -63,12 +68,15 @@ const RepeatConfirmModal: React.FC = () => {
 
             const repeatIds = isRepeatAll ? allTaskIds : selectedIds;
 
-            const response = await repeatTaskApi(repeatIds)
+            const response = reviewSource === "archive"
+                ? await Promise.all(repeatIds.map((archiveEntryId) => repeatTaskArchiveEntryApi(archiveEntryId)))
+                : await repeatTaskApi(repeatIds);
 
             console.log("[RepeatConfirmModal] repeatTaskApi response:", response);
 
             await fetchTasks();
             await refreshUser();
+            markTaskReviewCycleHandled(returnContext?.cycleKey);
             window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
 
             // Close everything after success

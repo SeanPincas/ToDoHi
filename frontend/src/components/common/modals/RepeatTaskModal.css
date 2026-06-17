@@ -417,14 +417,15 @@
 }
 
 .repeat-task-checkbox {
-    width: 24px;
-    height: 24px;
-
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    flex-shrink: 0;   /* ❗ prevents overlay / dead zones */
+    flex-shrink: 0;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 /* COMPLETED (GREEN) */
 /* COMPLETED (NEON GREEN) */
@@ -891,3 +892,4 @@
         width: 100%;
     }
 }
+

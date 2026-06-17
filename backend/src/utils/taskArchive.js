@@ -34,9 +34,11 @@ function buildArchiveRecord(task, options = {}) {
         archiveType,
         archiveReason,
         sourceCycleKey = null,
+        repeatedAt = null,
         repeatedIntoTaskId = null,
         archivedAt = new Date(),
         retentionDays,
+        retentionDeleteAt = null,
         userPreference = null
     } = options;
 
@@ -49,6 +51,7 @@ function buildArchiveRecord(task, options = {}) {
     }
 
     const resolvedArchivedAt = new Date(archivedAt);
+    const resolvedRepeatedAt = repeatedAt ? new Date(repeatedAt) : null;
     const resolvedRetentionDays = normalizeArchiveRetentionDays(
         retentionDays ?? userPreference?.dayTaskDelete
     );
@@ -75,8 +78,11 @@ function buildArchiveRecord(task, options = {}) {
         archiveType,
         archiveReason,
         sourceCycleKey,
+        repeatedAt: resolvedRepeatedAt,
         repeatedIntoTaskId,
-        retentionDeleteAt: buildRetentionDeleteAt(resolvedArchivedAt, resolvedRetentionDays)
+        retentionDeleteAt: retentionDeleteAt
+            ? new Date(retentionDeleteAt)
+            : buildRetentionDeleteAt(resolvedArchivedAt, resolvedRetentionDays)
     };
 }
 

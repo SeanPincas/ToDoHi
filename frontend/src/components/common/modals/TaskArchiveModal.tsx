@@ -3,6 +3,7 @@ import { useAuthContext } from "../../../context/AuthContext";
 import { useTodo } from "../../../context/TodoContext";
 import {
     deleteTaskArchiveEntryApi,
+    getRepeatReviewApi,
     getTaskArchiveApi,
     repeatTaskArchiveEntryApi,
     type TaskArchiveEntry,
@@ -23,6 +24,7 @@ import {
     safeStatusLabel,
     type TaskCategory,
 } from "../../../utils/taskUtils";
+import { REPEAT_REVIEW_REFRESH_EVENT } from "../../../utils/repeatReview";
 
 import "../../../styles/buttonStyles.css";
 import "./modalBaseTheme.css";
@@ -32,6 +34,7 @@ import "./TaskArchiveModal.css";
 type ArchiveStatusTab = "all" | "completed" | "failed";
 type ArchiveDaysLeftSort = "none" | "highToLow" | "lowToHigh";
 type ArchiveSelectionMode = "none" | "repeat" | "delete";
+type ArchiveLayoutMode = "list" | "grid";
 
 const ARCHIVE_TABS: ArchiveStatusTab[] = ["all", "completed", "failed"];
 
@@ -57,6 +60,7 @@ const TaskArchiveModal: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState<"all" | TaskCategory>("all");
     const [activeContainerColor, setActiveContainerColor] = useState<"all" | string>("all");
     const [daysLeftSort, setDaysLeftSort] = useState<ArchiveDaysLeftSort>("none");
+    const [layoutMode, setLayoutMode] = useState<ArchiveLayoutMode>("list");
 
     const isOpen = modal.isOpen && modal.type === "taskArchive";
     const modalData = modal.type === "taskArchive" ? modal.data ?? {} : {};
@@ -138,6 +142,7 @@ const TaskArchiveModal: React.FC = () => {
         setActiveCategory("all");
         setActiveContainerColor("all");
         setDaysLeftSort("none");
+        setLayoutMode("list");
         setSelectionMode("none");
         setSelectedArchiveIds(new Set());
         loadArchive();
@@ -162,6 +167,31 @@ const TaskArchiveModal: React.FC = () => {
         closeModal();
     };
 
+    const handleViewEntry = (entry: TaskArchiveEntry) => {
+        openModal("view", {
+            task: {
+                _id: entry._id,
+                userId: entry.userId,
+                title: entry.title,
+                description: entry.description ?? "",
+                category: entry.category,
+                status: entry.archiveType,
+                completedAt: entry.completedAt ?? null,
+                failedAt: entry.failedAt ?? null,
+                repeatedAt: entry.repeatedAt ?? null,
+                createdAt: entry.createdAt,
+                updatedAt: entry.archivedAt,
+                deadline: entry.deadline ?? null,
+                orderIndex: entry.orderIndex ?? 0,
+                isExpired: entry.isExpired,
+                memoId: entry.memoId ?? null,
+                containerColor: entry.containerColor,
+            },
+            returnTo: "taskArchive",
+            returnContext: modal.data,
+        });
+    };
+
     if (!isOpen) return null;
 
     const getDaysLeftLabel = (retentionDeleteAt?: string | null) => {
@@ -179,11 +209,41 @@ const TaskArchiveModal: React.FC = () => {
         });
     };
 
+    const handleToggleLayoutMode = () => {
+        setLayoutMode((prev) => (prev === "list" ? "grid" : "list"));
+    };
+
+    const handleOpenReviewTasksYesterday = async () => {
+        try {
+            const review = await getRepeatReviewApi();
+
+            if (!review.reviewRequired || review.tasks.length === 0) {
+                return;
+            }
+
+            closeModal();
+
+            window.setTimeout(() => {
+                openModal("repeat", {
+                    tasks: review.tasks,
+                    cycleKey: review.cycleKey,
+                    retentionDays: review.retentionDays,
+                    archiveLabel: review.archiveLabel,
+                    reviewSource: review.reviewSource ?? "live",
+                    summary: review.summary,
+                });
+            }, 0);
+        } catch (err) {
+            console.error("[TaskArchiveModal] Failed opening review tasks yesterday:", err);
+        }
+    };
+
     const handleRepeatEntry = async (archiveEntryId: string) => {
         try {
             setBusyEntryId(archiveEntryId);
             await repeatTaskArchiveEntryApi(archiveEntryId);
             await Promise.all([fetchTasks(), refreshUser(), loadArchive()]);
+            window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
         } catch (err) {
             console.error("[TaskArchiveModal] Failed repeating archive entry:", err);
         } finally {
@@ -196,6 +256,7 @@ const TaskArchiveModal: React.FC = () => {
             setBusyEntryId(archiveEntryId);
             await deleteTaskArchiveEntryApi(archiveEntryId);
             await Promise.all([refreshUser(), loadArchive()]);
+            window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
         } catch (err) {
             console.error("[TaskArchiveModal] Failed deleting archive entry:", err);
         } finally {
@@ -212,6 +273,7 @@ const TaskArchiveModal: React.FC = () => {
                 await repeatTaskArchiveEntryApi(archiveEntryId);
             }
             await Promise.all([fetchTasks(), refreshUser(), loadArchive()]);
+            window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
         } catch (err) {
             console.error("[TaskArchiveModal] Failed bulk repeating archive entries:", err);
         } finally {
@@ -230,6 +292,7 @@ const TaskArchiveModal: React.FC = () => {
                 await deleteTaskArchiveEntryApi(archiveEntryId);
             }
             await Promise.all([refreshUser(), loadArchive()]);
+            window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
         } catch (err) {
             console.error("[TaskArchiveModal] Failed bulk deleting archive entries:", err);
         } finally {
@@ -291,6 +354,18 @@ const TaskArchiveModal: React.FC = () => {
                         <span>Total: {summary.total}</span>
                         <span>Completed: {summary.completed}</span>
                         <span>Failed: {summary.failed}</span>
+                    </div>
+                    <div className="task-archive-review-entry">
+                        <button
+                            type="button"
+                            className="btn-secondary-rect task-archive-review-btn"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={handleOpenReviewTasksYesterday}
+                            disabled={loading || busyBulkAction !== null || busyEntryId !== null}
+                        >
+                            <Icons.ListDashes />
+                            <span>Review Tasks Yesterday</span>
+                        </button>
                     </div>
                 </div>
 
@@ -394,6 +469,16 @@ const TaskArchiveModal: React.FC = () => {
                         )}
                     </button>
 
+                    <button
+                        type="button"
+                        className={`icon-btn-square task-archive-layout-btn ${layoutMode === "grid" ? "active" : ""}`}
+                        onClick={handleToggleLayoutMode}
+                        aria-label={layoutMode === "grid" ? "Switch archive layout to list view" : "Switch archive layout to grid view"}
+                        title={layoutMode === "grid" ? "Grid view" : "List view"}
+                    >
+                        {layoutMode === "grid" ? <Icons.Shapes /> : <Icons.Todo />}
+                    </button>
+
                     <div className="task-archive-bulk-actions">
                         <button
                             type="button"
@@ -419,7 +504,7 @@ const TaskArchiveModal: React.FC = () => {
                 </div>
 
                 <div className="task-archive-list-wrapper task-management-modal-panel">
-                    <div className="task-archive-list">
+                    <div className={`task-archive-list ${layoutMode === "grid" ? "grid-layout" : "list-layout"}`}>
                         {loading && <div className="task-archive-empty-state">Loading archive...</div>}
                         {!loading && error && <div className="task-archive-empty-state">{error}</div>}
                         {!loading && !error && filteredEntries.length === 0 && (
@@ -437,12 +522,16 @@ const TaskArchiveModal: React.FC = () => {
                             return (
                                 <div
                                     key={entry._id}
-                                    className={`task-archive-item ${entry.archiveType}`}
+                                    className={`task-archive-item ${entry.archiveType} ${layoutMode === "grid" ? "grid-layout" : "list-layout"}`}
+                                    onClick={() => handleViewEntry(entry)}
                                 >
                                     {selectionMode !== "none" && (
                                         <div
                                             className="task-archive-select"
-                                            onClick={() => toggleArchiveSelection(entry._id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleArchiveSelection(entry._id);
+                                            }}
                                         >
                                             <input
                                                 type="checkbox"
@@ -480,7 +569,10 @@ const TaskArchiveModal: React.FC = () => {
                                                 type="button"
                                                 className="btn-green-rect task-archive-action-btn"
                                                 disabled={isBusy}
-                                                onClick={() => handleRepeatEntry(entry._id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRepeatEntry(entry._id);
+                                                }}
                                             >
                                                 <Icons.Repeat />
                                                 <span>{isBusy ? "Working..." : "Repeat"}</span>
@@ -489,7 +581,10 @@ const TaskArchiveModal: React.FC = () => {
                                                 type="button"
                                                 className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
                                                 disabled={isBusy}
-                                                onClick={() => handleDeleteEntry(entry._id)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteEntry(entry._id);
+                                                }}
                                             >
                                                 <Icons.Delete />
                                                 <span>Delete</span>
@@ -502,29 +597,33 @@ const TaskArchiveModal: React.FC = () => {
                     </div>
                 </div>
 
-                {selectionMode === "repeat" && (
-                    <button
-                        type="button"
-                        className="btn-green-rect task-archive-mode-action-btn"
-                        disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
-                        onClick={handleBulkRepeat}
-                    >
-                        <Icons.Repeat />
-                        <span>{busyBulkAction === "repeat" ? "Working..." : `Repeat Selected (${selectedArchiveIds.size})`}</span>
-                    </button>
-                )}
+                <div className="task-archive-footer-actions">
+                    {selectionMode === "repeat" && (
+                        <button
+                            type="button"
+                            className="btn-green-rect task-archive-mode-action-btn"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
+                            onClick={handleBulkRepeat}
+                        >
+                            <Icons.Repeat />
+                            <span>{busyBulkAction === "repeat" ? "Working..." : `Repeat Selected (${selectedArchiveIds.size})`}</span>
+                        </button>
+                    )}
 
-                {selectionMode === "delete" && (
-                    <button
-                        type="button"
-                        className="btn-danger-rect task-archive-mode-action-btn task-archive-mode-delete-btn"
-                        disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
-                        onClick={handleBulkDelete}
-                    >
-                        <Icons.Delete />
-                        <span>{busyBulkAction === "delete" ? "Working..." : `Delete Selected (${selectedArchiveIds.size})`}</span>
-                    </button>
-                )}
+                    {selectionMode === "delete" && (
+                        <button
+                            type="button"
+                            className="btn-danger-rect task-archive-mode-action-btn task-archive-mode-delete-btn"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            disabled={selectedArchiveIds.size === 0 || busyBulkAction !== null}
+                            onClick={handleBulkDelete}
+                        >
+                            <Icons.Delete />
+                            <span>{busyBulkAction === "delete" ? "Working..." : `Delete Selected (${selectedArchiveIds.size})`}</span>
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

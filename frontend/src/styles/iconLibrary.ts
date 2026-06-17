@@ -9,6 +9,7 @@ import {
     PiCheckCircle,
     PiCircle,
     PiCheckSquare,
+    PiCheckSquareOffset,
     PiCheck,
 
     // ---------------- NAV / MENU ----------------
@@ -23,9 +24,12 @@ import {
     PiUser,
     PiLock,
     PiClockCountdown,
+    PiEye,
+    PiEyeSlash,
 
     // ---------------- PRODUCTIVITY ----------------
     PiListChecks,
+    PiListDashes,
     PiCalendar,
     PiNotebookDuotone,
     PiArrowsClockwise,
@@ -71,6 +75,7 @@ export const Icons = {
     Check: PiCheckCircle,
     Uncheck: PiCircle,
     CheckboxDeleteTick: PiCheckSquare,
+    CheckboxOffset: PiCheckSquareOffset,
     Confirm: PiCheck,
 
     // ---------------- NAVIGATION ----------------
@@ -85,9 +90,12 @@ export const Icons = {
     User: PiUser,
     Lock: PiLock,
     Clock: PiClockCountdown,
+    ShowPassword: PiEye,
+    HidePassword: PiEyeSlash,
 
     // ---------------- PRODUCTIVITY ----------------
     Todo: PiListChecks,
+    ListDashes: PiListDashes,
     Planner: PiCalendar,
     Notebook: PiNotebookDuotone,
     Repeat: PiArrowsClockwise,

@@ -1,6 +1,12 @@
 const Quote = require("../models/quoteModel.js");
 const User = require("../models/userModel.js");
 
+const FALLBACK_QUOTE = {
+    text: "Stay productive today.",
+    author: "ToDoHi",
+    category: "Random"
+};
+
 // --------------------------- GET QUOTES BY CATEGORY ---------------------------
 exports.getQuotesByCategory = async (req, res) => {
     try {
@@ -73,7 +79,7 @@ exports.getRandomQuote = async (req, res) => {
         const count = await Quote.countDocuments(filter);
 
         if (count === 0) {
-            return res.status(404).json({ message: "No quotes found." });
+            return res.json({ quote: FALLBACK_QUOTE });
         }
 
         const random = Math.floor(Math.random() * count);

@@ -92,6 +92,12 @@
     opacity: 0.82;
 }
 
+.task-archive-review-entry {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
 .task-archive-filters {
     display: flex;
     flex-wrap: nowrap;
@@ -105,7 +111,8 @@
     flex-shrink: 0;
 }
 
-.task-archive-sort-btn {
+.task-archive-sort-btn,
+.task-archive-layout-btn {
     position: relative;
     min-width: 30px;
     width: 30px;
@@ -124,7 +131,8 @@
     justify-content: center;
 }
 
-.task-archive-sort-btn.active {
+.task-archive-sort-btn.active,
+.task-archive-layout-btn.active {
     border-color: var(--paper-attach-border);
     background: color-mix(in srgb, var(--paper-bg) 86%, #fff 14%);
     box-shadow:
@@ -132,7 +140,8 @@
         0 0 0 1px color-mix(in srgb, var(--btn-primary) 22%, #fff 78%);
 }
 
-.task-archive-sort-btn svg {
+.task-archive-sort-btn svg,
+.task-archive-layout-btn svg {
     width: 14px;
     height: 14px;
 }
@@ -419,16 +428,29 @@
 }
 
 .task-archive-list-wrapper {
+    position: relative;
+    z-index: 1;
     flex: 1 1 auto;
     min-height: 0;
     padding: 2px;
-    margin-bottom: 2px;
+    margin-bottom: 0;
     box-shadow:
         5px 6px 10px var(--modal-paper-shadow),
         2px 0 6px var(--modal-paper-shadow-side),
         0 1px 0 rgba(255, 255, 255, 0.55) inset;
     display: flex;
     overflow: hidden;
+}
+
+.task-archive-footer-actions {
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
 }
 
 .task-archive-list {
@@ -441,8 +463,64 @@
     overflow-y: auto;
 }
 
+.task-archive-list.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    align-content: start;
+    padding: 2px;
+}
+
 .task-archive-list::-webkit-scrollbar {
     width: 0;
+}
+
+.task-archive-review-btn {
+    align-self: center;
+    position: relative;
+    z-index: 4;
+    min-height: 38px;
+    min-width: 220px;
+    padding: 9px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 10px;
+    border: 1.5px solid color-mix(in srgb, var(--paper-attach-border) 84%, #8d7a5f 16%);
+    background: color-mix(in srgb, var(--paper-bg) 90%, #fff 10%);
+    color: var(--text-main);
+    font-family: var(--font-heading);
+    font-size: 0.98rem;
+    line-height: 1.1;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.58),
+        0 2px 0 rgba(0, 0, 0, 0.08),
+        0 6px 12px rgba(34, 49, 65, 0.1);
+}
+
+.task-archive-review-btn:hover:not(:disabled),
+.task-archive-review-btn:focus-visible {
+    background: color-mix(in srgb, var(--paper-bg) 84%, #fff 16%);
+    border-color: var(--paper-attach-border);
+}
+
+.task-archive-review-btn:disabled {
+    opacity: 0.72;
+}
+
+.task-archive-review-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.task-archive-review-btn span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    line-height: 1;
+    transform: translateY(1px);
 }
 
 .task-archive-empty-state {
@@ -456,6 +534,10 @@
     color: color-mix(in srgb, var(--text-main) 78%, #7d7160 22%);
 }
 
+.task-archive-list.grid-layout .task-archive-empty-state {
+    grid-column: 1 / -1;
+}
+
 .task-archive-item {
     display: flex;
     align-items: center;
@@ -464,6 +546,18 @@
     padding: 5px 8px 5px 6px;
     border-bottom: 1px solid color-mix(in srgb, var(--blue-dark) 12%, transparent 88%);
     background: transparent;
+}
+
+.task-archive-item.grid-layout {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    padding: 8px;
+    border: 1px solid color-mix(in srgb, var(--paper-attach-border) 72%, #fff 28%);
+    border-radius: 10px;
 }
 
 .task-archive-item.completed {
@@ -477,13 +571,22 @@
 }
 
 .task-archive-select {
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     cursor: pointer;
+    touch-action: manipulation;
+}
+
+.task-archive-item.grid-layout .task-archive-select {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 1;
 }
 
 .task-archive-select input[type="checkbox"] {
@@ -507,6 +610,14 @@
     flex: 1;
 }
 
+.task-archive-item.grid-layout .task-archive-item-main {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+    height: 100%;
+}
+
 .task-archive-title {
     font-family: var(--font-heading);
     font-size: 0.92rem;
@@ -519,6 +630,17 @@
     max-width: 34%;
 }
 
+.task-archive-item.grid-layout .task-archive-title {
+    max-width: 100%;
+    padding-top: 12px;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-height: 1.2;
+}
+
 .task-archive-color-line {
     height: 3px;
     min-width: 14px;
@@ -527,6 +649,11 @@
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28) inset;
     flex: 1 1 auto;
     opacity: 0.95;
+}
+
+.task-archive-item.grid-layout .task-archive-color-line {
+    width: 100%;
+    flex: 0 0 auto;
 }
 
 .task-archive-subinfo-right {
@@ -538,6 +665,14 @@
     font-size: 0.7rem;
     opacity: 0.84;
     flex-shrink: 0;
+}
+
+.task-archive-item.grid-layout .task-archive-subinfo-right {
+    margin-top: auto;
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 4px;
 }
 
 .task-archive-meta-label,
@@ -587,6 +722,12 @@
     flex-shrink: 0;
 }
 
+.task-archive-item.grid-layout .task-archive-item-actions {
+    width: 100%;
+    margin-top: 8px;
+    justify-content: stretch;
+}
+
 .task-archive-action-btn {
     min-height: 31px;
     min-width: 86px;
@@ -596,6 +737,15 @@
     font-size: 0.76rem;
     line-height: 1;
     gap: 6px;
+}
+
+.task-archive-item.grid-layout .task-archive-action-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 0.84rem;
 }
 
 .task-archive-action-btn svg {
@@ -612,6 +762,10 @@
     transform: translateY(0.5px);
     font-size: 0.76rem;
     line-height: 1;
+}
+
+.task-archive-item.grid-layout .task-archive-action-btn span {
+    white-space: nowrap;
 }
 
 .task-archive-delete-btn {
