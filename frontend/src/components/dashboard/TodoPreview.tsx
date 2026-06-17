@@ -444,20 +444,27 @@ const TodoPreview: React.FC = () => {
                         strategy={verticalListSortingStrategy}
                     >
                         <div className="todo-list">
-                            {displayTasks.map(task => (
+                            {displayTasks.map(task => {
+                                const isYesterdayTask = (task as YesterdayPreviewTask).previewOrigin === "yesterday";
+                                const renderKey = isYesterdayTask
+                                    ? `${(task as YesterdayPreviewTask).previewSource}:${task._id}`
+                                    : task._id;
+
+                                return (
                                 <SortableTaskItem
-                                    key={task._id}
+                                    key={renderKey}
                                     task={task}
                                     isRearrangeMode={isRearrangeMode}
                                     isDeleteMode={isDeleteMode}
-                                    isReadOnly={Boolean((task as YesterdayPreviewTask).previewOrigin === "yesterday")}
-                                    badgeLabel={(task as YesterdayPreviewTask).previewOrigin === "yesterday" ? "Task Yesterday" : undefined}
+                                    isReadOnly={isYesterdayTask}
+                                    badgeLabel={isYesterdayTask ? "Task Yesterday" : undefined}
                                     selectedToDelete={selectedToDelete}
                                     toggleDeleteSelection={toggleDeleteSelection}
                                     toggleCompletion={toggleCompletion}
                                     onOpenView={() => openViewTask(task)}
                                 />
-                            ))}
+                                );
+                            })}
                         </div>
                     </SortableContext>
                 </DndContext>

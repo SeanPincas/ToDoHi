@@ -31,13 +31,30 @@ async function repeatTaskArchiveEntryForUser({ userId, archiveEntryId }) {
         };
     }
 
+    if (archiveEntry.repeatedAt) {
+        return {
+            ok: false,
+            statusCode: 409,
+            body: { message: "Task Archive entry was already repeated" }
+        };
+    }
+
     const resetHour = user.preference?.resetHour ?? 0;
-    const deadline = computeRepeatDeadline(resetHour, new Date());
+    const repeatedAt = new Date();
+    const deadline = computeRepeatDeadline(resetHour, repeatedAt);
     const taskPayload = buildRepeatedTaskPayload(archiveEntry, userId, deadline);
     const repeatedTask = await Task.create(taskPayload);
 
-    const consumedArchiveEntryId = archiveEntry._id;
-    await TaskArchive.deleteOne({ _id: consumedArchiveEntryId, userId });
+    await TaskArchive.updateOne(
+        { _id: archiveEntry._id, userId },
+        {
+            $set: {
+                repeatedAt,
+                repeatedIntoTaskId: repeatedTask._id,
+                retentionDeleteAt: deadline
+            }
+        }
+    );
 
     await User.findByIdAndUpdate(userId, {
         $inc: { "stats.totalTasksCreated": 1 }
@@ -50,7 +67,7 @@ async function repeatTaskArchiveEntryForUser({ userId, archiveEntryId }) {
             message: "Task repeated from archive successfully",
             archiveLabel: DEFAULT_ARCHIVE_LABEL,
             task: repeatedTask,
-            archiveEntryId: consumedArchiveEntryId
+            archiveEntryId: archiveEntry._id
         }
     };
 }

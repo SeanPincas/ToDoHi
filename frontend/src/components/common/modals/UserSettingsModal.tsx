@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Icons } from "../../../styles/iconLibrary";
 import { modalOverlayStyle } from "../../../styles/modalStyles";
 import {
-    changeUserPassword,
     updateUserPreferences,
     updateUserProfile,
     uploadUserProfilePicture,
@@ -15,6 +14,7 @@ import { BOOKMARK_STYLE_OPTIONS } from "../../../utils/bookmarkStyles";
 import { WALLPAPER_STYLE_OPTIONS } from "../../../utils/wallpaperStyles";
 import ThemeToggle from "../themeToggle/ThemeToggle";
 import ProfilePictureCropModal from "./ProfilePictureCropModal";
+import ChangePasswordModal from "./ChangePasswordModal";
 import "./UserSettingsModal.css";
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
@@ -30,7 +30,7 @@ const RESET_HOUR_OPTIONS: DropdownOption[] = Array.from({ length: 24 }).map((_, 
 
 const QUOTE_OPTIONS: DropdownOption[] = [
     { value: "Random", label: "Random" },
-    ...QUOTE_CATEGORIES.map((category) => ({
+    ...QUOTE_CATEGORIES.filter((category) => category !== "Random").map((category) => ({
         value: category,
         label: category,
     })),
@@ -57,9 +57,6 @@ const UserSettingsModal = ({ onClose }: Props) => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const [username, setUsername] = useState("");
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const [resetHour, setResetHour] = useState("0");
     const [quotePreference, setQuotePreference] = useState<string>("Random");
     const [wallpaperStyle, setWallpaperStyle] = useState("wallpaper-1");
@@ -69,9 +66,9 @@ const UserSettingsModal = ({ onClose }: Props) => {
     const [accountError, setAccountError] = useState("");
     const [preferenceError, setPreferenceError] = useState("");
     const [isSavingUsername, setIsSavingUsername] = useState(false);
-    const [isSavingPassword, setIsSavingPassword] = useState(false);
     const [isSavingPreferences, setIsSavingPreferences] = useState(false);
     const [cropSource, setCropSource] = useState<string | null>(null);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -127,37 +124,6 @@ const UserSettingsModal = ({ onClose }: Props) => {
         }
     };
 
-    const handleChangePassword = async () => {
-        setAccountMessage("");
-        setAccountError("");
-
-        if (!currentPassword || !newPassword || !confirmPassword) {
-            setAccountError("Please complete all password fields.");
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setAccountError("New password and confirm password do not match.");
-            return;
-        }
-
-        setIsSavingPassword(true);
-
-        try {
-            await changeUserPassword({ currentPassword, newPassword });
-            setCurrentPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
-            setAccountMessage("Password updated successfully.");
-        } catch (error) {
-            const message =
-                error instanceof Error ? error.message : "Failed changing password.";
-            setAccountError(message);
-        } finally {
-            setIsSavingPassword(false);
-        }
-    };
-
     const handleSavePreferences = async () => {
         setPreferenceMessage("");
         setPreferenceError("");
@@ -201,7 +167,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
         <>
             <div style={modalOverlayStyle} onClick={onClose}>
                 <div
-                    className="modal-card-base task-management-modal user-settings-modal"
+                    className="modal-card-base task-management-modal paper-sheet-lines user-settings-modal"
                     onClick={(event) => event.stopPropagation()}
                 >
                     <div className="task-management-modal-header user-settings-modal-header">
@@ -284,52 +250,20 @@ const UserSettingsModal = ({ onClose }: Props) => {
                             </div>
 
                             <div className="user-settings-field-block">
-                                <label htmlFor="settings-current-password">Current Password</label>
-                                <input
-                                    id="settings-current-password"
-                                    type="password"
-                                    className="user-settings-input"
-                                    value={currentPassword}
-                                    onChange={(event) => setCurrentPassword(event.target.value)}
-                                    placeholder="Current password"
-                                />
+                                <label>Password</label>
+                                <button
+                                    type="button"
+                                    className="user-settings-primary-btn user-settings-block-btn"
+                                    onClick={() => {
+                                        setAccountError("");
+                                        setAccountMessage("");
+                                        setShowChangePasswordModal(true);
+                                    }}
+                                >
+                                    <Icons.Lock />
+                                    <span>Change Password</span>
+                                </button>
                             </div>
-
-                            <div className="user-settings-password-grid">
-                                <div className="user-settings-field-block">
-                                    <label htmlFor="settings-new-password">New Password</label>
-                                    <input
-                                        id="settings-new-password"
-                                        type="password"
-                                        className="user-settings-input"
-                                        value={newPassword}
-                                        onChange={(event) => setNewPassword(event.target.value)}
-                                        placeholder="New password"
-                                    />
-                                </div>
-
-                                <div className="user-settings-field-block">
-                                    <label htmlFor="settings-confirm-password">Confirm Password</label>
-                                    <input
-                                        id="settings-confirm-password"
-                                        type="password"
-                                        className="user-settings-input"
-                                        value={confirmPassword}
-                                        onChange={(event) => setConfirmPassword(event.target.value)}
-                                        placeholder="Confirm new password"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                type="button"
-                                className="user-settings-primary-btn user-settings-block-btn"
-                                onClick={handleChangePassword}
-                                disabled={isSavingPassword}
-                            >
-                                <Icons.Lock />
-                                <span>{isSavingPassword ? "Saving..." : "Change Password"}</span>
-                            </button>
 
                             {accountError ? (
                                 <p className="user-settings-feedback error">{accountError}</p>
@@ -421,6 +355,16 @@ const UserSettingsModal = ({ onClose }: Props) => {
                     imageSrc={cropSource}
                     onClose={() => setCropSource(null)}
                     onSave={handleSaveProfilePicture}
+                />
+            ) : null}
+
+            {showChangePasswordModal ? (
+                <ChangePasswordModal
+                    onClose={() => setShowChangePasswordModal(false)}
+                    onSuccess={(message) => {
+                        setAccountError("");
+                        setAccountMessage(message);
+                    }}
                 />
             ) : null}
         </>

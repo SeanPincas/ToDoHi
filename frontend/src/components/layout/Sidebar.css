@@ -275,28 +275,36 @@
     position: absolute;
     top: 12px;
     left: 12px;
-    width: 20px;
-    height: 20px;
-    border: 0;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--sidebar-bookmark-surface-border, var(--blue-dark));
+    border-radius: 10px;
     padding: 0;
-    background: transparent;
+    background: color-mix(in srgb, var(--sidebar-bookmark-button-surface, var(--sidebar-bookmark-soft-surface)) 74%, transparent 26%);
     color: var(--sidebar-bookmark-burger-icon, var(--sidebar-bookmark-surface-border, var(--blue-dark)));
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 4;
-    transition: color 0.18s ease, transform 0.18s ease;
+    box-shadow:
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
+    transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
 .sidebar-panel-burger:hover {
     color: var(--sidebar-bookmark-burger-hover, color-mix(in srgb, var(--sidebar-bookmark-surface-border, var(--blue-dark)) 76%, #000 24%));
-    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--sidebar-bookmark-button-surface-hover, var(--sidebar-bookmark-surface-hover)) 78%, transparent 22%);
 }
 
 .sidebar-panel-burger svg {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
+    color: inherit;
+    stroke-width: 1.6;
+    transform: scale(1.04);
 }
 
 .logo-section {
@@ -327,7 +335,7 @@
     min-height: 142px;
 }
 
-.sidebar-logo-wrapper {
+.sidebar-panel .sidebar-logo-wrapper {
     position: absolute;
     top: 26px;
     left: 50%;
@@ -335,17 +343,41 @@
     width: clamp(164px, 74%, 208px);
     height: clamp(58px, 6.6vw, 65px);
     border-radius: 50% 46% 52% 48% / 54% 48% 52% 46%;
-    background: radial-gradient(
-        circle at 38% 34%,
-        rgba(255, 255, 255, 0.98) 0%,
-        rgba(255, 255, 255, 0.95) 56%,
-        rgba(241, 238, 231, 0.94) 100%
-    );
+    border: 1px solid transparent;
+    background:
+        radial-gradient(
+            ellipse at 50% 46%,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 92%, #fff 8%) 0%,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 74%, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 26%) 48%,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 28%, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 72%) 74%,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 90%, var(--sidebar-bookmark-surface-border, var(--blue-dark)) 10%) 100%
+        ) padding-box,
+        linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 38%, var(--sidebar-bookmark-surface-border, var(--blue-dark)) 62%) 0%,
+            color-mix(in srgb, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 70%, var(--sidebar-bookmark-surface-border, var(--blue-dark)) 30%) 100%
+        ) border-box !important;
     box-shadow:
         0 10px 18px rgba(39, 57, 77, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.85);
     z-index: 0;
     pointer-events: none;
+    overflow: hidden;
+}
+
+.sidebar-panel .sidebar-logo-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: clamp(3px, 0.5vw, 5px) clamp(8px, 1.2vw, 12px);
+    border-radius: 50% 46% 52% 48% / 54% 48% 52% 46%;
+    background: radial-gradient(
+        ellipse at 50% 46%,
+        color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 98%, #fff 2%) 0%,
+        var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 56%,
+        color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 84%, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 16%) 80%,
+        color-mix(in srgb, var(--sidebar-bookmark-logo-halo-inner, rgba(255, 255, 255, 0.98)) 70%, var(--sidebar-bookmark-logo-halo-outer, rgba(241, 238, 231, 0.94)) 30%) 100%
+    );
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 .sidebar-logo {
@@ -366,7 +398,7 @@
     padding: 4px 10px;
     border: 1px solid var(--sidebar-bookmark-surface-border, var(--blue-dark));
     border-radius: 999px;
-    background: color-mix(in srgb, var(--sidebar-bookmark-soft-surface, var(--paper-bg)) 82%, transparent 18%);
+    background: color-mix(in srgb, var(--sidebar-bookmark-soft-surface, var(--paper-bg)) 82%, transparent 45%);
     box-shadow:
         4px 5px 10px rgba(39, 57, 77, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
@@ -379,22 +411,15 @@
     color: var(--sidebar-bookmark-surface-ink, var(--text-main));
     text-align: center;
     margin: 0;
-    line-height: 1.2;
+    padding-top: 4px;
+    line-height: 0.8;
 }
 
 .sidebar-divider {
     width: 100%;
     height: 2px;
     margin: 15px 0 15px;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        color-mix(in srgb, var(--sidebar-bookmark-divider, var(--sidebar-bookmark-surface-border, var(--blue-dark))) 34%, #d8c9ad 66%) 12%,
-        color-mix(in srgb, var(--sidebar-bookmark-divider, var(--sidebar-bookmark-surface-border, var(--blue-dark))) 52%, #d8c9ad 48%) 50%,
-        color-mix(in srgb, var(--sidebar-bookmark-divider, var(--sidebar-bookmark-surface-border, var(--blue-dark))) 34%, #d8c9ad 66%) 88%,
-        transparent 100%
-    );
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.28);
+    background: var(--sidebar-bookmark-divider, var(--sidebar-bookmark-surface-border, var(--blue-dark)));
 }
 
 
@@ -405,6 +430,10 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.sidebar-archive-section {
+    padding: 2px 0;
 }
 
 .sidebar-panel-section-label {
@@ -419,10 +448,11 @@
 
 /* ============================ NAV BUTTONS ============================ */
 
-.sidebar-btn {
+.sidebar-panel .sidebar-btn {
     padding: 8px 14px;
     min-height: 36px;
-    background: var(--button-paper-bg, var(--blue-light));
+    background: var(--sidebar-bookmark-button-surface, var(--sidebar-bookmark-soft-surface)) !important;
+    background-image: none !important;
     border: var(--button-border, 1px solid var(--sidebar-bookmark-surface-border, var(--blue-dark)));
     color: var(--sidebar-bookmark-surface-ink, var(--text-main));
     border-radius: 10px;
@@ -438,8 +468,9 @@
     box-shadow: var(--button-shadow, var(--shadow-soft));
 }
 
-.sidebar-btn:hover {
-    background: var(--button-primary-bg, var(--btn-primary-hover));
+.sidebar-panel .sidebar-btn:hover {
+    background: var(--sidebar-bookmark-button-surface-hover, var(--sidebar-bookmark-surface-hover)) !important;
+    background-image: none !important;
     border-color: var(--button-primary-border, var(--blue-dark));
     box-shadow: var(--button-shadow-hover, var(--shadow-soft));
     transform: translateY(-1px);
@@ -459,6 +490,11 @@
     margin-bottom: -5px;
     font-weight: bold;
     color: var(--sidebar-bookmark-ink, var(--blue-dark));
+    text-shadow:
+        -0.8px 0 var(--sidebar-bookmark-heading-border, transparent),
+        0.8px 0 var(--sidebar-bookmark-heading-border, transparent),
+        0 -0.8px var(--sidebar-bookmark-heading-border, transparent),
+        0 0.8px var(--sidebar-bookmark-heading-border, transparent);
 }
 
 .sidebar-section.failed-section {
@@ -517,7 +553,8 @@
     scrollbar-color: rgba(120, 180, 255, 0.55) transparent;
 }
 
-.failed-task-item {
+.failed-task-item,
+.failed-task-empty {
     background: var(--sidebar-bookmark-surface, var(--white));
     border: 2px solid var(--sidebar-bookmark-surface-border, var(--blue-dark));
 
@@ -529,6 +566,14 @@
 
     font-size: 13px;
     font-weight: 600;
+}
+
+.failed-task-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.35;
 }
 
 /* ============================ BOTTOM LOCKED ============================ */
@@ -552,12 +597,8 @@
     gap: 12px;
     padding: 12px;
     border: 1px solid color-mix(in srgb, var(--sidebar-bookmark-surface-border, var(--blue-dark)) 26%, #d8c9ad 74%);
-    border-radius: 14px;
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--sidebar-bookmark-surface, var(--paper-bg)) 95%, #fff 5%),
-        color-mix(in srgb, var(--sidebar-bookmark-surface, var(--paper-bg)) 90%, #eadfc9 10%)
-    );
+    border-radius: 4px;
+    background: var(--sidebar-bookmark-profile-surface, var(--sidebar-bookmark-soft-surface));
     box-shadow:
         5px 6px 10px var(--modal-paper-shadow),
         2px 0 6px var(--modal-paper-shadow-side),
@@ -622,10 +663,14 @@
     color: var(--sheet-bg, var(--text-main));
     padding: 8px 12px;
     min-height: 38px;
-    border-radius: 8px;
+    border-radius: 0;
     border: 1px solid var(--button-danger-border, var(--blue-dark));
     cursor: pointer;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     transition:
         background-color 0.16s ease,
         border-color 0.16s ease,
@@ -634,6 +679,12 @@
     box-shadow: var(--button-shadow, var(--shadow-soft));
     flex-shrink: 0;
     width: 100%;
+}
+
+.logout-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -645,24 +696,23 @@
 /* ============================ FOOTER ============================ */
 
 .sidebar-footer-row {
-    margin-top: 10px;
+    margin-top: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .sidebar-footer {
-    font-size: 12px;
-    color: var(--sidebar-bookmark-muted-ink, var(--blue-dark));
+    font-size: 11px;
+    color: var(--sidebar-bookmark-footer-ink, var(--sidebar-bookmark-muted-ink, var(--blue-dark)));
     opacity: 0.8;
 }
 
 .sidebar-footer-separator {
-    font-size: 12px;
-    line-height: 1;
-    color: var(--sidebar-bookmark-muted-ink, var(--blue-dark));
+    font-size: 11px;
+    color: var(--sidebar-bookmark-footer-ink, var(--sidebar-bookmark-muted-ink, var(--blue-dark)));
     opacity: 0.75;
 }
 
@@ -676,8 +726,14 @@
 .sidebar-theme-toggle .theme-toggle-btn,
 .sidebar-theme-toggle .theme-toggle-btn.light,
 .sidebar-theme-toggle .theme-toggle-btn.dark {
+    width: 30px;
+    height: 30px;
     background: transparent;
-    border-color: var(--sidebar-bookmark-surface-border, var(--blue-dark));
+    border-color: var(--sidebar-bookmark-toggle-border, var(--sidebar-bookmark-surface-border, var(--blue-dark)));
+}
+
+.sidebar-theme-toggle .theme-icon {
+    font-size: 14px;
 }
 
 .sidebar-theme-toggle .theme-toggle-btn:hover {

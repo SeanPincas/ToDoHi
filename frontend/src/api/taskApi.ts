@@ -37,6 +37,7 @@ export interface RepeatReviewResponse {
     cycleKey: string;
     retentionDays: number;
     archiveLabel: string;
+    reviewSource?: "live" | "archive";
     summary: RepeatReviewSummary;
     tasks: Task[];
 }
@@ -61,6 +62,7 @@ export interface TaskArchiveEntry {
     archiveType: "failed" | "completed";
     archiveReason: string;
     sourceCycleKey?: string | null;
+    repeatedAt?: string | null;
     repeatedIntoTaskId?: string | null;
     retentionDeleteAt?: string | null;
 }

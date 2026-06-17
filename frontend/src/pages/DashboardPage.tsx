@@ -9,8 +9,11 @@ import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
 import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
 import { getRepeatReviewApi } from "../api/taskApi";
-
-const TASK_REVIEW_MODAL_SNOOZE_KEY = "todohi_task_review_modal_snoozed_until";
+import {
+    clearExpiredTaskReviewSnooze,
+    getTaskReviewSnoozedUntil,
+    isTaskReviewCycleHandled,
+} from "../utils/repeatReview";
 
 const Dashboard: React.FC = () => {
     const { openModal } = useTodo();
@@ -27,16 +30,12 @@ const Dashboard: React.FC = () => {
 
         const checkRepeatReview = async () => {
             try {
-                const snoozedUntilRaw = localStorage.getItem(TASK_REVIEW_MODAL_SNOOZE_KEY);
-                const snoozedUntil = snoozedUntilRaw ? Number(snoozedUntilRaw) : 0;
+                clearExpiredTaskReviewSnooze();
+                const snoozedUntil = getTaskReviewSnoozedUntil();
 
                 if (Number.isFinite(snoozedUntil) && snoozedUntil > Date.now()) {
                     setRepeatChecked(true);
                     return;
-                }
-
-                if (snoozedUntilRaw && (!Number.isFinite(snoozedUntil) || snoozedUntil <= Date.now())) {
-                    localStorage.removeItem(TASK_REVIEW_MODAL_SNOOZE_KEY);
                 }
 
                 const review = await getRepeatReviewApi();
@@ -46,11 +45,17 @@ const Dashboard: React.FC = () => {
                     return;
                 }
 
+                if (isTaskReviewCycleHandled(review.cycleKey)) {
+                    setRepeatChecked(true);
+                    return;
+                }
+
                 openModal("repeat", {
                     tasks: review.tasks,
                     cycleKey: review.cycleKey,
                     retentionDays: review.retentionDays,
                     archiveLabel: review.archiveLabel,
+                    reviewSource: review.reviewSource ?? "live",
                     summary: review.summary,
                 });
             } catch (err) {

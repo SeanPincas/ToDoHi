@@ -20,6 +20,7 @@ import {
     deleteTask as apiDeleteTask,
     reorderTaskPositions
 } from "../api/taskApi.ts";
+import { isTaskFromPreviousCycle } from "../utils/repeatReview";
 
 // ------------------------------ MODAL TYPES --------------------------------------
 export type ModalType = "add" | "edit" | "view" | "deleteConfirm" | "repeat" | "repeatConfirm" | "taskArchive" | "privacyPolicy" | "termsConditions";
@@ -144,17 +145,17 @@ export const TodoProvider = ({ children }: { children: ReactNode }) => {
     // =================================================================================================
     //                                   FILTERING LOGIC
     // =================================================================================================
-    const todayString = new Date().toISOString().split("T")[0];
+    const resetHour = user?.preference?.resetHour ?? 0;
+    const currentCycleTasks = tasks.filter((task) => !isTaskFromPreviousCycle(task, resetHour));
 
-    const todayTasks = tasks.filter(t => {
-        const deadline = t.deadline ? t.deadline.split("T")[0] : null;
-        return deadline === todayString || t.status === "pending";
-    });
+    const todayTasks = currentCycleTasks.filter((task) =>
+        task.status === "pending" || task.status === "completed" || task.status === "failed"
+    );
 
-    const filterAll = tasks;
-    const filterPending = tasks.filter(t => t.status === "pending");
-    const filterCompleted = tasks.filter(t => t.status === "completed");
-    const filterFailed = tasks.filter(t => t.status === "failed" || t.isExpired);
+    const filterAll = currentCycleTasks.filter((task) => task.status !== "failed");
+    const filterPending = currentCycleTasks.filter(t => t.status === "pending");
+    const filterCompleted = currentCycleTasks.filter(t => t.status === "completed");
+    const filterFailed = currentCycleTasks.filter(t => t.status === "failed" || t.isExpired);
 
     // =================================================================================================
     //                                   ADD NEW TASK
