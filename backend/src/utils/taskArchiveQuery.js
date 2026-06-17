@@ -47,6 +47,8 @@ function buildTaskArchiveQuery({ userId, archiveType, archiveReason, cycleKey })
 
     if (cycleKey) {
         query.sourceCycleKey = cycleKey;
+    } else {
+        query.repeatedAt = null;
     }
 
     return query;

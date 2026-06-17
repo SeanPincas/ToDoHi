@@ -27,13 +27,16 @@ import {
     type TaskCategory,
     type TaskTab,
 } from "../../../utils/taskUtils";
-import { REPEAT_REVIEW_REFRESH_EVENT } from "../../../utils/repeatReview";
+import {
+    markTaskReviewCycleHandled,
+    REPEAT_REVIEW_REFRESH_EVENT,
+    setTaskReviewSnooze,
+} from "../../../utils/repeatReview";
 
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
 import "./RepeatTaskModal.css";
 
-const TASK_REVIEW_MODAL_SNOOZE_KEY = "todohi_task_review_modal_snoozed_until";
 const TASK_REVIEW_MODAL_SNOOZE_MS = 3 * 60 * 60 * 1000;
 
 // ------------------------------ TYPES ------------------------------
@@ -53,6 +56,7 @@ const RepeatTaskModal: React.FC = () => {
     const tasks = (modalData?.tasks ?? []) as Task[];
     const archiveLabel = modalData?.archiveLabel ?? "Task Archive";
     const retentionDays = modalData?.retentionDays ?? 30;
+    const reviewSource = modalData?.reviewSource ?? "live";
     const summary = modalData?.summary ?? {
         total: tasks.length,
         completed: tasks.filter((task) => task.status === "completed").length,
@@ -120,6 +124,9 @@ const RepeatTaskModal: React.FC = () => {
             taskIds: tasks.map(t => t._id),
             returnContext: modal.data,
             onAfterDelete: async () => {
+                if (modalData?.cycleKey) {
+                    markTaskReviewCycleHandled(modalData.cycleKey);
+                }
                 window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
             }
         });
@@ -130,6 +137,7 @@ const RepeatTaskModal: React.FC = () => {
         openModal("repeatConfirm", {
             mode: "repeatAll",
             allTaskIds: tasks.map(t => t._id),
+            reviewSource,
             returnContext: modal.data
         });
         console.log("[RepeatTaskModal] Repeat All clicked");
@@ -142,6 +150,7 @@ const RepeatTaskModal: React.FC = () => {
             mode: "confirmSelected",
             selectedIds: Array.from(selected),
             allTaskIds: tasks.map(t => t._id),
+            reviewSource,
             returnContext: modal.data
         });
         console.log(
@@ -152,10 +161,7 @@ const RepeatTaskModal: React.FC = () => {
 
     const handleDismiss = () => {
         if (snoozeReminder) {
-            localStorage.setItem(
-                TASK_REVIEW_MODAL_SNOOZE_KEY,
-                String(Date.now() + TASK_REVIEW_MODAL_SNOOZE_MS)
-            );
+            setTaskReviewSnooze(TASK_REVIEW_MODAL_SNOOZE_MS);
         }
         closeModal();
     };
@@ -211,7 +217,7 @@ const RepeatTaskModal: React.FC = () => {
                                 returnContext: modal.data,
                             })}
                         >
-                            <Icons.Notebook />
+                            <Icons.ListDashes />
                             <span>Open Task Archive</span>
                         </button>
                     </div>

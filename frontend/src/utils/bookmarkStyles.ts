@@ -110,10 +110,11 @@ const airyBlueTheme = (image: string) =>
         headingBorder: "#dfeaf7",
         burgerIcon: "#264a70",
         burgerHover: "#173654",
-        dragHandleIdle: "rgba(189, 220, 242, 0.88)",
-        dragHandleHover: "rgba(112, 161, 204, 0.96)",
+        dragHandleIdle: "rgba(112, 161, 204, 0.96)",
+        dragHandleHover: "rgba(63, 111, 156, 0.98)",
         guide: "rgba(178, 192, 207, 0.86)",
         guideHover: "rgba(119, 141, 166, 0.96)",
+        footerInk: "rgba(189, 220, 242, 0.88)",
     });
 
 const forestTheme = (image: string) =>

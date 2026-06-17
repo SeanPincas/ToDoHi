@@ -7,6 +7,7 @@
 // ============================================================================
 
 const Task = require("../models/taskModel");
+const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
 const { getCycleWindow } = require("./resetCycle");
 const { DEFAULT_ARCHIVE_LABEL, DEFAULT_REVIEW_LIMIT } = require("./repeatReviewConstants");
@@ -37,8 +38,8 @@ function getTaskCycleEventAt(task) {
     }
 
     if (task.status === "failed") {
-        return task.failedAt
-            ?? task.deadline
+        return task.deadline
+            ?? task.failedAt
             ?? task.createdAt
             ?? null;
     }
@@ -56,6 +57,26 @@ function isWithinPreviousCycle(dateValue, cycleWindow) {
     }
 
     return eventAt >= cycleWindow.previousCycleStart && eventAt < cycleWindow.currentCycleStart;
+}
+
+function mapArchiveEntryToReviewTask(entry) {
+    return {
+        _id: entry._id,
+        userId: entry.userId,
+        title: entry.title,
+        description: entry.description ?? "",
+        category: entry.category,
+        status: entry.archiveType,
+        completedAt: entry.completedAt ?? null,
+        failedAt: entry.failedAt ?? null,
+        createdAt: entry.createdAt,
+        updatedAt: entry.archivedAt ?? entry.createdAt,
+        deadline: entry.deadline ?? null,
+        orderIndex: entry.orderIndex ?? 0,
+        isExpired: entry.isExpired ?? false,
+        memoId: entry.memoId ?? null,
+        containerColor: entry.containerColor
+    };
 }
 
 async function getRepeatableTasksForUser({
@@ -105,15 +126,30 @@ async function getRepeatReviewForUser({ userId, limit = DEFAULT_REVIEW_LIMIT }) 
         limit
     });
 
-    const summary = buildRepeatReviewSummary(repeatableTasks);
+    let reviewTasks = repeatableTasks;
+
+    if (reviewTasks.length === 0) {
+        const archivedEntries = await TaskArchive.find({
+            userId,
+            sourceCycleKey: cycleWindow.currentCycleKey,
+            archiveReason: "repeat-unselected"
+        })
+            .sort({ archivedAt: 1, createdAt: 1, orderIndex: 1 })
+            .limit(limit);
+
+        reviewTasks = archivedEntries.map(mapArchiveEntryToReviewTask);
+    }
+
+    const summary = buildRepeatReviewSummary(reviewTasks);
 
     return {
-        reviewRequired: repeatableTasks.length > 0,
+        reviewRequired: reviewTasks.length > 0,
         cycleKey: cycleWindow.currentCycleKey,
         retentionDays,
         archiveLabel: DEFAULT_ARCHIVE_LABEL,
+        reviewSource: repeatableTasks.length > 0 ? "live" : "archive",
         summary,
-        tasks: repeatableTasks
+        tasks: reviewTasks
     };
 }
 
@@ -122,6 +158,7 @@ module.exports = {
     DEFAULT_REVIEW_LIMIT,
     buildRepeatReviewSummary,
     getTaskCycleEventAt,
+    mapArchiveEntryToReviewTask,
     getRepeatableTasksForUser,
     getRepeatReviewForUser
 };
