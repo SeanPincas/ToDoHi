@@ -60,6 +60,7 @@ export function computeNewPinPct({
     deltaY,
     boardWidth,
     boardHeight,
+    boundaryPadding,
 }: {
     xPct: number;
     yPct: number;
@@ -67,6 +68,7 @@ export function computeNewPinPct({
     deltaY: number;
     boardWidth: number;
     boardHeight: number;
+    boundaryPadding: number;
 }) {
     // ---------------------------------------------------------------------
     // STEP 1: Convert stored percentages → pixel position of the PIN
@@ -86,8 +88,8 @@ export function computeNewPinPct({
     // - The memo card may overflow
     // - The pin must never leave the board
     // ---------------------------------------------------------------------
-    const clampedPinX = clamp(movedPinX, 0, boardWidth);
-    const clampedPinY = clamp(movedPinY, 0, boardHeight);
+    const clampedPinX = clamp(movedPinX, boundaryPadding, boardWidth - boundaryPadding);
+    const clampedPinY = clamp(movedPinY, boundaryPadding, boardHeight - boundaryPadding);
 
     // ---------------------------------------------------------------------
     // STEP 4: Convert clamped pixel position → percentages

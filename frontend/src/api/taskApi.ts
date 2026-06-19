@@ -44,6 +44,7 @@ export interface RepeatReviewResponse {
 
 export interface TaskArchiveEntry {
     _id: string;
+    source?: "archive" | "liveReview";
     userId: string;
     originalTaskId?: string | null;
     title: string;

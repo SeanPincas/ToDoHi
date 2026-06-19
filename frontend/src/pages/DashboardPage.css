@@ -5,8 +5,8 @@
 .dashboard-page {
     --paper-attach-border: #c8bba4;
     --paper-attach-border-soft: #d7ccb8;
-    --paper-attach-shadow: rgba(196, 184, 162, 0.65);
-    --paper-attach-shadow-deep: rgba(178, 165, 141, 0.5);
+    --paper-attach-shadow: var(--dashboard-paper-shadow);
+    --paper-attach-shadow-deep: var(--dashboard-paper-shadow-deep);
     --page-gutter: clamp(8px, 0.9vw, 12px);
     --spread-gap: calc(var(--page-gutter) * 0.85);
 
@@ -64,14 +64,14 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: clamp(6px, 0.5vw, 8px);
+    gap: clamp(2px, 0.5vw, 4px);
     overflow: hidden;
 }
 
 .left-page-stack,
 .right-page-charts {
     display: grid;
-    gap: clamp(8px, 0.75vw, 11px);
+    gap: clamp(4px, 0.65vw, 7px);
     min-height: 0;
 }
 
@@ -109,13 +109,22 @@
 .dashboard-greeting-bar {
     margin-top: -2px;
     display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    overflow: visible;
+    isolation: isolate;
+}
+
+.dashboard-greeting-top {
+    display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
     gap: 8px;
     position: relative;
     overflow: visible;
-    isolation: isolate;
+    min-height: 34px;
 }
 
 .dashboard-header-logo {
@@ -123,7 +132,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: clamp(120px, 14vw, 220px);
+    width: clamp(140px, 10vw, 190px);
     height: auto;
     max-width: 28%;
     object-fit: contain;
@@ -166,10 +175,43 @@
     align-items: center;
 }
 
+.greeting-user-row {
+    gap: clamp(5px, 0.55vw, 9px);
+}
+
+.greeting-user-icon {
+    width: clamp(18px, 1.55vw, 26px);
+    height: clamp(18px, 1.55vw, 26px);
+    object-fit: contain;
+    flex: 0 0 auto;
+    transform: translateY(1px);
+}
+
 .greeting-right {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+}
+
+.dashboard-quote-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 1px 8px 0;
+}
+
+.dashboard-quote-text {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: clamp(11px, 0.95vw, 14px);
+    text-align: center;
+    color: color-mix(in srgb, var(--blue-dark) 88%, #59472f 12%);
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .time-row {
@@ -226,11 +268,21 @@
     min-height: 0;
     height: 100%;
     overflow: visible;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .left-page-memo {
     min-height: 0;
     height: 100%;
+    display: flex;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .right-page-planner {
@@ -241,6 +293,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .bento-scroll::-webkit-scrollbar {
@@ -304,12 +357,93 @@
         font-size: clamp(12px, 1.2vw, 18px);
     }
 
+    .greeting-user-icon {
+        width: clamp(16px, 1.3vw, 22px);
+        height: clamp(16px, 1.3vw, 22px);
+    }
+
     .time-text {
         font-size: clamp(12px, 1.2vw, 18px);
     }
 
     .left-page-stack {
         grid-template-rows: minmax(0, 1fr) minmax(0, 0.92fr);
+    }
+}
+
+@media (min-width: 1025px) and (max-height: 920px) {
+    .dashboard-page {
+        --page-gutter: 8px;
+        --spread-gap: calc(var(--page-gutter) * 0.82);
+    }
+
+    .book-page {
+        gap: 0px;
+    }
+
+    .left-page-stack,
+    .right-page-charts {
+        gap: 6px;
+    }
+
+    .dashboard-greeting-bar {
+        gap: 6px;
+        margin-top: -1px;
+    }
+
+    .dashboard-greeting-top {
+        gap: 6px;
+        min-height: 31px;
+    }
+
+    .dashboard-header-logo {
+        width: clamp(124px, 8.6vw, 168px);
+        max-width: 24%;
+    }
+
+    .greeting-left h2 {
+        font-size: clamp(10px, 0.9vw, 13px);
+        min-height: calc(clamp(11px, 1.05vw, 16px) * 1.5);
+    }
+
+    .greeting-left p {
+        font-size: clamp(12px, 1.1vw, 18px);
+        min-height: calc(clamp(10px, 0.9vw, 13px) * 1.15);
+    }
+
+    .greeting-user-icon {
+        width: clamp(15px, 1.2vw, 20px);
+        height: clamp(15px, 1.2vw, 20px);
+    }
+
+    .time-row {
+        gap: 6px;
+    }
+
+    .time-text {
+        font-size: clamp(12px, 1.1vw, 18px);
+        line-height: 1.45;
+    }
+
+    .time-divider {
+        font-size: clamp(14px, 1.3vw, 21px);
+    }
+
+    .date-text {
+        font-size: clamp(10px, 0.9vw, 13px);
+    }
+
+    .dashboard-quote-row {
+        min-height: 19px;
+        padding: 0 6px;
+    }
+
+    .dashboard-quote-text {
+        font-size: clamp(10px, 0.86vw, 12px);
+    }
+
+    .left-page-stack {
+        grid-template-rows: minmax(0, 1.04fr) minmax(0, 0.96fr);
     }
 }
 
@@ -385,6 +519,10 @@
         margin-left: 0;
     }
 
+    .dashboard-greeting-top {
+        width: 100%;
+    }
+
     .dashboard-header-logo {
         width: clamp(90px, 18vw, 140px);
         max-width: 34%;
@@ -394,6 +532,18 @@
     .greeting-right {
         width: 100%;
         align-items: flex-start;
+    }
+
+    .dashboard-quote-row {
+        justify-content: flex-start;
+        min-height: 20px;
+        padding: 0;
+    }
+
+    .dashboard-quote-text {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
     }
 
     .right-page-chart-stack {
@@ -423,10 +573,24 @@
 
 .todo-pane-scroll,
 .memo-pane-scroll {
-    overflow-y: hidden;
+    height: 100%;
+    padding: 0 8px 9px 0;
+    background: transparent;
+    overflow: visible;
+    box-shadow: none;
 }
 
 .todo-pane-scroll {
-    overflow: visible;
-    box-shadow: inset -5px 0 8px -10px rgba(178, 165, 141, 0.55);
+    overflow-y: hidden;
+}
+
+.memo-pane-scroll {
+    overflow-y: hidden;
+}
+
+@media (min-width: 1025px) and (max-height: 920px) {
+    .todo-pane-scroll,
+    .memo-pane-scroll {
+        padding: 0 7px 8px 0;
+    }
 }

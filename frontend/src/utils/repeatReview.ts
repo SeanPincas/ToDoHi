@@ -104,7 +104,10 @@ export function isTaskFromPreviousCycle(
 
     const { start, yesterdayStart } = getResetWindow(resetHour);
 
-    return eventAt >= yesterdayStart && eventAt < start;
+    // The reset boundary belongs to the cycle that just ended.
+    // This mirrors backend review/archive logic so tasks that finish exactly
+    // at resetHour still appear as "yesterday" items instead of disappearing.
+    return eventAt >= yesterdayStart && eventAt <= start;
 }
 
 function dedupeByCompositeKey<T>(

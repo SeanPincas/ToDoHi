@@ -14,6 +14,7 @@ import MemoBoardPage from "../pages/MemoBoardPage";
 import ProtectedRoute from "./ProtectedRoute";
 import Layout from "../components/layout/Layout";
 import { AuthProvider } from "../context/AuthContext";
+import { QuoteProvider } from "../context/QuoteContext";
 import { TodoProvider } from "../context/TodoContext";
 import AddTaskModal from "../components/todo/AddTaskModal";
 import ViewTaskModal from "../components/todo/ViewTaskModal";
@@ -33,55 +34,57 @@ const AppRouter: React.FC = () => {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <TodoProvider>
-                    <MemoProvider>
-                        <Routes>
-                            {/* ---------- Public Routes ---------- */}
-                            <Route path="/login" element={<LoginPage />} />
-                            <Route path="/register" element={<RegisterPage />} />
+                <QuoteProvider>
+                    <TodoProvider>
+                        <MemoProvider>
+                            <Routes>
+                                {/* ---------- Public Routes ---------- */}
+                                <Route path="/login" element={<LoginPage />} />
+                                <Route path="/register" element={<RegisterPage />} />
 
-                            {/* ---------- Protected Routes ---------- */}
-                            <Route element={<ProtectedRoute />}>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <Layout>
-                                            <DashboardPage />
-                                        </Layout>
-                                    }
-                                />
+                                {/* ---------- Protected Routes ---------- */}
+                                <Route element={<ProtectedRoute />}>
+                                    <Route
+                                        path="/"
+                                        element={
+                                            <Layout>
+                                                <DashboardPage />
+                                            </Layout>
+                                        }
+                                    />
 
-                                <Route
-                                    path="/memoboard"
-                                    element={
-                                        <>
-                                            <MemoBoardPage />
-                                            <AddMemoModal />
-                                            <ViewMemoModal />
-                                            <EditMemoModal />
-                                            <DeleteConfirmMemoModal />
-                                        </>
-                                    }
-                                />
-                            </Route>
+                                    <Route
+                                        path="/memoboard"
+                                        element={
+                                            <>
+                                                <MemoBoardPage />
+                                                <AddMemoModal />
+                                                <ViewMemoModal />
+                                                <EditMemoModal />
+                                                <DeleteConfirmMemoModal />
+                                            </>
+                                        }
+                                    />
+                                </Route>
 
-                            {/* ---------- Fallback ---------- */}
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
+                                {/* ---------- Fallback ---------- */}
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
 
-                        {/* ===================================================== */}
-                        {/*                   GLOBAL TODO MODALS                 */}
-                        {/* ===================================================== */}
-                        <AddTaskModal />
-                        <ViewTaskModal />
-                        <EditTaskModal />
-                        <DeleteConfirmModal />
-                        <RepeatTaskModal />
-                        <RepeatConfirmModal />
-                        <TaskArchiveModal />
-                        <LegalDocumentModal />
-                    </MemoProvider>
-                </TodoProvider>
+                            {/* ===================================================== */}
+                            {/*                   GLOBAL TODO MODALS                 */}
+                            {/* ===================================================== */}
+                            <AddTaskModal />
+                            <ViewTaskModal />
+                            <EditTaskModal />
+                            <DeleteConfirmModal />
+                            <RepeatTaskModal />
+                            <RepeatConfirmModal />
+                            <TaskArchiveModal />
+                            <LegalDocumentModal />
+                        </MemoProvider>
+                    </TodoProvider>
+                </QuoteProvider>
             </AuthProvider>
         </BrowserRouter>
     );

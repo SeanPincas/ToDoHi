@@ -3,10 +3,11 @@
 .memo-card-overlay {
     position: relative;
     transition: box-shadow 0.2s ease, transform 0.15s ease;
+    box-sizing: border-box;
 
     /* ---------------- FIXED SIZE ---------------- */
-    width: 220px;
-    height: 180px;
+    width: var(--memo-card-width, 220px);
+    height: var(--memo-card-height, 180px);
 
     background: transparent;
     /* sticky-note yellow */
@@ -25,8 +26,9 @@
 
 .memo-card-overlay.active {
     box-shadow:
-        0 0 0 2px var(--info-accent),
-        0 0 12px rgba(0, 150, 255, 0.45);
+        0 0 0 3px color-mix(in srgb, var(--success-accent) 86%, #2f7d32 14%),
+        0 0 16px rgba(102, 176, 102, 0.4),
+        0 8px 16px rgba(0, 0, 0, 0.18);
     transform: scale(1.01);
 }
 
@@ -41,12 +43,12 @@
 
 .memo-pin {
     position: absolute;
-    top: 5px;
+    top: var(--memo-pin-top-offset, 5px);
     left: 50%;
     transform: translateX(-50%);
 
-    width: 14px;
-    height: 14px;
+    width: var(--memo-pin-size, 14px);
+    height: var(--memo-pin-size, 14px);
 
     border-radius: 50%;
     box-shadow:
@@ -113,15 +115,7 @@
 /* --------------------------- TABLET --------------------------- */
 @media (max-width: 1024px) {
     .memo-card-overlay {
-        width: 190px;
-        height: 155px;
         padding: 12px 10px 10px;
-    }
-
-    .memo-pin {
-        width: 12px;
-        height: 12px;
-        top: 4px;
     }
 
     .memo-title {
@@ -142,16 +136,8 @@
 /* --------------------------- MOBILE --------------------------- */
 @media (max-width: 600px) {
     .memo-card-overlay {
-        width: 160px;
-        height: 130px;
         padding: 10px 8px 8px;
         border-radius: 5px;
-    }
-
-    .memo-pin {
-        width: 10px;
-        height: 10px;
-        top: 3px;
     }
 
     .memo-header {

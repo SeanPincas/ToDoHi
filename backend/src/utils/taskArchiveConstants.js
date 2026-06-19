@@ -10,6 +10,7 @@ const archiveTypeList = ["failed", "completed"];
 const archiveReasonList = [
     "repeat-unselected",
     "repeat-selected-source",
+    "review-window-expired",
     "manual-clear"
 ];
 

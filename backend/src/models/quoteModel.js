@@ -8,4 +8,9 @@ const quoteSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model("Quote", quoteSchema);
+const quoteDbName = process.env.QUOTE_DB_NAME || process.env.MONGO_QUOTE_DB_NAME || "todohiDB";
+const quoteConnection = mongoose.connection.useDb(quoteDbName, { useCache: true });
+
+module.exports =
+    quoteConnection.models.Quote ||
+    quoteConnection.model("Quote", quoteSchema);
