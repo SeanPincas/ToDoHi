@@ -17,6 +17,8 @@ import { computeDeadline } from "../../utils/computeDeadline";
 import { Icons } from "../../styles/iconLibrary";
 import { modalOverlayStyle } from "../../styles/modalStyles";
 import "../common/modals/modalBaseTheme.css";
+import "../common/modals/taskManagementModalTheme.css";
+import "../../styles/ButtonStyles.css";
 
 import "./AddTaskModal.css";
 
@@ -115,17 +117,28 @@ const AddTaskModal: React.FC = () => {
             onMouseDown={handleClose}
         >
             <div
-                className="modal-card-base todo-modal-card"
+                className="modal-card-base todo-modal-card task-management-modal paper-sheet-lines"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* ------------------ HEADER ------------------ */}
-                <div className="todo-modal-header">
-                    <h3>Create Task</h3>
+                <div className="todo-modal-header task-management-modal-header">
+                    <div className="task-management-modal-title-group todo-modal-title-group">
+                        <Icons.Todo />
+                        <h3>Create Task</h3>
+                    </div>
 
-                    <button className="modal-x-btn" onClick={handleClose}>
+                    <button
+                        type="button"
+                        className="icon-btn-square task-management-modal-close-btn"
+                        onClick={handleClose}
+                    >
                         <Icons.Close />
                     </button>
                 </div>
+
+                <p className="task-management-modal-subtitle todo-modal-subtitle">
+                    Add a fresh task to today&apos;s list and set its category and paper color.
+                </p>
 
                 {/* ------------------ ERROR ------------------ */}
                 {errorMsg && (
@@ -135,7 +148,7 @@ const AddTaskModal: React.FC = () => {
                 {/* ------------------ FORM ------------------ */}
                 <form className="todo-modal-form" onSubmit={handleSubmit}>
                     {/* TITLE */}
-                    <label className="todo-field">
+                    <label className="todo-field todo-field-panel task-management-modal-panel">
                         <span className="todo-label">Title *</span>
                         <input
                             className="todo-input"
@@ -146,7 +159,7 @@ const AddTaskModal: React.FC = () => {
                     </label>
 
                     {/* DESCRIPTION */}
-                    <label className="todo-field">
+                    <label className="todo-field todo-field-panel task-management-modal-panel">
                         <span className="todo-label">Description</span>
                         <textarea
                             className="todo-textarea"
@@ -157,7 +170,7 @@ const AddTaskModal: React.FC = () => {
                     </label>
 
                     {/* ------------------ CATEGORY DROPDOWN ------------------ */}
-                    <label className="todo-field">
+                    <label className="todo-field todo-field-panel task-management-modal-panel">
                         <span className="todo-label">Category</span>
 
                         <div
@@ -193,7 +206,7 @@ const AddTaskModal: React.FC = () => {
                     </label>
 
                     {/* ------------------ COLOR PICKER GRID ------------------ */}
-                    <label className="todo-field">
+                    <label className="todo-field todo-field-panel task-management-modal-panel">
                         <span className="todo-label">Task Color</span>
 
                         <div className="todo-color-grid">
@@ -230,7 +243,7 @@ const AddTaskModal: React.FC = () => {
                         <div className="todo-footer-actions">
                             <button
                                 type="button"
-                                className="btn-cancel"
+                                className="btn-secondary-rect todo-footer-btn"
                                 onClick={handleClose}
                                 disabled={loading}
                             >
@@ -239,7 +252,7 @@ const AddTaskModal: React.FC = () => {
 
                             <button
                                 type="submit"
-                                className="btn-primary"
+                                className="btn-primary-rect todo-footer-btn todo-submit-btn"
                                 disabled={loading}
                             >
                                 {loading ? "Creating..." : "Create Task"}

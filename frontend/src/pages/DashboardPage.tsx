@@ -5,9 +5,11 @@ import DashboardStats from "../components/dashboard/DashboardStats";
 import TodoPreview from "../components/dashboard/TodoPreview";
 import MemoPreview from "../components/dashboard/MemoPreview";
 import DailyPlanPreview from "../components/dashboard/DailyPlanPreview";
+import strawhatIcon from "../assets/strawhat.webp";
 
 import { useTodo } from '../context/TodoContext';
 import { useAuthContext } from '../context/AuthContext';
+import { useQuote } from '../context/QuoteContext';
 import { getRepeatReviewApi } from "../api/taskApi";
 import {
     clearExpiredTaskReviewSnooze,
@@ -18,6 +20,7 @@ import {
 const Dashboard: React.FC = () => {
     const { openModal } = useTodo();
     const { user } = useAuthContext();
+    const { currentQuote } = useQuote();
 
     const [time12, setTime12] = useState("");
     const [time24, setTime24] = useState("");
@@ -103,26 +106,40 @@ const Dashboard: React.FC = () => {
                 <div className="opened-book-spread">
                     <section className="book-page left-book-page">
                         <div className="dashboard-greeting-bar">
-                            <div className="greeting-left">
-                                <h2>Welcome Back!</h2>
-                                <p>Hello, {user?.username || "User"}</p>
-                            </div>
-
-                            <img
-                                src="/logo.webp"
-                                alt=""
-                                aria-hidden="true"
-                                className="dashboard-header-logo"
-                            />
-
-                            <div className="greeting-right">
-                                <div className="time-row">
-                                    <span className="time-text">{time12}</span>
-                                    <span className="time-divider">||</span>
-                                    <span className="time-text">{time24}</span>
+                            <div className="dashboard-greeting-top">
+                                <div className="greeting-left">
+                                    <h2>Welcome Back!</h2>
+                                    <p className="greeting-user-row">
+                                        <span>Hello, {user?.username || "User"}</span>
+                                        <img
+                                            src={strawhatIcon}
+                                            alt=""
+                                            aria-hidden="true"
+                                            className="greeting-user-icon"
+                                        />
+                                    </p>
                                 </div>
 
-                                <span className="date-text">{currentDate}</span>
+                                <img
+                                    src="/logo.webp"
+                                    alt=""
+                                    aria-hidden="true"
+                                    className="dashboard-header-logo"
+                                />
+
+                                <div className="greeting-right">
+                                    <div className="time-row">
+                                        <span className="time-text">{time12}</span>
+                                        <span className="time-divider">||</span>
+                                        <span className="time-text">{time24}</span>
+                                    </div>
+
+                                    <span className="date-text">{currentDate}</span>
+                                </div>
+                            </div>
+
+                            <div className="dashboard-quote-row">
+                                <p className="dashboard-quote-text">"{currentQuote}"</p>
                             </div>
                         </div>
 

@@ -15,6 +15,7 @@ import {
     // ---------------- NAV / MENU ----------------
     PiList,
     PiArrowUp,
+    PiArrowsDownUp,
     PiCaretDown,
     PiArrowsOutCardinal,
     PiArrowLeft,
@@ -33,6 +34,9 @@ import {
     PiCalendar,
     PiNotebookDuotone,
     PiArrowsClockwise,
+    PiListPlus,
+    PiSquaresFour,
+    PiNote,
 
     // ---------------- FEEDBACK / ALERT ----------------
     PiWarningCircle,
@@ -81,6 +85,7 @@ export const Icons = {
     // ---------------- NAVIGATION ----------------
     Menu: PiList,
     ArrowUp: PiArrowUp,
+    ArrowsDownUp: PiArrowsDownUp,
     DropdownArrow: PiCaretDown,
     Drag: PiArrowsOutCardinal,
     ArrowLeft: PiArrowLeft,
@@ -96,6 +101,9 @@ export const Icons = {
     // ---------------- PRODUCTIVITY ----------------
     Todo: PiListChecks,
     ListDashes: PiListDashes,
+    ListPlus: PiListPlus,
+    SquaresFour: PiSquaresFour,
+    Note: PiNote,
     Planner: PiCalendar,
     Notebook: PiNotebookDuotone,
     Repeat: PiArrowsClockwise,

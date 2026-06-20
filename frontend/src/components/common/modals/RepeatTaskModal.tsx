@@ -122,6 +122,7 @@ const RepeatTaskModal: React.FC = () => {
     const handleDeleteAll = () => {
         openModal("deleteConfirm", {
             taskIds: tasks.map(t => t._id),
+            cycleKey: modalData?.cycleKey,
             returnContext: modal.data,
             onAfterDelete: async () => {
                 if (modalData?.cycleKey) {
@@ -137,6 +138,7 @@ const RepeatTaskModal: React.FC = () => {
         openModal("repeatConfirm", {
             mode: "repeatAll",
             allTaskIds: tasks.map(t => t._id),
+            cycleKey: modalData?.cycleKey,
             reviewSource,
             returnContext: modal.data
         });
@@ -150,6 +152,7 @@ const RepeatTaskModal: React.FC = () => {
             mode: "confirmSelected",
             selectedIds: Array.from(selected),
             allTaskIds: tasks.map(t => t._id),
+            cycleKey: modalData?.cycleKey,
             reviewSource,
             returnContext: modal.data
         });
@@ -180,7 +183,7 @@ const RepeatTaskModal: React.FC = () => {
                 <div className="repeat-modal-header task-management-modal-header">
                     <div className="task-management-modal-title-group">
                         <Icons.Repeat />
-                        <h3>Review Yesterday&apos;s Tasks</h3>
+                        <h3>Review Tasks Yesterday</h3>
                     </div>
                     <button
                         type="button"

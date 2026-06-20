@@ -30,12 +30,14 @@ const RepeatConfirmModal: React.FC = () => {
         mode,
         selectedIds = [],
         allTaskIds = [],
+        cycleKey,
         reviewSource = "live",
         returnContext,
     } = modal.data as {
         mode: RepeatConfirmMode;
         selectedIds?: string[];
         allTaskIds?: string[];
+        cycleKey?: string;
         reviewSource?: "live" | "archive";
         returnContext?: any;
     };
@@ -76,7 +78,7 @@ const RepeatConfirmModal: React.FC = () => {
 
             await fetchTasks();
             await refreshUser();
-            markTaskReviewCycleHandled(returnContext?.cycleKey);
+            markTaskReviewCycleHandled(cycleKey ?? returnContext?.cycleKey);
             window.dispatchEvent(new CustomEvent(REPEAT_REVIEW_REFRESH_EVENT));
 
             // Close everything after success

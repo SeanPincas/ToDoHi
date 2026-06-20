@@ -10,6 +10,7 @@ import { useMemoContext } from "../../context/MemoContext";
 import { Icons } from "../../styles/iconLibrary";
 
 import {
+    formatMemoPreviewTextByWidth,
     getMemoCategoryIconKey,
 } from "../../utils/memoUtils/memoUtils";
 
@@ -76,7 +77,11 @@ const ViewMemoModal = () => {
 
                     {/* ---------- CONTENT ---------- */}
                     <div className="memo-zoom-content">
-                        {memo.content?.trim() || "No memo content."}
+                        {formatMemoPreviewTextByWidth(
+                            memo.content?.trim() || "No memo content.",
+                            392,
+                            '400 15.2px "Kalam", cursive'
+                        )}
                     </div>
 
                 </div>

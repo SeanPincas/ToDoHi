@@ -4,18 +4,35 @@ const User = require("../models/userModel.js");
 
 const { getNextZIndex } = require("../utils/memoBoard");
 const { validCategories } = require("../utils/helpers");
+const {
+    MEMO_TITLE_MAX_LENGTH,
+    MEMO_CONTENT_MAX_LENGTH,
+    normalizeMemoTitle,
+    normalizeMemoContent,
+    validateMemoLengths,
+} = require("../utils/memoLimits");
 
 // --------------------------- CREATE MEMO MANUALLY ---------------------------
 exports.createMemo = async (req, res) => {
     try {
         const { title, content, category, containerColor, pinColor, position } = req.body
+        const normalizedTitle = normalizeMemoTitle(title);
+        const normalizedContent = normalizeMemoContent(content);
+        const memoLengthError = validateMemoLengths({
+            title: normalizedTitle,
+            content: normalizedContent,
+        });
+
+        if (memoLengthError) {
+            return res.status(400).json({ message: memoLengthError });
+        }
 
         const nextZ = await getNextZIndex(req.user._id);
 
         const newMemo = await Memo.create({
             userId: req.user._id,
-            title,
-            content,
+            title: normalizedTitle,
+            content: normalizedContent,
             category: validCategories.includes(category) ? category : "others",
             containerColor: containerColor || "#ffffff",
             pinColor: pinColor || "#d32f2f",
@@ -56,13 +73,15 @@ exports.createMemoFromTask = async (req, res) => {
 
         // Determine next zIndex
         const nextZ = await getNextZIndex(req.user._id);
+        const normalizedTitle = normalizeMemoTitle(task.title).slice(0, MEMO_TITLE_MAX_LENGTH);
+        const normalizedContent = normalizeMemoContent(task.description).slice(0, MEMO_CONTENT_MAX_LENGTH);
 
         // Copy the Task data into the Memo
         const newMemo = await Memo.create({
             userId: req.user._id,
             taskSourceId: task._id,
-            title: task.title,
-            content: task.description || "",
+            title: normalizedTitle,
+            content: normalizedContent,
             category: category,
             containerColor: task.containerColor || "#fff2b3",
             pinColor: pinColor || "#d32f2f",
@@ -108,17 +127,27 @@ exports.updateMemo = async (req, res) => {
             containerColor,
             pinColor
         } = req.body
+        const normalizedTitle = normalizeMemoTitle(title);
+        const normalizedContent = normalizeMemoContent(content);
+        const memoLengthError = validateMemoLengths({
+            title: normalizedTitle,
+            content: normalizedContent,
+        });
+
+        if (memoLengthError) {
+            return res.status(400).json({ message: memoLengthError });
+        }
 
         const updateMemo = await Memo.findOneAndUpdate(
             { _id: id, userId: req.user._id },
             {
-                title,
-                content,
+                title: normalizedTitle,
+                content: normalizedContent,
                 category,
                 containerColor,
                 pinColor
             },
-            { new: true }
+            { new: true, runValidators: true }
         )
 
         if (!updateMemo) return res.status(404).json({ message: "Memo Not Found" });

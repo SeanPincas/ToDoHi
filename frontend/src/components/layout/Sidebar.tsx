@@ -3,7 +3,6 @@ import "./Sidebar.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Icons } from "../../styles/iconLibrary";
 
-import { type QuoteCategory } from "../../utils/quoteUtils";
 import {
     getFailedTasksYesterdayPreview,
     REPEAT_REVIEW_REFRESH_EVENT,
@@ -11,13 +10,10 @@ import {
 } from "../../utils/repeatReview";
 
 import { useAuthContext } from "../../context/AuthContext";
+import { useQuote } from "../../context/QuoteContext";
 import { getMe } from "../../api/userApi";
 
 import ThemeToggle from "../common/themeToggle/ThemeToggle";
-import {
-    getRandomQuoteApi,
-    getQuotesByCategoryApi,
-} from "../../api/quoteApi";
 import { getBookmarkTheme } from "../../utils/bookmarkStyles";
 import anahawImage from "../../assets/anahaw.webp";
 
@@ -34,7 +30,6 @@ const Sidebar = () => {
     const [open, setOpen] = useState(false);
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
     const [username, setUsername] = useState("Username");
-    const [currentQuote, setCurrentQuote] = useState<string>("Loading quote...");
     const [showUserSettingsModal, setShowUserSettingsModal] = useState(false);
     const [sidebarMetrics, setSidebarMetrics] = useState<React.CSSProperties>({});
     const [dragOffset, setDragOffset] = useState(0);
@@ -43,6 +38,7 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, theme, toggleTheme, user } = useAuthContext();
+    const { currentQuote } = useQuote();
     const { openModal } = useTodo();
     const bookmarkTheme = getBookmarkTheme(user?.preference?.bookmarkStyle);
 
@@ -86,18 +82,12 @@ const Sidebar = () => {
     };
 
     useEffect(() => {
-        const loadUser = async () => {
+        const loadSidebarMeta = async () => {
             try {
                 const user = await getMe();
 
                 if (user?.username) {
                     setUsername(user.username);
-                }
-
-                if (Array.isArray(user?.preference?.quoteCategory)) {
-                    const preferred = user.preference.quoteCategory[0];
-                    const selected = preferred ? preferred : "Random";
-                    fetchQuote(selected as QuoteCategory);
                 }
 
                 const failedPreview = await getFailedTasksYesterdayPreview();
@@ -107,10 +97,10 @@ const Sidebar = () => {
             }
         };
 
-        loadUser();
+        loadSidebarMeta();
 
         const handleRepeatReviewRefresh = () => {
-            loadUser();
+            loadSidebarMeta();
         };
 
         window.addEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
@@ -241,25 +231,6 @@ const Sidebar = () => {
         setIsDragging(true);
         event.currentTarget.setPointerCapture(event.pointerId);
         event.preventDefault();
-    };
-
-    const fetchQuote = async (category: QuoteCategory) => {
-        try {
-            if (category === "Random") {
-                const res = await getRandomQuoteApi();
-                setCurrentQuote(res.quote.text);
-                return;
-            }
-
-            const res = await getQuotesByCategoryApi(category);
-            if (res.quotes.length > 0) {
-                const randomIndex = Math.floor(Math.random() * res.quotes.length);
-                setCurrentQuote(res.quotes[randomIndex].text);
-            }
-        } catch (err) {
-            console.error("Failed fetching quote:", err);
-            setCurrentQuote("Stay productive today.");
-        }
     };
 
     return (

@@ -6,26 +6,16 @@
 /* ---------------- HEADER ---------------- */
 
 .memo-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 0;
 }
 
-.memo-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
+.memo-modal-title-group {
+    min-width: 0;
+    flex: 1 1 auto;
 }
 
-/* Close icon button */
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.memo-modal-subtitle {
+    margin-bottom: 4px;
 }
 
 /* ---------------- FORM FIELDS ---------------- */
@@ -33,14 +23,20 @@
 .memo-modal-field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 14px;
+    gap: 7px;
+    margin-bottom: 5px;
+}
+
+.memo-modal-field-panel {
+    padding: 12px 14px;
 }
 
 .memo-modal-field label {
+    font-family: var(--font-heading);
     font-size: 0.8rem;
     font-weight: 700;
     opacity: 0.85;
+    line-height: 1.1;
 }
 
 .memo-modal-field input,
@@ -51,6 +47,14 @@
     font-family: inherit;
     font-size: 0.9rem;
     resize: none;
+}
+
+.memo-modal-char-count {
+    align-self: flex-end;
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    line-height: 1;
+    opacity: 0.72;
 }
 
 /* ============================================================================
@@ -151,8 +155,15 @@
 
 .memo-modal-actions {
     display: flex;
+    align-items: stretch;
     gap: 12px;
     margin-top: 18px;
+}
+
+.memo-modal-actions > .btn-secondary-rect,
+.memo-modal-actions > .btn-green-rect {
+    flex: 1 1 0;
+    width: 100%;
 }
 
 /* ============================================================================
@@ -161,6 +172,10 @@
 
 /* ---------------- TABLET ---------------- */
 @media (max-width: 768px) {
+    .memo-modal-field-panel {
+        padding: 10px 12px;
+    }
+
     .memo-category-item {
         height: 30px;
     }
@@ -175,9 +190,6 @@
 
 /* ---------------- MOBILE ---------------- */
 @media (max-width: 480px) {
-    .memo-header h2 {
-        font-size: 1.1rem;
-    }
     .memo-category-item {
         height: 25px;
     }

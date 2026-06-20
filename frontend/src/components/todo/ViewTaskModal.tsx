@@ -161,11 +161,12 @@ const ViewTaskModal = () => {
                     )}
                 </div>
 
+                <p className="view-description-label">Task Notes</p>
+
                 {/* DESCRIPTION BOX */}
                 <div
                     className="view-description-box task-management-modal-panel"
                 >
-                    <p className="view-description-label">Task Notes</p>
                     <div className="view-description-content">
                         {task.description?.trim() || "No Description Provided."}
                     </div>

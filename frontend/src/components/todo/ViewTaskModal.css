@@ -109,13 +109,14 @@
 }
 
 .view-description-box {
+    margin-top: -2px;
     padding: 12px 14px 14px;
     border-width: 3px;
     border-color: color-mix(in srgb, var(--view-task-accent, #c8bba4) 48%, #fff 52%);
 }
 
 .view-description-label {
-    margin: 0 0 6px;
+    margin: 0;
     font-family: var(--font-heading);
     font-size: 0.95rem;
     line-height: 1.2;

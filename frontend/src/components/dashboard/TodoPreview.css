@@ -75,11 +75,21 @@
 }
 
 .todo-preview-title {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     font-size: clamp(18px, 1.5vw, 24px);
     font-weight: 700;
     text-align: center;
     margin: 0;
     white-space: nowrap;
+}
+
+.todo-preview-title-icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
 }
 
 .todo-preview-title-wrap {
@@ -94,7 +104,7 @@
 
 .todo-preview-header-flower {
     position: absolute;
-    left: calc(50% + clamp(50px, 3.1vw, 92px));
+    left: calc(50% + clamp(70px, 3vw, 92px));
     right: clamp(74px, 8.1vw, 94px);
     top: 50%;
     bottom: auto;
@@ -453,13 +463,15 @@
     margin-top: 7px;
     flex-shrink: 0;
     font-family: var(--font-heading);
-    min-height: 36px;
+    min-height: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     line-height: 1.1;
 }
 
 .todo-list-add-btn.btn-primary-rect:not(.todo-list-mode-btn) {
-    background: #7FAF7A;
-    border-color: #4F7F4C;
+    background: #96ce90;
+    border-color: #67a463;
     color: var(--text-main);
 }
 
@@ -471,7 +483,9 @@
 
 .todo-list-mode-btn {
     margin-top: 7px;
-    min-height: 36px;
+    min-height: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     line-height: 1.1;
 }
 
@@ -565,6 +579,112 @@
         right: 68px;
         height: clamp(60px, 3vw, 70px);
         min-width: 120px;
+    }
+}
+
+@media (min-width: 1025px) and (max-height: 920px) {
+    .todo-preview-container {
+        padding: 7px 8px 8px;
+        gap: 4px;
+    }
+
+    .todo-preview-header {
+        min-height: 27px;
+    }
+
+    .todo-mode-label-slot {
+        min-width: 112px;
+    }
+
+    .mode-label {
+        font-size: 12px;
+        padding-left: 2px;
+    }
+
+    .todo-preview-title {
+        font-size: clamp(16px, 1.3vw, 21px);
+    }
+
+    .todo-preview-header-flower {
+        left: calc(50% + clamp(58px, 2.8vw, 76px));
+        right: clamp(68px, 7vw, 88px);
+        height: clamp(48px, 3.4vw, 72px);
+        min-width: clamp(126px, 13vw, 166px);
+    }
+
+    .todo-preview-actions {
+        gap: 6px;
+    }
+
+    .todo-tabs {
+        gap: 4px;
+    }
+
+    .todo-category-menu,
+    .todo-color-menu,
+    .todo-yesterday-menu {
+        --todo-filter-width: clamp(92px, 7.2vw, 102px);
+    }
+
+    .todo-category-menu .dropdown-trigger,
+    .todo-yesterday-menu .dropdown-trigger,
+    .todo-color-menu .dropdown-trigger {
+        min-height: 23px;
+        padding: 2px 7px;
+        font-size: 10px;
+    }
+
+    .todo-category-menu .dropdown-item,
+    .todo-yesterday-menu .dropdown-item {
+        padding: 5px 7px;
+    }
+
+    .todo-category-option-icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .todo-color-trigger-swatch {
+        width: 13px;
+        height: 13px;
+    }
+
+    .todo-color-grid-menu,
+    .todo-color-menu .dropdown-menu {
+        gap: 3px;
+        padding: 4px;
+    }
+
+    .todo-color-grid-menu .dropdown-item:first-child {
+        margin: -4px -4px 0;
+        width: calc(100% + 8px);
+    }
+
+    .todo-color-all-option {
+        min-height: 20px;
+        font-size: 9.5px;
+    }
+
+    .todo-color-option-fill {
+        width: 24px;
+        height: 24px;
+        min-height: 24px;
+    }
+
+    .todo-list-container {
+        padding: 4px 7px;
+    }
+
+    .todo-list-add-btn,
+    .todo-list-mode-btn {
+        margin-top: 6px;
+        min-height: 28px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .todo-main-action-text {
+        font-size: 0.94rem;
     }
 }
 

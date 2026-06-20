@@ -86,12 +86,15 @@ exports.getTasks = async (req, res) => {
 // --------------------------- GET TASK ARCHIVE ---------------------------
 exports.getTaskArchive = async (req, res) => {
     try {
+        const user = await User.findById(req.user._id, "preference.resetHour preference.dayTaskDelete");
         const archiveResult = await getTaskArchiveEntriesForUser({
             userId: req.user._id,
             archiveType: req.query.archiveType,
             archiveReason: req.query.archiveReason,
             cycleKey: req.query.cycleKey,
-            limit: req.query.limit
+            limit: req.query.limit,
+            resetHour: user?.preference?.resetHour ?? 0,
+            retentionDays: user?.preference?.dayTaskDelete ?? 30
         });
 
         res.json({
