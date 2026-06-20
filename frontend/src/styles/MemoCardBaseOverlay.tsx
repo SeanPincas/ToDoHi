@@ -13,6 +13,7 @@ interface MemoCardBaseOverlayProps {
     pinColor: string;
     isActive?: boolean;
     isAtEdge?: boolean,
+    scrollableContent?: boolean;
 }
 
 const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
@@ -23,7 +24,10 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     pinColor,
     isActive = false,
     isAtEdge = false,
+    scrollableContent = false,
 }) => {
+    const resolvedContent = content || "No content";
+
     return (
         <div
             className={`memo-card-overlay 
@@ -40,7 +44,7 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
             />
 
             {/* ---------------- CONTENT ---------------- */}
-            <div className="memo-card-paper">
+            <div className={`memo-card-paper ${scrollableContent ? "scrollable" : ""}`}>
                 <div className="memo-header">
                     <h4 className="memo-title">
                         {title}
@@ -51,8 +55,8 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
                         </span>
                     )}
                 </div>
-                <p className="memo-content">
-                    {content || "No content"}
+                <p className={`memo-content ${scrollableContent ? "scrollable" : ""}`}>
+                    {resolvedContent}
                 </p>
 
             </div>

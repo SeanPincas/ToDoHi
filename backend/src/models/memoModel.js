@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+const {
+    MEMO_TITLE_MAX_LENGTH,
+    MEMO_CONTENT_MAX_LENGTH,
+} = require("../utils/memoLimits.js");
 
 const categoryList = [
     'cleaning', 'work', 'study', 'fitness', 'health', 'cooking',
@@ -22,11 +26,13 @@ const memoSchema = new mongoose.Schema({
     title: {
         type: String,
         trim: true,
+        maxlength: MEMO_TITLE_MAX_LENGTH,
         default: "Untitled Memo"
     },
     content: {
         type: String,
         trim: true,
+        maxlength: MEMO_CONTENT_MAX_LENGTH,
         default: ""
     },
     category: {

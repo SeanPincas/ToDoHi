@@ -180,9 +180,15 @@ const MemoBoardPage: React.FC = () => {
         ? memos.findIndex((memo) => memo._id === activeMemoId)
         : -1;
 
-    const activeMemoOrderLabel = activeMemoOrderIndex >= 0
-        ? `${activeMemoOrderIndex + 1} / ${memos.length}`
-        : "-- / --";
+    const activeMemoOrderParts = activeMemoOrderIndex >= 0
+        ? {
+            current: `${activeMemoOrderIndex + 1}`,
+            total: `${memos.length}`,
+        }
+        : {
+            current: "--",
+            total: "--",
+        };
 
     const handleFrameMouseDownCapture = (event: React.MouseEvent<HTMLDivElement>) => {
         if (boardMode !== "edit") return;
@@ -304,7 +310,15 @@ const MemoBoardPage: React.FC = () => {
                                     </button>
 
                                     <div className="memo-zorder-index">
-                                        {activeMemoOrderLabel}
+                                        <span className="memo-zorder-current">
+                                            {activeMemoOrderParts.current}
+                                        </span>
+                                        <span className="memo-zorder-separator">
+                                            {" / "}
+                                        </span>
+                                        <span className="memo-zorder-total">
+                                            {activeMemoOrderParts.total}
+                                        </span>
                                     </div>
 
                                     <button
