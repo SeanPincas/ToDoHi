@@ -22,6 +22,7 @@ export const getMe = async () => {
 export const updateUserPreferences = async (data: {
     resetHour?: number;
     dayTaskDelete?: 3 | 7 | 15 | 30;
+    quoteDelay?: 5 | 10 | 30 | 45 | 60;
     theme?: "light" | "dark";
     bookmarkStyle?: string;
     wallpaperStyle?: string;

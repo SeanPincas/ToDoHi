@@ -1,12 +1,22 @@
 import { getQuotesByCategoryApi, getRandomQuoteApi } from "../api/quoteApi";
-import type { QuoteCategory } from "./quoteUtils";
+import { QUOTE_DELAY_OPTIONS, type QuoteCategory, type QuoteDelayMinutes } from "./quoteUtils";
 
 export const FALLBACK_QUOTE_TEXT = "Stay productive today.";
-export const QUOTE_ROTATION_INTERVAL_MS = 45_000;
+const DEFAULT_QUOTE_DELAY_MINUTES: QuoteDelayMinutes = 10;
 
 export function getPreferredQuoteCategory(preferences?: string[] | null): QuoteCategory {
     const preferred = Array.isArray(preferences) ? preferences[0] : undefined;
     return (preferred ? preferred : "Random") as QuoteCategory;
+}
+
+export function getPreferredQuoteDelayMinutes(delay?: number | null): QuoteDelayMinutes {
+    return QUOTE_DELAY_OPTIONS.includes(delay as QuoteDelayMinutes)
+        ? (delay as QuoteDelayMinutes)
+        : DEFAULT_QUOTE_DELAY_MINUTES;
+}
+
+export function getQuoteRotationIntervalMs(delay?: number | null): number {
+    return getPreferredQuoteDelayMinutes(delay) * 60_000;
 }
 
 export async function fetchRotatingQuoteText(category: QuoteCategory): Promise<string> {

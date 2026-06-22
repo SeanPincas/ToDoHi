@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');        // For token signing
 const bcrypt = require('bcryptjs');         // For password hashing and comparison
 const User = require('../models/userModel'); // Mongoose User model
+const { reconcileUserCompletedTaskStat } = require("../utils/completedTaskStats");
+const { reconcileUserFailedTasksYesterdayStat } = require("../utils/failedTaskYesterdayStats");
 
 // --------------------------- REGISTER USER ---------------------------
 exports.register = async (req, res) => {
@@ -80,6 +82,19 @@ exports.login = async (req, res) => {
 // --------------------------- GET CURRENT USER ---------------------------
 exports.me = async (req, res) => {
     try {
+        const authUser = await User.findById(req.user._id).select("preference.resetHour");
+
+        if (!authUser) {
+            return res.status(404).json({ message: "User Not Found" });
+        }
+
+        const resetHour = authUser.preference?.resetHour ?? 0;
+
+        await Promise.all([
+            reconcileUserCompletedTaskStat(req.user._id, resetHour),
+            reconcileUserFailedTasksYesterdayStat(req.user._id, resetHour)
+        ]);
+
         // req.user is expected to be set by authMiddleware
         const user = await User.findById(req.user._id).select("-password"); // exclude password
         res.json(user);

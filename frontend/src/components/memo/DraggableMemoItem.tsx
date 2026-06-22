@@ -18,6 +18,9 @@ interface DraggableMemoItemProps {
     memo: Memo;
     zIndex: number;
     isEditMode: boolean;
+    isDeleteMode?: boolean;
+    isDeleteSelected?: boolean;
+    onDeleteModeSelect?: (memoId: string) => void;
     boardWidth: number;
     boardHeight: number;
     boundaryPadding: number;
@@ -30,6 +33,9 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     memo,
     zIndex,
     isEditMode,
+    isDeleteMode = false,
+    isDeleteSelected = false,
+    onDeleteModeSelect,
     boardWidth,
     boardHeight,
     boundaryPadding,
@@ -150,6 +156,11 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     // CLICK → OPEN VIEW MEMO MODAL (VIEW MODE ONLY)
     // -----------------------------------------------------------------------------
     const handleMemoClick = () => {
+        if (isDeleteMode) {
+            onDeleteModeSelect?.(memo._id);
+            return;
+        }
+
         // Edit mode is reserved for dragging / repositioning.
         if (boardMode !== "view") return;
 
@@ -184,7 +195,8 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
                 categoryIcon={<CategoryIcon />}
                 containerColor={memo.containerColor}
                 pinColor={memo.pinColor}
-                isActive={activeMemoId === memo._id}
+                isActive={!isDeleteMode && activeMemoId === memo._id}
+                isDeleteSelected={isDeleteSelected}
                 isAtEdge={isEditMode && isAtEdge}
             />
         </div>

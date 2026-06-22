@@ -19,6 +19,19 @@ const DashboardStats: React.FC = () => {
         return computeDailyDashboardStats(tasks, user);
     }, [tasks, user?.preference?.resetHour]);
 
+    const liveTotalTasksCompleted = useMemo(() => {
+        const storedTotal = user?.stats?.totalTasksCompleted ?? 0;
+        const storedCompletedToday = user?.stats?.tasksCompletedToday ?? 0;
+        const currentCompletedToday = daily?.totalTasksCompletedToday ?? 0;
+        const historicalBase = Math.max(0, storedTotal - storedCompletedToday);
+
+        return historicalBase + currentCompletedToday;
+    }, [
+        daily?.totalTasksCompletedToday,
+        user?.stats?.totalTasksCompleted,
+        user?.stats?.tasksCompletedToday,
+    ]);
+
     // ------------------ BASE STATS FROM BACKEND ------------------
     const todoStats = [
         {
@@ -29,7 +42,7 @@ const DashboardStats: React.FC = () => {
         },
         {
             label: "Total Tasks Completed",
-            value: user?.stats?.totalTasksCompleted ?? 0,
+            value: liveTotalTasksCompleted,
             icon: Icons.Check,
             tone: "green",
         },

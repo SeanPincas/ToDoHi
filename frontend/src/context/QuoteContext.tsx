@@ -5,7 +5,7 @@ import {
     FALLBACK_QUOTE_TEXT,
     fetchRotatingQuoteText,
     getPreferredQuoteCategory,
-    QUOTE_ROTATION_INTERVAL_MS,
+    getQuoteRotationIntervalMs,
 } from "../utils/quoteRotation";
 
 interface QuoteContextType {
@@ -52,12 +52,15 @@ export const QuoteProvider = ({ children }: { children: ReactNode }) => {
         }
 
         refreshQuote();
-        const rotationTimer = window.setInterval(refreshQuote, QUOTE_ROTATION_INTERVAL_MS);
+        const rotationTimer = window.setInterval(
+            refreshQuote,
+            getQuoteRotationIntervalMs(user.preference?.quoteDelay)
+        );
 
         return () => {
             window.clearInterval(rotationTimer);
         };
-    }, [loading, user?._id, JSON.stringify(user?.preference?.quoteCategory)]);
+    }, [loading, user?._id, user?.preference?.quoteDelay, JSON.stringify(user?.preference?.quoteCategory)]);
 
     const value = useMemo(
         () => ({

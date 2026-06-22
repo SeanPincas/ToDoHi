@@ -11,7 +11,35 @@ const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
 const { buildArchiveRecord } = require("./taskArchive");
 const { computeRepeatCycleKey, getCycleWindow } = require("./resetCycle");
-const { getTaskCycleEventAt } = require("./repeatReview");
+
+function getTaskCycleEventAt(task) {
+    if (!task) return null;
+
+    if (task.status === "completed") {
+        return task.completedAt ?? task.createdAt ?? null;
+    }
+
+    if (task.status === "failed") {
+        return task.deadline
+            ?? task.failedAt
+            ?? task.createdAt
+            ?? null;
+    }
+
+    return null;
+}
+
+function isWithinPreviousCycle(dateValue, cycleWindow) {
+    if (!dateValue) return false;
+
+    const eventAt = new Date(dateValue);
+
+    if (Number.isNaN(eventAt.getTime())) {
+        return false;
+    }
+
+    return eventAt >= cycleWindow.previousCycleStart && eventAt <= cycleWindow.currentCycleStart;
+}
 
 function isTaskOlderThanReviewWindow(task, cycleWindow) {
     const eventAtValue = getTaskCycleEventAt(task);
@@ -82,7 +110,72 @@ async function archiveExpiredReviewWindowTasks(now = new Date()) {
     return { archivedCount };
 }
 
+async function syncPreviousCycleTasksToArchiveForUser({
+    userId,
+    resetHour = 0,
+    userPreference = null,
+    now = new Date()
+}) {
+    const cycleWindow = getCycleWindow(resetHour, now);
+
+    const candidateTasks = await Task.find({
+        userId,
+        status: { $in: ["completed", "failed"] }
+    }).sort({ createdAt: 1, orderIndex: 1 });
+
+    const previousCycleTasks = candidateTasks.filter((task) =>
+        isWithinPreviousCycle(getTaskCycleEventAt(task), cycleWindow)
+    );
+
+    if (previousCycleTasks.length === 0) {
+        return {
+            cycleWindow,
+            archivedCount: 0,
+            removedLiveCount: 0
+        };
+    }
+
+    const originalTaskIds = previousCycleTasks.map((task) => task._id);
+    const existingEntries = await TaskArchive.find({
+        userId,
+        sourceCycleKey: cycleWindow.currentCycleKey,
+        originalTaskId: { $in: originalTaskIds }
+    }).select("originalTaskId");
+
+    const existingIdSet = new Set(existingEntries.map((entry) => String(entry.originalTaskId)));
+    const tasksToArchive = previousCycleTasks.filter(
+        (task) => !existingIdSet.has(String(task._id))
+    );
+
+    if (tasksToArchive.length > 0) {
+        const archivedAt = new Date(cycleWindow.currentCycleStart);
+        const archiveRecords = tasksToArchive.map((task) =>
+            buildArchiveRecord(task, {
+                archiveType: task.status,
+                archiveReason: "review-pending",
+                sourceCycleKey: cycleWindow.currentCycleKey,
+                archivedAt,
+                userPreference
+            })
+        );
+
+        await TaskArchive.insertMany(archiveRecords);
+    }
+
+    await Task.deleteMany({
+        userId,
+        _id: { $in: originalTaskIds }
+    });
+
+    return {
+        cycleWindow,
+        archivedCount: tasksToArchive.length,
+        removedLiveCount: previousCycleTasks.length
+    };
+}
+
 module.exports = {
     archiveExpiredReviewWindowTasks,
-    isTaskOlderThanReviewWindow
+    isTaskOlderThanReviewWindow,
+    syncPreviousCycleTasksToArchiveForUser
 };

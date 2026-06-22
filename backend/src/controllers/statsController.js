@@ -5,12 +5,27 @@
 // ============================================================================
 
 const User = require("../models/userModel");
+const { reconcileUserCompletedTaskStat } = require("../utils/completedTaskStats");
+const { reconcileUserFailedTasksYesterdayStat } = require("../utils/failedTaskYesterdayStats");
 
 // ============================================================================
 // GET USER STATS (READ-ONLY)
 // ============================================================================
 exports.getStats = async (req, res) => {
     try {
+        const statsUser = await User.findById(req.user._id).select("preference.resetHour");
+
+        if (!statsUser) {
+            return res.status(404).json({ message: "User Not Found" });
+        }
+
+        const resetHour = statsUser.preference?.resetHour ?? 0;
+
+        await Promise.all([
+            reconcileUserCompletedTaskStat(req.user._id, resetHour),
+            reconcileUserFailedTasksYesterdayStat(req.user._id, resetHour)
+        ]);
+
         const user = await User.findById(req.user._id).select("stats");
 
         if (!user) {

@@ -8,8 +8,8 @@ import {
 } from "../../../api/userApi";
 import { useAuthContext } from "../../../context/AuthContext";
 import DropdownMenu, { type DropdownOption } from "../dropdownMenu/DropdownMenu";
-import type { QuoteCategory } from "../../../utils/quoteUtils";
-import { QUOTE_CATEGORIES } from "../../../utils/quoteUtils";
+import type { QuoteCategory, QuoteDelayMinutes } from "../../../utils/quoteUtils";
+import { QUOTE_CATEGORIES, QUOTE_DELAY_LABELS, QUOTE_DELAY_OPTIONS } from "../../../utils/quoteUtils";
 import { BOOKMARK_STYLE_OPTIONS } from "../../../utils/bookmarkStyles";
 import { WALLPAPER_STYLE_OPTIONS } from "../../../utils/wallpaperStyles";
 import ThemeToggle from "../themeToggle/ThemeToggle";
@@ -36,6 +36,11 @@ const QUOTE_OPTIONS: DropdownOption[] = [
     })),
 ];
 
+const QUOTE_DELAY_DROPDOWN_OPTIONS: DropdownOption[] = QUOTE_DELAY_OPTIONS.map((delay) => ({
+    value: String(delay),
+    label: QUOTE_DELAY_LABELS[delay],
+}));
+
 const BOOKMARK_OPTIONS: DropdownOption[] = BOOKMARK_STYLE_OPTIONS.map((style) => ({
     value: style,
     label: style.replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
@@ -59,6 +64,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
     const [username, setUsername] = useState("");
     const [resetHour, setResetHour] = useState("0");
     const [quotePreference, setQuotePreference] = useState<string>("Random");
+    const [quoteDelay, setQuoteDelay] = useState<string>("10");
     const [wallpaperStyle, setWallpaperStyle] = useState("wallpaper-1");
     const [bookmarkStyle, setBookmarkStyle] = useState("bookmark-1");
     const [accountMessage, setAccountMessage] = useState("");
@@ -75,6 +81,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
 
         setUsername(user.username ?? "");
         setResetHour(String(user.preference?.resetHour ?? 0));
+        setQuoteDelay(String(user.preference?.quoteDelay ?? 10));
         setWallpaperStyle(user.preference?.wallpaperStyle ?? "wallpaper-1");
         setBookmarkStyle(user.preference?.bookmarkStyle ?? "bookmark-1");
 
@@ -132,6 +139,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
         try {
             await updateUserPreferences({
                 resetHour: Number(resetHour),
+                quoteDelay: Number(quoteDelay) as QuoteDelayMinutes,
                 wallpaperStyle,
                 bookmarkStyle,
                 quoteCategory: quotePreference === "Random" ? [] : [quotePreference as QuoteCategory],
@@ -298,6 +306,15 @@ const UserSettingsModal = ({ onClose }: Props) => {
                                     options={QUOTE_OPTIONS}
                                     onChange={setQuotePreference}
                                     maxHeight={220}
+                                />
+
+                                <DropdownMenu
+                                    label="Quote Delay"
+                                    value={QUOTE_DELAY_DROPDOWN_OPTIONS.find((option) => option.value === quoteDelay)?.label ?? "10 Minutes"}
+                                    selectedValue={quoteDelay}
+                                    options={QUOTE_DELAY_DROPDOWN_OPTIONS}
+                                    onChange={setQuoteDelay}
+                                    maxHeight={180}
                                 />
 
                                 <DropdownMenu

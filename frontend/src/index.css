@@ -80,7 +80,7 @@
     --memo-frame-header-bg: rgba(255, 255, 255, 0.35);
 
     /* Cork Board */
-    --memo-cork-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+    --memo-cork-shadow: inset 0 0 12px rgba(0, 0, 0, 0.75);
 }
 
 /* Apply font and general body styling */

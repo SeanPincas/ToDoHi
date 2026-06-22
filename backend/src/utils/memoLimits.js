@@ -1,4 +1,4 @@
-const MEMO_TITLE_MAX_LENGTH = 24;
+const MEMO_TITLE_MAX_LENGTH = 65;
 const MEMO_CONTENT_MAX_LENGTH = 650;
 
 function normalizeMemoTitle(value) {

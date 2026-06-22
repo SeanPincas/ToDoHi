@@ -10,10 +10,9 @@
 const Task = require("../models/taskModel");
 const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
-const { buildArchiveRecord } = require("./taskArchive");
 const { DEFAULT_ARCHIVE_LABEL } = require("./repeatReviewConstants");
 const { computeRepeatDeadline, computeRepeatCycleKey } = require("./resetCycle");
-const { getRepeatableTasksForUser } = require("./repeatReview");
+const { syncPreviousCycleTasksToArchiveForUser } = require("./taskArchiveSync");
 
 function buildRepeatedTaskPayload(task, userId, deadline) {
     return {
@@ -37,12 +36,19 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
     }
 
     const resetHour = user.preference?.resetHour ?? 0;
-    const { tasks: oldTasks } = await getRepeatableTasksForUser({
+    const { cycleWindow } = await syncPreviousCycleTasksToArchiveForUser({
         userId,
-        resetHour
+        resetHour,
+        userPreference: user.preference
     });
 
-    if (oldTasks.length === 0) {
+    const reviewEntries = await TaskArchive.find({
+        userId,
+        sourceCycleKey: cycleWindow.currentCycleKey,
+        repeatedAt: null
+    }).sort({ archivedAt: 1, createdAt: 1, orderIndex: 1 });
+
+    if (reviewEntries.length === 0) {
         return {
             ok: false,
             statusCode: 400,
@@ -54,10 +60,10 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
     const newDeadline = computeRepeatDeadline(resetHour, now);
     const cycleKey = computeRepeatCycleKey(resetHour, now);
     const repeatIdSet = new Set((repeatTaskIds || []).map(String));
-    const tasksToRepeat = oldTasks.filter(task => repeatIdSet.has(task._id.toString()));
+    const tasksToRepeat = reviewEntries.filter((entry) => repeatIdSet.has(entry._id.toString()));
 
-    const newTaskPayloads = tasksToRepeat.map(task =>
-        buildRepeatedTaskPayload(task, userId, newDeadline)
+    const newTaskPayloads = tasksToRepeat.map((entry) =>
+        buildRepeatedTaskPayload(entry, userId, newDeadline)
     );
 
     const insertedTasks = newTaskPayloads.length > 0
@@ -65,35 +71,40 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
         : [];
 
     const repeatedTaskIdMap = new Map();
-    tasksToRepeat.forEach((task, index) => {
-        repeatedTaskIdMap.set(task._id.toString(), insertedTasks[index]?._id ?? null);
+    tasksToRepeat.forEach((entry, index) => {
+        repeatedTaskIdMap.set(entry._id.toString(), insertedTasks[index]?._id ?? null);
     });
 
     const archivedAt = new Date();
-    const archiveRecords = oldTasks.map(task => {
-        const repeatedIntoTaskId = repeatedTaskIdMap.get(task._id.toString()) ?? null;
-        const wasRepeated = Boolean(repeatedIntoTaskId);
-
-        return buildArchiveRecord(task, {
-            archiveType: task.status,
-            archiveReason: wasRepeated ? "repeat-selected-source" : "repeat-unselected",
-            sourceCycleKey: cycleKey,
-            repeatedAt: wasRepeated ? archivedAt : null,
-            repeatedIntoTaskId,
-            archivedAt,
-            retentionDeleteAt: wasRepeated ? newDeadline : null,
-            userPreference: user.preference
-        });
-    });
-
-    if (archiveRecords.length > 0) {
-        await TaskArchive.insertMany(archiveRecords);
+    if (tasksToRepeat.length > 0) {
+        await Promise.all(tasksToRepeat.map((entry) =>
+            TaskArchive.updateOne(
+                { _id: entry._id, userId, repeatedAt: null },
+                {
+                    $set: {
+                        archiveReason: "repeat-selected-source",
+                        repeatedAt: archivedAt,
+                        repeatedIntoTaskId: repeatedTaskIdMap.get(entry._id.toString()) ?? null,
+                        retentionDeleteAt: newDeadline
+                    }
+                }
+            )
+        ));
     }
 
-    await Task.deleteMany({
-        userId,
-        _id: { $in: oldTasks.map(task => task._id) }
-    });
+    await TaskArchive.updateMany(
+        {
+            userId,
+            sourceCycleKey: cycleKey,
+            repeatedAt: null,
+            archiveReason: "review-pending"
+        },
+        {
+            $set: {
+                archiveReason: "repeat-unselected"
+            }
+        }
+    );
 
     const userUpdate = {};
 
@@ -115,9 +126,9 @@ async function repeatTasksForUser({ userId, repeatTaskIds = [] }) {
             archiveLabel: DEFAULT_ARCHIVE_LABEL,
             retentionDays: user.preference?.dayTaskDelete ?? 30,
             repeatedCount: insertedTasks.length,
-            archivedCount: archiveRecords.length,
-            archivedFailedCount: archiveRecords.filter(task => task.archiveType === "failed").length,
-            archivedCompletedCount: archiveRecords.filter(task => task.archiveType === "completed").length
+            archivedCount: reviewEntries.length,
+            archivedFailedCount: reviewEntries.filter((task) => task.archiveType === "failed").length,
+            archivedCompletedCount: reviewEntries.filter((task) => task.archiveType === "completed").length
         }
     };
 }

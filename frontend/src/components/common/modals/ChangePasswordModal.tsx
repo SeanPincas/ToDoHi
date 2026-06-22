@@ -16,6 +16,9 @@ const ChangePasswordModal = ({ onClose, onSuccess }: Props) => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [isSaving, setIsSaving] = useState(false);
@@ -89,38 +92,80 @@ const ChangePasswordModal = ({ onClose, onSuccess }: Props) => {
                 <div className="task-management-modal-panel change-password-panel">
                     <div className="change-password-field-block">
                         <label htmlFor="change-password-current">Current Password</label>
-                        <input
-                            id="change-password-current"
-                            type="password"
-                            className="change-password-input"
-                            value={currentPassword}
-                            onChange={(event) => setCurrentPassword(event.target.value)}
-                            placeholder="Current password"
-                        />
+                        <div className="change-password-input-shell">
+                            <input
+                                id="change-password-current"
+                                type={showCurrentPassword ? "text" : "password"}
+                                className="change-password-input"
+                                value={currentPassword}
+                                onChange={(event) => setCurrentPassword(event.target.value)}
+                                placeholder="Current password"
+                            />
+                            <button
+                                type="button"
+                                className="change-password-toggle"
+                                aria-label={showCurrentPassword ? "Hide current password" : "Show current password"}
+                                onClick={() => setShowCurrentPassword((value) => !value)}
+                            >
+                                {showCurrentPassword ? (
+                                    <Icons.HidePassword className="change-password-toggle-icon" />
+                                ) : (
+                                    <Icons.ShowPassword className="change-password-toggle-icon" />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="change-password-field-block">
                         <label htmlFor="change-password-new">New Password</label>
-                        <input
-                            id="change-password-new"
-                            type="password"
-                            className="change-password-input"
-                            value={newPassword}
-                            onChange={(event) => setNewPassword(event.target.value)}
-                            placeholder="New password"
-                        />
+                        <div className="change-password-input-shell">
+                            <input
+                                id="change-password-new"
+                                type={showNewPassword ? "text" : "password"}
+                                className="change-password-input"
+                                value={newPassword}
+                                onChange={(event) => setNewPassword(event.target.value)}
+                                placeholder="New password"
+                            />
+                            <button
+                                type="button"
+                                className="change-password-toggle"
+                                aria-label={showNewPassword ? "Hide new password" : "Show new password"}
+                                onClick={() => setShowNewPassword((value) => !value)}
+                            >
+                                {showNewPassword ? (
+                                    <Icons.HidePassword className="change-password-toggle-icon" />
+                                ) : (
+                                    <Icons.ShowPassword className="change-password-toggle-icon" />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="change-password-field-block">
                         <label htmlFor="change-password-confirm">Confirm Password</label>
-                        <input
-                            id="change-password-confirm"
-                            type="password"
-                            className="change-password-input"
-                            value={confirmPassword}
-                            onChange={(event) => setConfirmPassword(event.target.value)}
-                            placeholder="Confirm new password"
-                        />
+                        <div className="change-password-input-shell">
+                            <input
+                                id="change-password-confirm"
+                                type={showConfirmPassword ? "text" : "password"}
+                                className="change-password-input"
+                                value={confirmPassword}
+                                onChange={(event) => setConfirmPassword(event.target.value)}
+                                placeholder="Confirm new password"
+                            />
+                            <button
+                                type="button"
+                                className="change-password-toggle"
+                                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                                onClick={() => setShowConfirmPassword((value) => !value)}
+                            >
+                                {showConfirmPassword ? (
+                                    <Icons.HidePassword className="change-password-toggle-icon" />
+                                ) : (
+                                    <Icons.ShowPassword className="change-password-toggle-icon" />
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
