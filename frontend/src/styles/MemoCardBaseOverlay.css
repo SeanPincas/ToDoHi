@@ -3,10 +3,12 @@
 .memo-card-overlay {
     position: relative;
     transition: box-shadow 0.2s ease, transform 0.15s ease;
+    box-sizing: border-box;
 
     /* ---------------- FIXED SIZE ---------------- */
-    width: 220px;
-    height: 180px;
+    width: var(--memo-card-width, 220px);
+    height: var(--memo-card-height, 180px);
+    min-height: var(--memo-card-min-height, var(--memo-card-height, 180px));
 
     background: transparent;
     /* sticky-note yellow */
@@ -25,8 +27,19 @@
 
 .memo-card-overlay.active {
     box-shadow:
-        0 0 0 2px var(--info-accent),
-        0 0 12px rgba(0, 150, 255, 0.45);
+        0 0 0 3px color-mix(in srgb, var(--success-accent) 86%, #2f7d32 14%),
+        0 0 16px rgba(102, 176, 102, 0.4),
+        0 8px 16px rgba(0, 0, 0, 0.18);
+    transform: scale(1.01);
+}
+
+.memo-card-overlay.delete-selected {
+    border: 3px solid color-mix(in srgb, var(--danger-red) 88%, #ff3b30 12%);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, #ff3b30 82%, white 18%),
+        0 0 0 1px color-mix(in srgb, #ff3b30 48%, transparent 52%),
+        0 0 18px rgba(255, 59, 48, 0.34),
+        0 6px 12px rgba(0, 0, 0, 0.22);
     transform: scale(1.01);
 }
 
@@ -41,12 +54,12 @@
 
 .memo-pin {
     position: absolute;
-    top: 5px;
+    top: var(--memo-pin-top-offset, 5px);
     left: 50%;
     transform: translateX(-50%);
 
-    width: 14px;
-    height: 14px;
+    width: var(--memo-pin-size, 14px);
+    height: var(--memo-pin-size, 14px);
 
     border-radius: 50%;
     box-shadow:
@@ -59,6 +72,40 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.memo-delete-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.memo-delete-overlay-icon {
+    font-family: var(--font-heading);
+    font-size: clamp(2.1rem, 2.6vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1;
+    color: #ff3b30;
+    transform: rotate(45deg);
+    filter:
+        drop-shadow(0 0 1px rgba(255, 255, 255, 0.82))
+        drop-shadow(0 2px 5px rgba(166, 23, 23, 0.42));
+    opacity: 1;
+}
+
+.memo-card-paper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.memo-card-paper.scrollable {
+    overflow: hidden;
 }
 
 /* ============================ HEADER ============================ */
@@ -110,18 +157,42 @@
     text-overflow: ellipsis;
 }
 
+.memo-content.scrollable {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: block;
+    line-clamp: unset;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-overflow: clip;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.34) transparent;
+}
+
+.memo-content.scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.memo-content.scrollable::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.memo-content.scrollable::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.34);
+    border-radius: 999px;
+}
+
+.memo-content.scrollable::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 /* --------------------------- TABLET --------------------------- */
 @media (max-width: 1024px) {
     .memo-card-overlay {
-        width: 190px;
-        height: 155px;
         padding: 12px 10px 10px;
-    }
-
-    .memo-pin {
-        width: 12px;
-        height: 12px;
-        top: 4px;
     }
 
     .memo-title {
@@ -142,16 +213,8 @@
 /* --------------------------- MOBILE --------------------------- */
 @media (max-width: 600px) {
     .memo-card-overlay {
-        width: 160px;
-        height: 130px;
         padding: 10px 8px 8px;
         border-radius: 5px;
-    }
-
-    .memo-pin {
-        width: 10px;
-        height: 10px;
-        top: 3px;
     }
 
     .memo-header {

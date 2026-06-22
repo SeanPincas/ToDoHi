@@ -283,7 +283,10 @@ const TodoPreview: React.FC = () => {
                 </div>
 
                 <div className="todo-preview-title-wrap">
-                    <h2 className="todo-preview-title">To-Do List</h2>
+                    <h2 className="todo-preview-title">
+                        <Icons.Todo className="todo-preview-title-icon" />
+                        <span>To-Do List</span>
+                    </h2>
                 </div>
 
                 <div

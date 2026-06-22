@@ -104,7 +104,10 @@ export function isTaskFromPreviousCycle(
 
     const { start, yesterdayStart } = getResetWindow(resetHour);
 
-    return eventAt >= yesterdayStart && eventAt < start;
+    // The reset boundary belongs to the cycle that just ended.
+    // This mirrors backend review/archive logic so tasks that finish exactly
+    // at resetHour still appear as "yesterday" items instead of disappearing.
+    return eventAt >= yesterdayStart && eventAt <= start;
 }
 
 function dedupeByCompositeKey<T>(
@@ -125,14 +128,6 @@ function dedupeByCompositeKey<T>(
     });
 }
 
-const mapTaskToFailedYesterdayItem = (task: Task): FailedYesterdayItem => ({
-    _id: task._id,
-    title: task.title,
-    category: String(task.category),
-    containerColor: task.containerColor,
-    status: "failed",
-});
-
 const mapArchiveEntryToFailedYesterdayItem = (entry: TaskArchiveEntry): FailedYesterdayItem => ({
     _id: entry._id,
     title: entry.title,
@@ -144,10 +139,6 @@ const mapArchiveEntryToFailedYesterdayItem = (entry: TaskArchiveEntry): FailedYe
 export const getFailedTasksYesterdayPreview = async (): Promise<FailedYesterdayItem[]> => {
     const review = await getRepeatReviewApi();
 
-    const liveFailedTasks = review.tasks
-        .filter((task) => task.status === "failed")
-        .map(mapTaskToFailedYesterdayItem);
-
     const archive = await getTaskArchiveApi({
         archiveType: "failed",
         cycleKey: review.cycleKey,
@@ -156,17 +147,8 @@ export const getFailedTasksYesterdayPreview = async (): Promise<FailedYesterdayI
 
     const archivedFailedTasks = archive.entries.map(mapArchiveEntryToFailedYesterdayItem);
 
-    return dedupeByCompositeKey(
-        [...liveFailedTasks, ...archivedFailedTasks],
-        (task) => task._id
-    );
+    return dedupeByCompositeKey(archivedFailedTasks, (task) => task._id);
 };
-
-const mapTaskToYesterdayPreviewTask = (task: Task): YesterdayPreviewTask => ({
-    ...task,
-    previewOrigin: "yesterday",
-    previewSource: "review",
-});
 
 const mapArchiveEntryToYesterdayPreviewTask = (entry: TaskArchiveEntry): YesterdayPreviewTask => ({
     _id: entry._id,
@@ -200,10 +182,6 @@ export const getYesterdayTasksPreview = async (
     const matchesFilter = (status: string) =>
         filter === "all" ? status === "completed" || status === "failed" : status === filter;
 
-    const liveYesterdayTasks = review.tasks
-        .filter((task) => matchesFilter(task.status))
-        .map(mapTaskToYesterdayPreviewTask);
-
     const archive = await getTaskArchiveApi({
         archiveType: filter === "all" ? "all" : filter,
         cycleKey: review.cycleKey,
@@ -214,8 +192,5 @@ export const getYesterdayTasksPreview = async (
         .filter((entry) => matchesFilter(entry.archiveType))
         .map(mapArchiveEntryToYesterdayPreviewTask);
 
-    return dedupeByCompositeKey(
-        [...liveYesterdayTasks, ...archivedYesterdayTasks],
-        (task) => task._id
-    );
+    return dedupeByCompositeKey(archivedYesterdayTasks, (task) => task._id);
 };

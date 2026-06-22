@@ -61,14 +61,14 @@
     --border-ink-soft: rgba(53, 81, 109, 0.72);
     --border-ink-strong: rgba(44, 69, 94, 0.85);
     --border-width-soft: 1px;
-    --shadow-soft: 0 3px 10px rgba(34, 49, 65, 0.1);
-    --shadow-paper-lift: 0 10px 22px rgba(34, 49, 65, 0.12);
-    --dashboard-paper-shadow: rgba(196, 184, 162, 0.65);
-    --dashboard-paper-shadow-deep: rgba(178, 165, 141, 0.5);
-    --modal-paper-shadow: rgba(110, 88, 52, 0.12);
-    --modal-paper-shadow-side: rgba(110, 88, 52, 0.08);
-    --modal-paper-shadow-deep: rgba(101, 79, 46, 0.38);
-    --modal-paper-shadow-ledge: rgba(143, 123, 91, 0.22);
+    --shadow-soft: 0 4px 14px rgba(34, 49, 65, 0.16);
+    --shadow-paper-lift: 0 12px 26px rgba(34, 49, 65, 0.2);
+    --dashboard-paper-shadow: rgba(168, 148, 114, 0.82);
+    --dashboard-paper-shadow-deep: rgba(138, 117, 86, 0.68);
+    --modal-paper-shadow: rgba(110, 88, 52, 0.2);
+    --modal-paper-shadow-side: rgba(110, 88, 52, 0.16);
+    --modal-paper-shadow-deep: rgba(101, 79, 46, 0.5);
+    --modal-paper-shadow-ledge: rgba(143, 123, 91, 0.32);
 
     /* ===================== MEMO BOARD THEME ===================== */
 
@@ -80,7 +80,7 @@
     --memo-frame-header-bg: rgba(255, 255, 255, 0.35);
 
     /* Cork Board */
-    --memo-cork-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
+    --memo-cork-shadow: inset 0 0 12px rgba(0, 0, 0, 0.75);
 }
 
 /* Apply font and general body styling */
@@ -216,14 +216,14 @@ body[data-theme="dark"] {
     --border-ink-soft: rgba(140, 180, 223, 0.65);
     --border-ink-strong: rgba(155, 192, 232, 0.82);
     --border-width-soft: 1px;
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.36);
-    --shadow-paper-lift: 0 10px 24px rgba(0, 0, 0, 0.34);
-    --dashboard-paper-shadow: rgba(34, 47, 63, 0.56);
-    --dashboard-paper-shadow-deep: rgba(10, 18, 28, 0.5);
-    --modal-paper-shadow: rgba(0, 0, 0, 0.22);
-    --modal-paper-shadow-side: rgba(0, 0, 0, 0.16);
-    --modal-paper-shadow-deep: rgba(0, 0, 0, 0.34);
-    --modal-paper-shadow-ledge: rgba(0, 0, 0, 0.2);
+    --shadow-soft: 0 5px 14px rgba(0, 0, 0, 0.44);
+    --shadow-paper-lift: 0 12px 28px rgba(0, 0, 0, 0.42);
+    --dashboard-paper-shadow: rgba(24, 34, 48, 0.7);
+    --dashboard-paper-shadow-deep: rgba(6, 12, 20, 0.64);
+    --modal-paper-shadow: rgba(0, 0, 0, 0.3);
+    --modal-paper-shadow-side: rgba(0, 0, 0, 0.24);
+    --modal-paper-shadow-deep: rgba(0, 0, 0, 0.44);
+    --modal-paper-shadow-ledge: rgba(0, 0, 0, 0.3);
 
     /* ----------------------- MEMO BOARD (DARK) ----------------------------- */
 

@@ -37,13 +37,14 @@ export interface RepeatReviewResponse {
     cycleKey: string;
     retentionDays: number;
     archiveLabel: string;
-    reviewSource?: "live" | "archive";
+    reviewSource?: "archive";
     summary: RepeatReviewSummary;
     tasks: Task[];
 }
 
 export interface TaskArchiveEntry {
     _id: string;
+    source?: "archive";
     userId: string;
     originalTaskId?: string | null;
     title: string;

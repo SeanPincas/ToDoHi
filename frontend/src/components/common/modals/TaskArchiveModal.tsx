@@ -136,6 +136,11 @@ const TaskArchiveModal: React.FC = () => {
         failed: entries.filter((entry) => entry.archiveType === "failed").length,
     }), [entries]);
 
+    const actionableArchiveEntries = useMemo(
+        () => filteredEntries,
+        [filteredEntries]
+    );
+
     useEffect(() => {
         if (!isOpen) return;
         setActiveTab("all");
@@ -484,7 +489,7 @@ const TaskArchiveModal: React.FC = () => {
                             type="button"
                             className={`icon-btn-square btn-green-rect task-archive-bulk-btn ${selectionMode === "repeat" ? "active" : ""}`}
                             onClick={() => toggleSelectionMode("repeat")}
-                            disabled={filteredEntries.length === 0 || busyBulkAction !== null}
+                            disabled={actionableArchiveEntries.length === 0 || busyBulkAction !== null}
                             aria-label={selectionMode === "repeat" ? "Cancel multi-repeat mode" : "Enable multi-repeat mode"}
                             title={selectionMode === "repeat" ? "Cancel multi-repeat mode" : "Enable multi-repeat mode"}
                         >
@@ -494,7 +499,7 @@ const TaskArchiveModal: React.FC = () => {
                             type="button"
                             className={`icon-btn-square btn-danger-rect task-archive-bulk-btn task-archive-bulk-delete-btn ${selectionMode === "delete" ? "active" : ""}`}
                             onClick={() => toggleSelectionMode("delete")}
-                            disabled={filteredEntries.length === 0 || busyBulkAction !== null}
+                            disabled={actionableArchiveEntries.length === 0 || busyBulkAction !== null}
                             aria-label={selectionMode === "delete" ? "Cancel multi-delete mode" : "Enable multi-delete mode"}
                             title={selectionMode === "delete" ? "Cancel multi-delete mode" : "Enable multi-delete mode"}
                         >
@@ -565,30 +570,32 @@ const TaskArchiveModal: React.FC = () => {
 
                                     {selectionMode === "none" && (
                                         <div className="task-archive-item-actions">
-                                            <button
-                                                type="button"
-                                                className="btn-green-rect task-archive-action-btn"
-                                                disabled={isBusy}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRepeatEntry(entry._id);
-                                                }}
-                                            >
-                                                <Icons.Repeat />
-                                                <span>{isBusy ? "Working..." : "Repeat"}</span>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
-                                                disabled={isBusy}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteEntry(entry._id);
-                                                }}
-                                            >
-                                                <Icons.Delete />
-                                                <span>Delete</span>
-                                            </button>
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="btn-green-rect task-archive-action-btn"
+                                                    disabled={isBusy}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRepeatEntry(entry._id);
+                                                    }}
+                                                >
+                                                    <Icons.Repeat />
+                                                    <span>{isBusy ? "Working..." : "Repeat"}</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn-danger-rect task-archive-action-btn task-archive-delete-btn"
+                                                    disabled={isBusy}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteEntry(entry._id);
+                                                    }}
+                                                >
+                                                    <Icons.Delete />
+                                                    <span>Delete</span>
+                                                </button>
+                                            </>
                                         </div>
                                     )}
                                 </div>

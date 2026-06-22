@@ -11,6 +11,7 @@ const TaskArchive = require("../models/taskArchiveModel");
 const User = require("../models/userModel");
 const { getCycleWindow } = require("./resetCycle");
 const { DEFAULT_ARCHIVE_LABEL, DEFAULT_REVIEW_LIMIT } = require("./repeatReviewConstants");
+const { syncPreviousCycleTasksToArchiveForUser } = require("./taskArchiveSync");
 
 function buildRepeatReviewSummary(tasks) {
     const summary = {
@@ -56,7 +57,10 @@ function isWithinPreviousCycle(dateValue, cycleWindow) {
         return false;
     }
 
-    return eventAt >= cycleWindow.previousCycleStart && eventAt < cycleWindow.currentCycleStart;
+    // Treat the exact reset boundary as part of the cycle that just ended.
+    // This keeps tasks that fail/complete exactly at resetHour visible in the
+    // previous-cycle review instead of dropping into a gap between cycles.
+    return eventAt >= cycleWindow.previousCycleStart && eventAt <= cycleWindow.currentCycleStart;
 }
 
 function mapArchiveEntryToReviewTask(entry) {
@@ -120,25 +124,21 @@ async function getRepeatReviewForUser({ userId, limit = DEFAULT_REVIEW_LIMIT }) 
 
     const resetHour = user.preference?.resetHour ?? 0;
     const retentionDays = user.preference?.dayTaskDelete ?? 30;
-    const { cycleWindow, tasks: repeatableTasks } = await getRepeatableTasksForUser({
+    const { cycleWindow } = await syncPreviousCycleTasksToArchiveForUser({
         userId,
         resetHour,
-        limit
+        userPreference: user.preference
     });
 
-    let reviewTasks = repeatableTasks;
+    const archivedEntries = await TaskArchive.find({
+        userId,
+        sourceCycleKey: cycleWindow.currentCycleKey,
+        repeatedAt: null
+    })
+        .sort({ archivedAt: 1, createdAt: 1, orderIndex: 1 })
+        .limit(limit);
 
-    if (reviewTasks.length === 0) {
-        const archivedEntries = await TaskArchive.find({
-            userId,
-            sourceCycleKey: cycleWindow.currentCycleKey,
-            archiveReason: "repeat-unselected"
-        })
-            .sort({ archivedAt: 1, createdAt: 1, orderIndex: 1 })
-            .limit(limit);
-
-        reviewTasks = archivedEntries.map(mapArchiveEntryToReviewTask);
-    }
+    const reviewTasks = archivedEntries.map(mapArchiveEntryToReviewTask);
 
     const summary = buildRepeatReviewSummary(reviewTasks);
 
@@ -147,7 +147,7 @@ async function getRepeatReviewForUser({ userId, limit = DEFAULT_REVIEW_LIMIT }) 
         cycleKey: cycleWindow.currentCycleKey,
         retentionDays,
         archiveLabel: DEFAULT_ARCHIVE_LABEL,
-        reviewSource: repeatableTasks.length > 0 ? "live" : "archive",
+        reviewSource: "archive",
         summary,
         tasks: reviewTasks
     };
@@ -158,6 +158,7 @@ module.exports = {
     DEFAULT_REVIEW_LIMIT,
     buildRepeatReviewSummary,
     getTaskCycleEventAt,
+    isWithinPreviousCycle,
     mapArchiveEntryToReviewTask,
     getRepeatableTasksForUser,
     getRepeatReviewForUser

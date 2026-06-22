@@ -18,8 +18,12 @@ interface DraggableMemoItemProps {
     memo: Memo;
     zIndex: number;
     isEditMode: boolean;
+    isDeleteMode?: boolean;
+    isDeleteSelected?: boolean;
+    onDeleteModeSelect?: (memoId: string) => void;
     boardWidth: number;
     boardHeight: number;
+    boundaryPadding: number;
 }
 
 // ============================================================================
@@ -29,8 +33,12 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     memo,
     zIndex,
     isEditMode,
+    isDeleteMode = false,
+    isDeleteSelected = false,
+    onDeleteModeSelect,
     boardWidth,
     boardHeight,
+    boundaryPadding,
 }) => {
     const {
         activeMemoId,
@@ -52,19 +60,47 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
         id: memo._id,
     });
 
+    const wrapperRef = React.useRef<HTMLDivElement | null>(null);
+    const [pinOffsets, setPinOffsets] = React.useState({
+        x: 110,
+        y: 12,
+    });
+
     // ------------------------------------------------------------------------
     // PIN-CENTER OFFSETS (MUST MATCH CSS)
     // ------------------------------------------------------------------------
-    // Memo card width from CSS
-    const CARD_WIDTH = 220;
+    React.useLayoutEffect(() => {
+        if (!wrapperRef.current) return;
 
-    // Pin styles from `.memo-pin`
-    const PIN_RADIUS = 7;      // 14px / 2
-    const PIN_TOP_OFFSET = 5;  // top: 5px
+        const measureOffsets = () => {
+            const overlay = wrapperRef.current?.querySelector(".memo-card-overlay") as HTMLElement | null;
+            const pin = wrapperRef.current?.querySelector(".memo-pin") as HTMLElement | null;
 
-    // Pin center relative to card top-left
-    const PIN_OFFSET_X = CARD_WIDTH / 2;
-    const PIN_OFFSET_Y = PIN_TOP_OFFSET + PIN_RADIUS;
+            if (!overlay || !pin) return;
+
+            const overlayRect = overlay.getBoundingClientRect();
+            const pinRect = pin.getBoundingClientRect();
+
+            setPinOffsets({
+                x: (pinRect.left - overlayRect.left) + (pinRect.width / 2),
+                y: (pinRect.top - overlayRect.top) + (pinRect.height / 2),
+            });
+        };
+
+        measureOffsets();
+
+        const overlay = wrapperRef.current.querySelector(".memo-card-overlay") as HTMLElement | null;
+        if (!overlay) return;
+
+        const resizeObserver = new ResizeObserver(measureOffsets);
+        resizeObserver.observe(overlay);
+        window.addEventListener("resize", measureOffsets);
+
+        return () => {
+            resizeObserver.disconnect();
+            window.removeEventListener("resize", measureOffsets);
+        };
+    }, []);
 
     // ------------------------------------------------------------------------
     // POSITION CALCULATION (PIN IS SOURCE OF TRUTH)
@@ -74,8 +110,8 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     const pinY = (memo.position.yPct / 100) * boardHeight;
 
     // Convert pin-center → card top-left
-    const leftPx = pinX - PIN_OFFSET_X;
-    const topPx = pinY - PIN_OFFSET_Y;
+    const leftPx = pinX - pinOffsets.x;
+    const topPx = pinY - pinOffsets.y;
 
     // ------------------------------------------------------------------------
     // LIVE DRAG CLAMP (PIN-BASED, FRONTEND ONLY)
@@ -91,6 +127,7 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
             pinY,
             boardWidth,
             boardHeight,
+            boundaryPadding,
         });
 
         clampedTransform = result.transform;
@@ -119,6 +156,11 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
     // CLICK → OPEN VIEW MEMO MODAL (VIEW MODE ONLY)
     // -----------------------------------------------------------------------------
     const handleMemoClick = () => {
+        if (isDeleteMode) {
+            onDeleteModeSelect?.(memo._id);
+            return;
+        }
+
         // Edit mode is reserved for dragging / repositioning.
         if (boardMode !== "view") return;
 
@@ -132,7 +174,10 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
 
     return (
         <div
-            ref={setNodeRef}
+            ref={(node) => {
+                wrapperRef.current = node;
+                setNodeRef(node);
+            }}
             style={style}
             {...(isEditMode ? listeners : {})}
             {...(isEditMode ? attributes : {})}
@@ -150,7 +195,8 @@ const DraggableMemoItem: React.FC<DraggableMemoItemProps> = ({
                 categoryIcon={<CategoryIcon />}
                 containerColor={memo.containerColor}
                 pinColor={memo.pinColor}
-                isActive={activeMemoId === memo._id}
+                isActive={!isDeleteMode && activeMemoId === memo._id}
+                isDeleteSelected={isDeleteSelected}
                 isAtEdge={isEditMode && isAtEdge}
             />
         </div>

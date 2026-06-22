@@ -7,6 +7,8 @@
 
 const TaskArchive = require("../models/taskArchiveModel");
 const { archiveTypeList, archiveReasonList } = require("./taskArchiveConstants");
+const User = require("../models/userModel");
+const { syncPreviousCycleTasksToArchiveForUser } = require("./taskArchiveSync");
 
 const DEFAULT_ARCHIVE_LIMIT = 50;
 const MAX_ARCHIVE_LIMIT = 200;
@@ -62,6 +64,15 @@ async function getTaskArchiveEntriesForUser({
     limit
 }) {
     const normalizedLimit = normalizeArchiveLimit(limit);
+    const user = await User.findById(userId, "preference.resetHour preference.dayTaskDelete");
+    const resetHour = user?.preference?.resetHour ?? 0;
+
+    await syncPreviousCycleTasksToArchiveForUser({
+        userId,
+        resetHour,
+        userPreference: user?.preference ?? null
+    });
+
     const query = buildTaskArchiveQuery({
         userId,
         archiveType,
@@ -69,11 +80,11 @@ async function getTaskArchiveEntriesForUser({
         cycleKey
     });
 
-    const entries = await TaskArchive.find(query)
+    const archivedEntries = await TaskArchive.find(query)
         .sort({ archivedAt: -1, createdAt: -1, orderIndex: 1 })
         .limit(normalizedLimit);
 
-    const totalCount = await TaskArchive.countDocuments(query);
+    const totalArchivedCount = await TaskArchive.countDocuments(query);
 
     return {
         filters: {
@@ -82,8 +93,11 @@ async function getTaskArchiveEntriesForUser({
             cycleKey: cycleKey ?? null,
             limit: normalizedLimit
         },
-        totalCount,
-        entries
+        totalCount: totalArchivedCount,
+        entries: archivedEntries.map((entry) => ({
+            ...entry.toObject(),
+            source: "archive"
+        }))
     };
 }
 

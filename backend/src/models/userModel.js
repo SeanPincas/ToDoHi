@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
     preference: {
         resetHour: { type: Number, default: 0 },
         dayTaskDelete: { type: Number, enum: [3, 7, 15, 30], default: 30 },
+        quoteDelay: { type: Number, enum: [5, 10, 30, 45, 60], default: 10 },
         theme: { type: String, enum: ['light', 'dark'], default: 'light' },
         bookmarkStyle: { type: String, default: "bookmark-1" },
         wallpaperStyle: { type: String, default: "default" },

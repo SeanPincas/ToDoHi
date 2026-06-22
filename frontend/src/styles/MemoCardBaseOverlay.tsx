@@ -12,7 +12,9 @@ interface MemoCardBaseOverlayProps {
     containerColor: string;
     pinColor: string;
     isActive?: boolean;
-    isAtEdge?: boolean,
+    isAtEdge?: boolean;
+    isDeleteSelected?: boolean;
+    scrollableContent?: boolean;
 }
 
 const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
@@ -23,15 +25,25 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     pinColor,
     isActive = false,
     isAtEdge = false,
+    isDeleteSelected = false,
+    scrollableContent = false,
 }) => {
+    const resolvedContent = content || "No content";
+
     return (
         <div
             className={`memo-card-overlay 
                 ${isActive ? "active" : ""}
+                ${isDeleteSelected ? "delete-selected" : ""}
                 ${isAtEdge ? "edge-warning" : ""}
             `}
             style={{ backgroundColor: containerColor }}
         >
+            {isDeleteSelected && (
+                <div className="memo-delete-overlay" aria-hidden="true">
+                    <div className="memo-delete-overlay-icon">+</div>
+                </div>
+            )}
 
             {/* ---------------- PIN ---------------- */}
             <div
@@ -40,7 +52,7 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
             />
 
             {/* ---------------- CONTENT ---------------- */}
-            <div className="memo-card-paper">
+            <div className={`memo-card-paper ${scrollableContent ? "scrollable" : ""}`}>
                 <div className="memo-header">
                     <h4 className="memo-title">
                         {title}
@@ -51,8 +63,8 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
                         </span>
                     )}
                 </div>
-                <p className="memo-content">
-                    {content || "No content"}
+                <p className={`memo-content ${scrollableContent ? "scrollable" : ""}`}>
+                    {resolvedContent}
                 </p>
 
             </div>

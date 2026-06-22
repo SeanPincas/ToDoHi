@@ -29,6 +29,17 @@ export const QUOTE_CATEGORIES = [
 // Literal Type
 export type QuoteCategory = (typeof QUOTE_CATEGORIES)[number];
 
+export const QUOTE_DELAY_OPTIONS = [5, 10, 30, 45, 60] as const;
+export type QuoteDelayMinutes = (typeof QUOTE_DELAY_OPTIONS)[number];
+
+export const QUOTE_DELAY_LABELS: Record<QuoteDelayMinutes, string> = {
+  5: "5 Minutes",
+  10: "10 Minutes",
+  30: "30 Minutes",
+  45: "45 Minutes",
+  60: "1 Hour"
+};
+
 // ============================================================================
 // 🟨 CATEGORY LABELS (Display versions — customizable)
 // ============================================================================

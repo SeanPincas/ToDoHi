@@ -12,36 +12,8 @@ const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 const { runDailyStats } = require("./dailyStats.js");
 const { cleanupExpiredTaskArchives } = require("./taskArchiveCleanup.js");
-
-// ============================================================================
-// HELPER: Compute reset-cycle key for a user
-//
-// Example outputs:
-//   "2025-01-15@9"
-//   "2025-01-15@0"
-//
-// Meaning:
-//   This uniquely identifies ONE reset window for ONE user
-//
-// Improvement note:
-//   This reset-cycle math is also mirrored in repeatTasks.js and frontend
-//   resetCycle helpers. A shared reset-cycle utility would be cleaner later.
-// ============================================================================
-function getResetCycleKey(now, resetHour) {
-    const boundary = new Date(now);
-    boundary.setHours(resetHour, 0, 0, 0);
-
-    // If resetHour not reached yet today -> cycle started yesterday
-    if (now < boundary) {
-        boundary.setDate(boundary.getDate() - 1);
-    }
-
-    const yyyy = boundary.getFullYear();
-    const mm = String(boundary.getMonth() + 1).padStart(2, "0");
-    const dd = String(boundary.getDate()).padStart(2, "0");
-
-    return `${yyyy}-${mm}-${dd}@${resetHour}`;
-}
+const { computeRepeatCycleKey } = require("./resetCycle.js");
+const { archiveExpiredReviewWindowTasks } = require("./taskArchiveSync.js");
 
 // ============================================================================
 // JOB #1: EXPIRE TASKS
@@ -78,7 +50,7 @@ async function handleDailyReset(now) {
         const userId = user._id.toString();
         const resetHour = user.preference?.resetHour ?? 0;
 
-        const currentResetKey = getResetCycleKey(now, resetHour);
+        const currentResetKey = computeRepeatCycleKey(resetHour, now);
         const lastKey = user.lastResetCycleKey ?? null;
 
         // Already reset for this cycle -> skip
@@ -113,6 +85,20 @@ async function cleanupTaskArchives(now) {
 }
 
 // ============================================================================
+// JOB #4: ARCHIVE STALE REVIEW-WINDOW TASKS
+// Rule:
+//   - status === "completed" or "failed"
+//   - task event time is older than the active "yesterday" review window
+// ============================================================================
+async function syncTaskArchives(now) {
+    const { archivedCount } = await archiveExpiredReviewWindowTasks(now);
+
+    console.log(
+        `[Scheduler] Task Archive Sync @ ${now.toISOString()} | Archived: ${archivedCount}`
+    );
+}
+
+// ============================================================================
 // MAIN SCHEDULER TICK
 // ============================================================================
 async function schedulerTick() {
@@ -125,7 +111,10 @@ async function schedulerTick() {
         // 2. Handle per-user daily reset
         await handleDailyReset(now);
 
-        // 3. Clean expired task archives
+        // 3. Move stale completed/failed live tasks into archive
+        await syncTaskArchives(now);
+
+        // 4. Clean expired task archives
         await cleanupTaskArchives(now);
 
     } catch (err) {

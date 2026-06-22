@@ -10,6 +10,7 @@ import { useMemoContext } from "../../context/MemoContext";
 import { Icons } from "../../styles/iconLibrary";
 
 import {
+    formatMemoPreviewTextByWidth,
     getMemoCategoryIconKey,
 } from "../../utils/memoUtils/memoUtils";
 
@@ -33,6 +34,7 @@ const ViewMemoModal = () => {
     // ---------------------------------------------------------------------
     if (activeModal !== "view" || !memo) return null;
     const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
+    const shouldMarqueeTitle = memo.title.trim().length > 32;
 
     // ---------------------------------------------------------------------
     // CLOSE HANDLER (OVERLAY ONLY)
@@ -65,9 +67,11 @@ const ViewMemoModal = () => {
 
                     {/* ---------- TITLE ROW ---------- */}
                     <div className="memo-zoom-header">
-                        <h2 className="memo-zoom-title">
-                            {memo.title}
-                        </h2>
+                        <div className={`memo-zoom-title-wrap ${shouldMarqueeTitle ? "marquee" : ""}`}>
+                            <h2 className="memo-zoom-title">
+                                {memo.title}
+                            </h2>
+                        </div>
 
                         <span className="memo-zoom-emoji">
                             <CategoryIcon />
@@ -76,7 +80,11 @@ const ViewMemoModal = () => {
 
                     {/* ---------- CONTENT ---------- */}
                     <div className="memo-zoom-content">
-                        {memo.content?.trim() || "No memo content."}
+                        {formatMemoPreviewTextByWidth(
+                            memo.content?.trim() || "No memo content.",
+                            392,
+                            '400 15.2px "Kalam", cursive'
+                        )}
                     </div>
 
                 </div>

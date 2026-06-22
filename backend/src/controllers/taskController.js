@@ -7,6 +7,7 @@ const {
     repeatTaskArchiveEntryForUser,
     deleteTaskArchiveEntryForUser
 } = require("../utils/taskArchiveActions.js");
+const { syncPreviousCycleTasksToArchiveForUser } = require("../utils/taskArchiveSync.js");
 
 const {
     validCategories,
@@ -45,6 +46,16 @@ function buildStatusTimestampUpdates(existingTask, nextStatus, now = new Date())
     return {};
 }
 
+function hasTaskEverBeenCompleted(task) {
+    if (!task) return false;
+
+    return Boolean(
+        task.completedOnce === true ||
+        task.completedAt ||
+        task.status === "completed"
+    );
+}
+
 // --------------------------- CREATE NEW TASK ---------------------------
 exports.createTask = async (req, res) => {
     try {
@@ -74,6 +85,13 @@ exports.createTask = async (req, res) => {
 // --------------------------- GET ALL TASKS ---------------------------
 exports.getTasks = async (req, res) => {
     try {
+        const user = await User.findById(req.user._id, "preference.resetHour preference.dayTaskDelete");
+        await syncPreviousCycleTasksToArchiveForUser({
+            userId: req.user._id,
+            resetHour: user?.preference?.resetHour ?? 0,
+            userPreference: user?.preference ?? null
+        });
+
         const tasks = await Task.find({ userId: req.user._id })
             .sort({ orderIndex: 1, createdAt: -1 });
 
@@ -86,12 +104,15 @@ exports.getTasks = async (req, res) => {
 // --------------------------- GET TASK ARCHIVE ---------------------------
 exports.getTaskArchive = async (req, res) => {
     try {
+        const user = await User.findById(req.user._id, "preference.resetHour preference.dayTaskDelete");
         const archiveResult = await getTaskArchiveEntriesForUser({
             userId: req.user._id,
             archiveType: req.query.archiveType,
             archiveReason: req.query.archiveReason,
             cycleKey: req.query.cycleKey,
-            limit: req.query.limit
+            limit: req.query.limit,
+            resetHour: user?.preference?.resetHour ?? 0,
+            retentionDays: user?.preference?.dayTaskDelete ?? 30
         });
 
         res.json({
@@ -159,6 +180,16 @@ exports.updateTask = async (req, res) => {
 
         Object.assign(updates, buildStatusTimestampUpdates(existing, status));
 
+        const isTransitioningToCompleted =
+            status === "completed" && existing.status !== "completed";
+        const hasEverCompleted = hasTaskEverBeenCompleted(existing);
+
+        if (isTransitioningToCompleted) {
+            updates.completedOnce = true;
+        } else if (existing.status === "completed" && !existing.completedOnce) {
+            updates.completedOnce = true;
+        }
+
         // Remove undefined fields
         Object.keys(updates).forEach(key => updates[key] === undefined && delete updates[key])
 
@@ -167,6 +198,13 @@ exports.updateTask = async (req, res) => {
             updates,
             { new: true }
         )
+
+        if (isTransitioningToCompleted && !hasEverCompleted) {
+            await User.findByIdAndUpdate(
+                req.user._id,
+                { $inc: { "stats.totalTasksCompleted": 1 } }
+            );
+        }
 
         res.json({ message: "Task Updated", task: updated });
     } catch (err) {
@@ -221,8 +259,15 @@ exports.markComplete = async (req, res) => {
         if (!existing)
             return res.status(404).json({ message: "Task Not Found" });
 
+        const hasEverCompleted = hasTaskEverBeenCompleted(existing);
+
         // If already completed → do NOT increment stats again
         if (existing.status === "completed") {
+            if (!existing.completedOnce) {
+                existing.completedOnce = true;
+                await existing.save();
+            }
+
             return res.json({
                 message: "Task already completed",
                 task: existing
@@ -232,15 +277,18 @@ exports.markComplete = async (req, res) => {
         // Mark completed
         existing.status = "completed";
         existing.completedAt = new Date();
+        existing.completedOnce = true;
         existing.failedAt = null;
         existing.isExpired = false;
         await existing.save();
 
         // ---------------- STATS: increment totalTasksCompleted ----------------
-        await User.findByIdAndUpdate(
-            req.user._id,
-            { $inc: { "stats.totalTasksCompleted": 1 } }
-        );
+        if (!hasEverCompleted) {
+            await User.findByIdAndUpdate(
+                req.user._id,
+                { $inc: { "stats.totalTasksCompleted": 1 } }
+            );
+        }
 
         res.json({
             message: "Task Completed",

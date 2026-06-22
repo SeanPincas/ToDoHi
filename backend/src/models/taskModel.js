@@ -32,6 +32,10 @@ const taskSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    completedOnce: {
+        type: Boolean,
+        default: false
+    },
     failedAt: {
         type: Date,
         default: null

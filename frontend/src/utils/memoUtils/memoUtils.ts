@@ -124,3 +124,128 @@ export type MemoPinColor = typeof memoPinColors[number];
 export function getDefaultMemoPinColor(): MemoPinColor {
     return "#d32f2f";
 }
+
+export const MEMO_TITLE_MAX_LENGTH = 65;
+export const MEMO_CONTENT_MAX_LENGTH = 650;
+
+// ============================================================================
+// 4. PREVIEW TEXT WRAPPING
+// ============================================================================
+
+/**
+ * Keeps natural sentence wrapping while only inserting manual dash-break
+ * opportunities into very long unbroken tokens.
+ */
+export function formatMemoPreviewText(
+    value?: string,
+    chunkSize = 52
+): string {
+    if (!value) return "";
+
+    return value.replace(/\S+/g, (token) => {
+        if (token.length <= chunkSize) return token;
+
+        const chunks = token.match(new RegExp(`.{1,${chunkSize}}`, "g"));
+        return chunks ? chunks.join("-\u200b") : token;
+    });
+}
+
+function measureMemoTextWidth(text: string, font: string): number {
+    if (typeof document === "undefined") {
+        return text.length * 8;
+    }
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+        return text.length * 8;
+    }
+
+    context.font = font;
+    return context.measureText(text).width;
+}
+
+function splitLongMemoTokenByWidth(
+    token: string,
+    maxWidthPx: number,
+    font: string
+): string[] {
+    const parts: string[] = [];
+    let remaining = token;
+
+    while (remaining.length > 0) {
+        let current = "";
+        let index = 0;
+
+        while (index < remaining.length) {
+            const next = current + remaining[index];
+            const test = index < remaining.length - 1 ? `${next}-` : next;
+
+            if (measureMemoTextWidth(test, font) > maxWidthPx) {
+                break;
+            }
+
+            current = next;
+            index += 1;
+        }
+
+        if (!current) {
+            current = remaining[0];
+            index = 1;
+        }
+
+        remaining = remaining.slice(index);
+        parts.push(remaining.length > 0 ? `${current}-` : current);
+    }
+
+    return parts;
+}
+
+export function formatMemoPreviewTextByWidth(
+    value: string | undefined,
+    maxWidthPx: number,
+    font = '400 13.6px "Kalam", cursive'
+): string {
+    if (!value) return "";
+
+    const paragraphs = value.split(/\r?\n/);
+
+    return paragraphs
+        .map((paragraph) => {
+            const words = paragraph.trim().split(/\s+/).filter(Boolean);
+            if (!words.length) return "";
+
+            const lines: string[] = [];
+            let currentLine = "";
+
+            for (const word of words) {
+                if (measureMemoTextWidth(word, font) > maxWidthPx) {
+                    if (currentLine) {
+                        lines.push(currentLine);
+                        currentLine = "";
+                    }
+
+                    lines.push(...splitLongMemoTokenByWidth(word, maxWidthPx, font));
+                    continue;
+                }
+
+                const candidate = currentLine ? `${currentLine} ${word}` : word;
+                if (measureMemoTextWidth(candidate, font) <= maxWidthPx) {
+                    currentLine = candidate;
+                } else {
+                    if (currentLine) {
+                        lines.push(currentLine);
+                    }
+                    currentLine = word;
+                }
+            }
+
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+
+            return lines.join("\n");
+        })
+        .join("\n");
+}

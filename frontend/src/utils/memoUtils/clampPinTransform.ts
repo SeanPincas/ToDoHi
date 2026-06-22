@@ -14,9 +14,6 @@ export interface ClampedTransform {
     isClamped: boolean;
 }
 
-// ---------------- CONFIG ----------------
-const EDGE_PADDING = 0; // keep pin strictly inside board
-
 interface ClampPinTransformArgs {
     transformX: number;
     transformY: number;
@@ -24,6 +21,7 @@ interface ClampPinTransformArgs {
     pinY: number;
     boardWidth: number;
     boardHeight: number;
+    boundaryPadding: number;
 }
 
 export function clampPinTransform({
@@ -33,6 +31,7 @@ export function clampPinTransform({
     pinY,
     boardWidth,
     boardHeight,
+    boundaryPadding,
 }: ClampPinTransformArgs): ClampedTransform {
     // --------------------------------------------------
     // Compute proposed pin position after movement
@@ -46,20 +45,20 @@ export function clampPinTransform({
     let clampedX = transformX;
     let clampedY = transformY;
 
-    if (nextPinX < EDGE_PADDING) {
-        clampedX = EDGE_PADDING - pinX;
+    if (nextPinX < boundaryPadding) {
+        clampedX = boundaryPadding - pinX;
     }
 
-    if (nextPinX > boardWidth - EDGE_PADDING) {
-        clampedX = boardWidth - EDGE_PADDING - pinX;
+    if (nextPinX > boardWidth - boundaryPadding) {
+        clampedX = boardWidth - boundaryPadding - pinX;
     }
 
-    if (nextPinY < EDGE_PADDING) {
-        clampedY = EDGE_PADDING - pinY;
+    if (nextPinY < boundaryPadding) {
+        clampedY = boundaryPadding - pinY;
     }
 
-    if (nextPinY > boardHeight - EDGE_PADDING) {
-        clampedY = boardHeight - EDGE_PADDING - pinY;
+    if (nextPinY > boardHeight - boundaryPadding) {
+        clampedY = boardHeight - boundaryPadding - pinY;
     }
 
     const isClamped =

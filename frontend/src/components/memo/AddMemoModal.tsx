@@ -8,8 +8,11 @@ import { useMemoContext } from "../../context/MemoContext";
 import { modalOverlayStyle } from "../../styles/modalStyles";
 import "../../styles/ButtonStyles.css"
 import "../common/modals/modalBaseTheme.css";
+import "../common/modals/taskManagementModalTheme.css";
 
 import {
+    MEMO_CONTENT_MAX_LENGTH,
+    MEMO_TITLE_MAX_LENGTH,
     memoPinColors,
     getDefaultMemoPinColor,
     memoCategoryIconMap,
@@ -64,7 +67,7 @@ const AddMemoModal: React.FC = () => {
         e.preventDefault();
 
         if (!title.trim()) {
-            setErrorMsg("Task Title is required.");
+            setErrorMsg("Memo title is required.");
             return;
         }
 
@@ -90,21 +93,32 @@ const AddMemoModal: React.FC = () => {
 
     // --------------------- RENDER ------------------------------
     return (
-        <div style={modalOverlayStyle} onClick={handleClose}>
-            <div className="modal-card-base memo-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div style={modalOverlayStyle} onMouseDown={handleClose}>
+            <div
+                className="modal-card-base memo-modal-card task-management-modal paper-sheet-lines"
+                onMouseDown={(e) => e.stopPropagation()}
+            >
 
                 {/* ================= HEADER ================= */}
-                <div className="memo-header">
-                    <h2>Add Memo</h2>
+                <div className="memo-header task-management-modal-header">
+                    <div className="task-management-modal-title-group memo-modal-title-group">
+                        <Icons.Note />
+                        <h3>Add Memo</h3>
+                    </div>
 
                     <button
-                        className="icon-btn"
+                        type="button"
+                        className="icon-btn-square task-management-modal-close-btn"
                         onClick={handleClose}
                         disabled={loading}
                     >
                         <Icons.Close />
                     </button>
                 </div>
+
+                <p className="task-management-modal-subtitle memo-modal-subtitle">
+                    Create a memo card with its note content, pin color, category, and paper color.
+                </p>
 
                 {/* ================= ERROR ================= */}
                 {errorMsg && (
@@ -115,29 +129,37 @@ const AddMemoModal: React.FC = () => {
 
                 <form onSubmit={handleSubmit}>
                     {/* ---------------- TITLE ---------------- */}
-                    <div className="memo-modal-field">
+                    <div className="memo-modal-field task-management-modal-panel memo-modal-field-panel">
                         <label>Title</label>
                         <input
                             type="text"
                             placeholder="Memo title"
                             value={title}
+                            maxLength={MEMO_TITLE_MAX_LENGTH}
                             onChange={(e) => setTitle(e.target.value)}
                         />
+                        <span className="memo-modal-char-count">
+                            {title.length}/{MEMO_TITLE_MAX_LENGTH}
+                        </span>
                     </div>
 
                     {/* ---------------- CONTENT ---------------- */}
-                    <div className="memo-modal-field">
+                    <div className="memo-modal-field task-management-modal-panel memo-modal-field-panel">
                         <label>Content</label>
                         <textarea
                             placeholder="Write Something..."
                             rows={4}
                             value={content}
+                            maxLength={MEMO_CONTENT_MAX_LENGTH}
                             onChange={(e) => setContent(e.target.value)}
                         />
+                        <span className="memo-modal-char-count">
+                            {content.length}/{MEMO_CONTENT_MAX_LENGTH}
+                        </span>
                     </div>
 
                     {/* ---------------- CONTENT ---------------- */}
-                    <div className="memo-modal-field">
+                    <div className="memo-modal-field task-management-modal-panel memo-modal-field-panel">
                         <label>Category</label>
 
                         <div className="memo-category-grid">
@@ -161,7 +183,7 @@ const AddMemoModal: React.FC = () => {
                     </div>
 
                     {/* ================= PIN COLOR PICKER ================= */}
-                    <div className="memo-modal-field">
+                    <div className="memo-modal-field task-management-modal-panel memo-modal-field-panel">
                         <label>Pin Color</label>
 
                         <div className="memo-pin-grid">
@@ -179,7 +201,7 @@ const AddMemoModal: React.FC = () => {
                     </div>
 
                     {/* ================= CONTAINER COLOR PICKER ================= */}
-                    <div className="memo-modal-field">
+                    <div className="memo-modal-field task-management-modal-panel memo-modal-field-panel">
                         <label>Memo Color</label>
 
                         <div className="memo-container-color-grid">
@@ -199,7 +221,7 @@ const AddMemoModal: React.FC = () => {
                     </div>
 
                     {/* ================= ACTIONS ================= */}
-                    <div className="memo-modal-actions">
+                    <div className="memo-modal-actions task-management-modal-actions">
                         <button
                             type="button"
                             className="btn-secondary-rect"
@@ -211,7 +233,7 @@ const AddMemoModal: React.FC = () => {
 
                         <button
                             type="submit"
-                            className="btn-primary-rect"
+                            className="btn-green-rect"
                             disabled={loading}
                         >
                             <Icons.Add />
