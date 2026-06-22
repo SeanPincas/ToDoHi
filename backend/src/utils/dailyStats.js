@@ -11,6 +11,8 @@ const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js");
 const DailyPlan = require("../models/dailyPlanModel.js");
 const { getCycleWindow } = require("./resetCycle.js");
+const { reconcileUserCompletedTaskStat } = require("./completedTaskStats.js");
+const { reconcileUserFailedTasksYesterdayStat } = require("./failedTaskYesterdayStats.js");
 
 exports.runDailyStats = async () => {
     try {
@@ -37,12 +39,6 @@ exports.runDailyStats = async () => {
                 updatedAt: { $gte: start, $lt: end }
             });
 
-            const tasksFailedYesterday = await Task.countDocuments({
-                userId,
-                status: "failed",
-                updatedAt: { $gte: yesterdayStart, $lt: start }
-            });
-
             const yesterdayDateKey = yesterdayStart.toISOString().split("T")[0];
 
             const yesterdayPlan = await DailyPlan.findOne({
@@ -52,6 +48,16 @@ exports.runDailyStats = async () => {
 
             let dailyStreak = user.stats.dailyStreak || 0;
             let longestStreak = user.stats.longestStreak || 0;
+            const completedTaskStats = await reconcileUserCompletedTaskStat(
+                userId,
+                resetHour,
+                new Date()
+            );
+            const tasksFailedYesterday = await reconcileUserFailedTasksYesterdayStat(
+                userId,
+                resetHour,
+                new Date()
+            );
 
             if (yesterdayPlan && yesterdayPlan.status === "completed") {
                 dailyStreak += 1;
@@ -62,8 +68,11 @@ exports.runDailyStats = async () => {
 
             await User.findByIdAndUpdate(userId, {
                 $set: {
-                    "stats.tasksCompletedToday": tasksCompletedToday,
                     "stats.tasksFailedYesterday": tasksFailedYesterday,
+                    "stats.totalTasksCompleted":
+                        completedTaskStats?.totalTasksCompleted ?? user.stats.totalTasksCompleted ?? 0,
+                    "stats.tasksCompletedToday":
+                        completedTaskStats?.tasksCompletedToday ?? tasksCompletedToday,
                     "stats.dailyStreak": dailyStreak,
                     "stats.longestStreak": longestStreak
                 }

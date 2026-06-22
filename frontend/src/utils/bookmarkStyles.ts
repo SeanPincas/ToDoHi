@@ -373,7 +373,7 @@ const auroraTideTheme = (image: string) =>
         surfaceMutedInk: "#4c6f78",
         surfaceBorder: "#1f5d66",
         divider: "#1f5d66",
-        headingBorder: "#d6b95b",
+        headingBorder: "#1f5a60",
         burgerIcon: "#1f5d66",
         burgerHover: "#123f48",
         dragHandleIdle: "rgba(77, 196, 188, 0.9)",

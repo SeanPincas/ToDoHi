@@ -451,6 +451,17 @@
         box-shadow 0.16s ease,
         transform 0.12s ease;
     box-shadow: var(--button-shadow, var(--shadow-soft));
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.sidebar-panel .sidebar-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: inherit;
 }
 
 .sidebar-panel .sidebar-btn:hover {

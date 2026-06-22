@@ -125,7 +125,7 @@ export function getDefaultMemoPinColor(): MemoPinColor {
     return "#d32f2f";
 }
 
-export const MEMO_TITLE_MAX_LENGTH = 24;
+export const MEMO_TITLE_MAX_LENGTH = 65;
 export const MEMO_CONTENT_MAX_LENGTH = 650;
 
 // ============================================================================

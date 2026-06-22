@@ -32,6 +32,7 @@ const MemoBoardPage: React.FC = () => {
         openModal,
         moveMemo,
         setActiveMemoId,
+        removeMemo,
 
         isMemoAtEdge,
 
@@ -63,6 +64,9 @@ const MemoBoardPage: React.FC = () => {
         height: 0,
         boundaryPadding: 11,
     });
+    const [isMultiDeleteMode, setIsMultiDeleteMode] = useState(false);
+    const [selectedMemoIds, setSelectedMemoIds] = useState<Set<string>>(new Set());
+    const [busyDelete, setBusyDelete] = useState(false);
 
     // -------------------------------------------------------------------------
     // MEASURE BOARD SIZE ON MOUNT
@@ -116,6 +120,49 @@ const MemoBoardPage: React.FC = () => {
 
     const handleAddMemo = () => {
         openModal("add");
+    };
+
+    const toggleMemoDeleteSelection = (memoId: string) => {
+        if (!isMultiDeleteMode) return;
+
+        setSelectedMemoIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(memoId)) {
+                next.delete(memoId);
+            } else {
+                next.add(memoId);
+            }
+            return next;
+        });
+    };
+
+    const handleEnterMultiDeleteMode = () => {
+        setBoardMode("view");
+        setActiveMemoId(null);
+        setIsMultiDeleteMode(true);
+        setSelectedMemoIds(new Set());
+    };
+
+    const handleCancelMultiDeleteMode = () => {
+        setIsMultiDeleteMode(false);
+        setSelectedMemoIds(new Set());
+    };
+
+    const handleDeleteSelectedMemos = async () => {
+        if (selectedMemoIds.size === 0 || busyDelete) return;
+
+        try {
+            setBusyDelete(true);
+            for (const memoId of selectedMemoIds) {
+                await removeMemo(memoId);
+            }
+            setSelectedMemoIds(new Set());
+            setIsMultiDeleteMode(false);
+        } catch (error) {
+            console.error("[MemoBoardPage] Failed deleting selected memos:", error);
+        } finally {
+            setBusyDelete(false);
+        }
     };
 
 
@@ -190,6 +237,8 @@ const MemoBoardPage: React.FC = () => {
             total: "--",
         };
 
+    const selectedDeleteCount = selectedMemoIds.size;
+
     const handleFrameMouseDownCapture = (event: React.MouseEvent<HTMLDivElement>) => {
         if (boardMode !== "edit") return;
 
@@ -261,40 +310,69 @@ const MemoBoardPage: React.FC = () => {
 
                         {boardMode === "view" && (
                             <>
-                                <button
-                                    className="icon-btn-square memo-toolbar-icon-btn"
-                                    onClick={() => setBoardMode("edit")}
-                                    aria-label="Stack memos"
-                                    title="Stack memos"
-                                >
-                                    <Icons.Drag />
-                                </button>
+                                {!isMultiDeleteMode ? (
+                                    <>
+                                        <button
+                                            className="icon-btn-square memo-toolbar-icon-btn"
+                                            onClick={() => setBoardMode("edit")}
+                                            aria-label="Stack memos"
+                                            title="Stack memos"
+                                        >
+                                            <Icons.Drag />
+                                        </button>
 
-                                <button
-                                    className="icon-btn-square delete memo-toolbar-icon-btn"
-                                    onClick={() => {
-                                        if (!activeMemoId) return;
-                                        openModal("deleteConfirm", activeMemoId);
-                                    }}
-                                    disabled={!activeMemoId}
-                                    aria-label="Delete selected memo"
-                                    title="Delete selected memo"
-                                >
-                                    <Icons.Delete />
-                                </button>
+                                        <button
+                                            className="icon-btn-square delete memo-toolbar-icon-btn"
+                                            onClick={handleEnterMultiDeleteMode}
+                                            disabled={memos.length === 0}
+                                            aria-label="Enable multi delete mode"
+                                            title="Enable multi delete mode"
+                                        >
+                                            <Icons.Delete />
+                                        </button>
 
-                                <button
-                                    className="icon-btn-square memo-toolbar-icon-btn memo-toolbar-icon-btn-add"
-                                    onClick={handleAddMemo}
-                                    aria-label="Add memo"
-                                    title="Add memo"
-                                >
-                                    <Icons.Add />
-                                </button>
+                                        <button
+                                            className="icon-btn-square memo-toolbar-icon-btn memo-toolbar-icon-btn-add"
+                                            onClick={handleAddMemo}
+                                            aria-label="Add memo"
+                                            title="Add memo"
+                                        >
+                                            <Icons.Add />
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            className="btn-secondary-rect memo-toolbar-btn memo-toolbar-btn-cancel"
+                                            onClick={handleCancelMultiDeleteMode}
+                                            disabled={busyDelete}
+                                            aria-label="Cancel multi delete mode"
+                                            title="Cancel"
+                                        >
+                                            <Icons.Close />
+                                            <span className="memo-toolbar-text">
+                                                Cancel
+                                            </span>
+                                        </button>
+
+                                        <button
+                                            className="btn-danger-rect memo-toolbar-btn memo-toolbar-btn-delete-selected"
+                                            onClick={handleDeleteSelectedMemos}
+                                            disabled={selectedDeleteCount === 0 || busyDelete}
+                                            aria-label="Delete selected memos"
+                                            title="Delete selected memos"
+                                        >
+                                            <Icons.Delete />
+                                            <span className="memo-toolbar-text">
+                                                {busyDelete ? "Deleting..." : `Delete Selected (${selectedDeleteCount})`}
+                                            </span>
+                                        </button>
+                                    </>
+                                )}
                             </>
                         )}
 
-                        {boardMode === "edit" && (
+                        {boardMode === "edit" && !isMultiDeleteMode && (
                             <>
                                 <div className="memo-zorder-panel">
                                     <button
@@ -382,6 +460,9 @@ const MemoBoardPage: React.FC = () => {
                                 memo={memo}
                                 zIndex={index}
                                 isEditMode={boardMode === "edit"}
+                                isDeleteMode={isMultiDeleteMode}
+                                isDeleteSelected={selectedMemoIds.has(memo._id)}
+                                onDeleteModeSelect={toggleMemoDeleteSelection}
                                 boardWidth={boardSize.width}
                                 boardHeight={boardSize.height}
                                 boundaryPadding={boardSize.boundaryPadding}

@@ -4,7 +4,7 @@ const User = require("../models/userModel.js");
 // --------------------------- UPDATE USER PREFERENCE ---------------------------
 exports.updatePreference = async (req, res) => {
     try {
-        const { resetHour, dayTaskDelete, theme, quoteCategory, bookmarkStyle, wallpaperStyle } = req.body;
+        const { resetHour, dayTaskDelete, quoteDelay, theme, quoteCategory, bookmarkStyle, wallpaperStyle } = req.body;
 
         const updatePayload = {};
 
@@ -18,6 +18,10 @@ exports.updatePreference = async (req, res) => {
             // Existing TaskArchive records keep their already assigned
             // retentionDeleteAt value for predictable retention behavior.
             updatePayload["preference.dayTaskDelete"] = dayTaskDelete;
+        }
+
+        if (quoteDelay !== undefined) {
+            updatePayload["preference.quoteDelay"] = quoteDelay;
         }
 
         if (theme !== undefined) {

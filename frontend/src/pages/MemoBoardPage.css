@@ -71,6 +71,7 @@
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
+    min-height: 64px;
 
     padding: 9px 18px;
     margin-bottom: var(--memo-topbar-gap);
@@ -149,12 +150,19 @@
 /* ============================ TITLE ============================ */
 
 .memo-board-title-group {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     min-height: 64px;
+    width: min(100%, 720px);
+    max-width: calc(100% - 220px);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .memo-board-title {
@@ -165,6 +173,7 @@
 
     text-align: center;
     width: 100%;
+    pointer-events: none;
 }
 
 .memo-board-edit-label {
@@ -253,6 +262,25 @@
 
 .memo-toolbar-btn {
     font-family: var(--font-heading);
+}
+
+.memo-toolbar-btn-cancel,
+.memo-toolbar-btn-delete-selected {
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    line-height: 1;
+}
+
+.memo-toolbar-btn-delete-selected {
+    color: #17375b;
+}
+
+.memo-toolbar-btn-delete-selected svg {
+    color: var(--danger-red);
 }
 
 .memo-toolbar-icon-btn svg {
@@ -351,10 +379,10 @@
     justify-content: center;
     min-width: 18px;
     min-height: 16px;
-    padding: 0 4px;
+    padding: 4px;
     border: 1px solid #000;
     border-radius: 3px;
-    font-size: 0.95rem;
+    font-size: 0.90rem;
     line-height: 1;
     justify-self: end;
     transform: translateY(1px);
@@ -373,6 +401,7 @@
 }
 
 .memo-zorder-total {
+    padding-left: 5px;
     justify-self: start;
 }
 
@@ -492,6 +521,10 @@
         font-size: 1.6rem;
     }
 
+    .memo-board-title-group {
+        max-width: calc(100% - 128px);
+    }
+
     .memo-board-toolbar .memo-toolbar-btn {
         width: 100%;
         justify-content: center;
@@ -565,7 +598,8 @@
     padding: var(--memo-board-inner-pad);
 
     background-image:
-        linear-gradient(rgba(78, 52, 30, 0.16), rgba(78, 52, 30, 0.16)),
+        linear-gradient(rgba(245, 237, 221, 0.26), rgba(245, 237, 221, 0.26)),
+        linear-gradient(rgba(92, 63, 36, 0.14), rgba(92, 63, 36, 0.14)),
         url("../assets/cork-board.webp");
     background-size: cover;
     background-repeat: no-repeat;

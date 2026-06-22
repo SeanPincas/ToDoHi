@@ -34,6 +34,7 @@ const ViewMemoModal = () => {
     // ---------------------------------------------------------------------
     if (activeModal !== "view" || !memo) return null;
     const CategoryIcon = Icons[getMemoCategoryIconKey(memo.category)];
+    const shouldMarqueeTitle = memo.title.trim().length > 32;
 
     // ---------------------------------------------------------------------
     // CLOSE HANDLER (OVERLAY ONLY)
@@ -66,9 +67,11 @@ const ViewMemoModal = () => {
 
                     {/* ---------- TITLE ROW ---------- */}
                     <div className="memo-zoom-header">
-                        <h2 className="memo-zoom-title">
-                            {memo.title}
-                        </h2>
+                        <div className={`memo-zoom-title-wrap ${shouldMarqueeTitle ? "marquee" : ""}`}>
+                            <h2 className="memo-zoom-title">
+                                {memo.title}
+                            </h2>
+                        </div>
 
                         <span className="memo-zoom-emoji">
                             <CategoryIcon />

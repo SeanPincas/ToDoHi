@@ -12,7 +12,8 @@ interface MemoCardBaseOverlayProps {
     containerColor: string;
     pinColor: string;
     isActive?: boolean;
-    isAtEdge?: boolean,
+    isAtEdge?: boolean;
+    isDeleteSelected?: boolean;
     scrollableContent?: boolean;
 }
 
@@ -24,6 +25,7 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     pinColor,
     isActive = false,
     isAtEdge = false,
+    isDeleteSelected = false,
     scrollableContent = false,
 }) => {
     const resolvedContent = content || "No content";
@@ -32,10 +34,16 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
         <div
             className={`memo-card-overlay 
                 ${isActive ? "active" : ""}
+                ${isDeleteSelected ? "delete-selected" : ""}
                 ${isAtEdge ? "edge-warning" : ""}
             `}
             style={{ backgroundColor: containerColor }}
         >
+            {isDeleteSelected && (
+                <div className="memo-delete-overlay" aria-hidden="true">
+                    <div className="memo-delete-overlay-icon">+</div>
+                </div>
+            )}
 
             {/* ---------------- PIN ---------------- */}
             <div

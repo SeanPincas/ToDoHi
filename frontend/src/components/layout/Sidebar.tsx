@@ -386,6 +386,7 @@ const Sidebar = () => {
                                 navigate("/");
                             }}
                         >
+                            <Icons.Home />
                             Dashboard
                         </button>
                         <button
@@ -395,6 +396,7 @@ const Sidebar = () => {
                                 navigate("/memoboard");
                             }}
                         >
+                            <Icons.Memo />
                             Memo Board
                         </button>
                     </div>
@@ -409,6 +411,7 @@ const Sidebar = () => {
                                 openModal("taskArchive");
                             }}
                         >
+                            <Icons.Archive />
                             Task Archive
                         </button>
                     </div>

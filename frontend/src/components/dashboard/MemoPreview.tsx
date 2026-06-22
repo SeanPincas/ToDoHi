@@ -242,6 +242,12 @@ const MemoPreview: React.FC = () => {
                                             </label>
                                         )}
 
+                                        {isMultiDeleteMode && isSelected && (
+                                            <div className="memo-preview-delete-overlay" aria-hidden="true">
+                                                <Icons.Close className="memo-preview-delete-overlay-icon" />
+                                            </div>
+                                        )}
+
                                         <span
                                             className="memo-preview-pin"
                                             style={{ backgroundColor: memo.pinColor }}
