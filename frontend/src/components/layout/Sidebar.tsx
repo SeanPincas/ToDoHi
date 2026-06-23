@@ -14,7 +14,7 @@ import { useQuote } from "../../context/QuoteContext";
 import { getMe } from "../../api/userApi";
 
 import ThemeToggle from "../common/themeToggle/ThemeToggle";
-import { getBookmarkTheme } from "../../utils/bookmarkStyles";
+import { getBookmarkTheme, loadBookmarkThemeImage } from "../../utils/bookmarkStyles";
 import anahawImage from "../../assets/anahaw.webp";
 
 import UserSettingsModal from "../common/modals/UserSettingsModal";
@@ -41,6 +41,7 @@ const Sidebar = () => {
     const { currentQuote } = useQuote();
     const { openModal } = useTodo();
     const bookmarkTheme = getBookmarkTheme(user?.preference?.bookmarkStyle);
+    const [bookmarkImage, setBookmarkImage] = useState("");
 
     const [failedTasksYesterday, setFailedTasksYesterday] = useState<FailedYesterdayItem[]>([]);
 
@@ -109,6 +110,24 @@ const Sidebar = () => {
             window.removeEventListener(REPEAT_REVIEW_REFRESH_EVENT, handleRepeatReviewRefresh);
         };
     }, []);
+
+    useEffect(() => {
+        let isActive = true;
+
+        loadBookmarkThemeImage(user?.preference?.bookmarkStyle)
+            .then((image) => {
+                if (isActive) {
+                    setBookmarkImage(image);
+                }
+            })
+            .catch((error) => {
+                console.error("[Sidebar] Failed loading bookmark theme image:", error);
+            });
+
+        return () => {
+            isActive = false;
+        };
+    }, [user?.preference?.bookmarkStyle]);
 
     useEffect(() => {
         setOpen(false);
@@ -325,7 +344,7 @@ const Sidebar = () => {
                 <div
                     className="sidebar-panel"
                     style={{
-                        ["--sidebar-bookmark-image" as string]: `url("${bookmarkTheme.image}")`,
+                        ["--sidebar-bookmark-image" as string]: bookmarkImage ? `url("${bookmarkImage}")` : "none",
                         ["--sidebar-bookmark-overlay-top" as string]: bookmarkTheme.overlayTop,
                         ["--sidebar-bookmark-overlay-bottom" as string]: bookmarkTheme.overlayBottom,
                         ["--sidebar-bookmark-ink" as string]: bookmarkTheme.ink,

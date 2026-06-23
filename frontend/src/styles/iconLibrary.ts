@@ -60,7 +60,8 @@ import {
     PiHandWaving,
     PiPower,
     PiShapes,
-    PiArchiveDuotone
+    PiArchiveDuotone,
+    PiTShirt
 } from "react-icons/pi";
 
 // ============================================================================
@@ -139,5 +140,6 @@ export const Icons = {
     HandWaving: PiHandWaving,
     Off: PiPower,
     Shapes: PiShapes,
-    Archive: PiArchiveDuotone
+    Archive: PiArchiveDuotone,
+    Shirt: PiTShirt
 };

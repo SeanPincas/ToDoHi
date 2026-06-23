@@ -26,6 +26,7 @@ export const updateUserPreferences = async (data: {
     theme?: "light" | "dark";
     bookmarkStyle?: string;
     wallpaperStyle?: string;
+    frameStyle?: string;
     quoteCategory?: string[];
 }) => {
     const res = await axios.patch(

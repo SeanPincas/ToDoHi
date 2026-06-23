@@ -4,7 +4,7 @@ const User = require("../models/userModel.js");
 // --------------------------- UPDATE USER PREFERENCE ---------------------------
 exports.updatePreference = async (req, res) => {
     try {
-        const { resetHour, dayTaskDelete, quoteDelay, theme, quoteCategory, bookmarkStyle, wallpaperStyle } = req.body;
+        const { resetHour, dayTaskDelete, quoteDelay, theme, quoteCategory, bookmarkStyle, wallpaperStyle, frameStyle } = req.body;
 
         const updatePayload = {};
 
@@ -34,6 +34,10 @@ exports.updatePreference = async (req, res) => {
 
         if (wallpaperStyle !== undefined) {
             updatePayload["preference.wallpaperStyle"] = wallpaperStyle;
+        }
+
+        if (frameStyle !== undefined) {
+            updatePayload["preference.frameStyle"] = frameStyle;
         }
 
         if (quoteCategory !== undefined) {

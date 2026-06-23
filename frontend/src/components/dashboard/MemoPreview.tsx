@@ -11,13 +11,13 @@ import "./MemoPreview.css";
 import "../../styles/ButtonStyles.css";
 
 const MemoPreview: React.FC = () => {
-    const { memos, loading, removeMemo } = useMemoContext();
+    const { memos, loading, openModal } = useMemoContext();
     const navigate = useNavigate();
     const [layoutMode, setLayoutMode] = useState<"grid" | "list">("grid");
     const [alphabetSort, setAlphabetSort] = useState<"none" | "asc" | "desc">("none");
     const [isMultiDeleteMode, setIsMultiDeleteMode] = useState(false);
     const [selectedMemoIds, setSelectedMemoIds] = useState<Set<string>>(new Set());
-    const [busyDelete, setBusyDelete] = useState(false);
+    const [busyDelete] = useState(false);
 
     const selectedCount = selectedMemoIds.size;
     const hasMemos = memos.length > 0;
@@ -75,21 +75,16 @@ const MemoPreview: React.FC = () => {
         });
     };
 
-    const handleDeleteSelected = async () => {
+    const handleDeleteSelected = () => {
         if (selectedMemoIds.size === 0 || busyDelete) return;
 
-        try {
-            setBusyDelete(true);
-            for (const memoId of selectedMemoIds) {
-                await removeMemo(memoId);
-            }
-            setSelectedMemoIds(new Set());
-            setIsMultiDeleteMode(false);
-        } catch (error) {
-            console.error("[MemoPreview] Failed deleting selected memos:", error);
-        } finally {
-            setBusyDelete(false);
-        }
+        openModal("deleteConfirm", {
+            memoIds: Array.from(selectedMemoIds),
+            onConfirmSuccess: () => {
+                setSelectedMemoIds(new Set());
+                setIsMultiDeleteMode(false);
+            },
+        });
     };
 
     return (

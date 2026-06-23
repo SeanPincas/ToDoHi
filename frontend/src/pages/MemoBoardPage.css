@@ -13,7 +13,20 @@
     --memo-pin-size: 14px;
     --memo-pin-top-offset: 5px;
     --memo-boundary-stroke: 4px;
-    --memo-page-wallpaper: url("../assets/wallpaper/wallpaper-1.webp");
+    --memo-page-bg-base: #f5efe1;
+    --memo-page-title-ink: var(--blue-dark);
+    --memo-page-bg-layer-1: radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 32%);
+    --memo-page-bg-layer-2: radial-gradient(circle at 82% 22%, rgba(235, 214, 178, 0.28) 0%, rgba(235, 214, 178, 0) 34%);
+    --memo-page-bg-layer-3: linear-gradient(180deg, rgba(249, 243, 232, 0.96) 0%, rgba(239, 229, 211, 0.96) 100%);
+    --memo-page-bg-size-1: cover;
+    --memo-page-bg-size-2: cover;
+    --memo-page-bg-size-3: cover;
+    --memo-page-bg-position-1: center;
+    --memo-page-bg-position-2: center;
+    --memo-page-bg-position-3: center;
+    --memo-page-bg-repeat-1: no-repeat;
+    --memo-page-bg-repeat-2: no-repeat;
+    --memo-page-bg-repeat-3: no-repeat;
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -23,12 +36,23 @@
     height: 100dvh;
     padding: var(--memo-page-pad);
     box-sizing: border-box;
-    background:
-        linear-gradient(rgba(247, 242, 232, 0.14), rgba(247, 242, 232, 0.14)),
-        var(--memo-page-wallpaper);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: var(--memo-page-bg-base);
+    background-image:
+        var(--memo-page-bg-layer-1),
+        var(--memo-page-bg-layer-2),
+        var(--memo-page-bg-layer-3);
+    background-size:
+        var(--memo-page-bg-size-1),
+        var(--memo-page-bg-size-2),
+        var(--memo-page-bg-size-3);
+    background-position:
+        var(--memo-page-bg-position-1),
+        var(--memo-page-bg-position-2),
+        var(--memo-page-bg-position-3);
+    background-repeat:
+        var(--memo-page-bg-repeat-1),
+        var(--memo-page-bg-repeat-2),
+        var(--memo-page-bg-repeat-3);
     overflow: hidden;
 }
 
@@ -51,7 +75,7 @@
 
     background:
         linear-gradient(rgba(88, 58, 30, 0.14), rgba(88, 58, 30, 0.14)),
-        url("../assets/wood-table.webp");
+        var(--memo-frame-image, url("../assets/wood-table.webp"));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -70,15 +94,17 @@
 
     display: grid;
     grid-template-columns: auto 1fr auto;
+    grid-template-areas: "left title controls";
     align-items: center;
-    min-height: 64px;
+    min-height: 60px;
 
-    padding: 9px 18px;
+    padding: 8px 16px;
     margin-bottom: var(--memo-topbar-gap);
 
     border-radius: 12px;
     background: transparent;
     isolation: isolate;
+    z-index: 12;
 }
 
 .memo-board-topbar::before {
@@ -102,12 +128,14 @@
 /* ============================ NAV ============================ */
 
 .memo-board-topbar-left {
+    grid-area: left;
     justify-self: start;
 
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
+    overflow: visible;
 }
 
 .memo-nav-btn {
@@ -116,8 +144,8 @@
     gap: 6px;
     font-family: var(--font-heading);
 
-    min-height: 40px;
-    padding: 0 14px;
+    min-height: 38px;
+    padding: 0 13px;
 
     background: rgba(255, 248, 236, 0.92);
     border: 1.6px solid var(--blue-dark);
@@ -143,6 +171,91 @@
         0 1px 0 rgba(255, 255, 255, 0.6) inset;
 }
 
+.memo-nav-theme-btn {
+    flex-shrink: 0;
+}
+
+.memo-board-topbar-controls {
+    grid-area: controls;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+}
+
+.memo-nav-theme-btn.active {
+    background: rgba(250, 241, 223, 0.98);
+    box-shadow:
+        0 4px 10px rgba(116, 90, 52, 0.16),
+        0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.memo-theme-panel-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    overflow: visible;
+    z-index: 24;
+}
+
+.memo-theme-panel {
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    gap: 10px;
+    min-width: 390px;
+    padding: 12px;
+    border: 1.6px solid var(--blue-dark);
+    border-radius: 12px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 26%),
+        color-mix(in srgb, var(--paper-bg) 93%, #fff 7%);
+    box-shadow:
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+.memo-theme-panel::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -12px;
+    height: 12px;
+}
+
+.memo-theme-panel .dropdown-label {
+    font-family: var(--font-heading);
+    font-size: 0.96rem;
+    color: var(--blue-dark);
+}
+
+.memo-theme-panel .dropdown-trigger {
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 248, 236, 0.95);
+    box-shadow:
+        5px 6px 10px var(--modal-paper-shadow),
+        2px 0 6px var(--modal-paper-shadow-side),
+        0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+.memo-theme-panel .dropdown-trigger-text {
+    font-family: var(--font-heading);
+}
+
+.memo-theme-panel .dropdown-menu {
+    z-index: 60;
+}
+
 .memo-nav-text {
     white-space: nowrap;
 }
@@ -150,6 +263,7 @@
 /* ============================ TITLE ============================ */
 
 .memo-board-title-group {
+    grid-area: title;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -158,18 +272,18 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 64px;
+    min-height: 60px;
     width: min(100%, 720px);
-    max-width: calc(100% - 220px);
+    max-width: calc(100% - 260px);
     pointer-events: none;
     z-index: 1;
 }
 
 .memo-board-title {
-    font-size: 2.45rem;
+    font-size: clamp(2rem, 2vw + 0.9rem, 2.45rem);
     font-weight: 800;
     letter-spacing: 0.6px;
-    color: var(--blue-dark);
+    color: var(--memo-page-title-ink, var(--blue-dark));
 
     text-align: center;
     width: 100%;
@@ -206,17 +320,20 @@
     white-space: nowrap;
 }
 
+.memo-board-edit-label-controls {
+    flex-shrink: 0;
+}
+
 /* ============================ TOOLBAR ============================ */
 
 .memo-board-toolbar {
-    justify-self: end;
-
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 8px;
 
     min-width: 0;
+    flex-wrap: wrap;
 }
 
 /* vertical z-stack */
@@ -229,18 +346,18 @@
     color: #000;
 
     margin-left: auto;
-    margin-top: -6px;
-    margin-bottom: -6px;
+    margin-top: -4px;
+    margin-bottom: -4px;
     flex-shrink: 0;
 
-    min-width: 72px;
+    min-width: 68px;
 
     border: 1px solid #000;
     border-radius: 12px;
     background:
         linear-gradient(rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.26)),
         linear-gradient(rgba(88, 58, 30, 0.04), rgba(88, 58, 30, 0.04)),
-        url("../assets/wood-table.webp");
+        var(--memo-frame-image, url("../assets/wood-table.webp"));
     background-size: 280% 280%;
     background-position: center;
     background-repeat: no-repeat;
@@ -252,10 +369,10 @@
 }
 
 .memo-toolbar-icon-btn {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
     padding: 0;
     font-family: var(--font-heading);
 }
@@ -266,8 +383,8 @@
 
 .memo-toolbar-btn-cancel,
 .memo-toolbar-btn-delete-selected {
-    min-height: 40px;
-    padding: 0 14px;
+    min-height: 38px;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -419,68 +536,93 @@
     .memo-board-page {
         --memo-page-pad: 10px;
         --memo-frame-pad: 16px;
-        --memo-board-inner-pad: 18px;
-        --memo-card-width: 190px;
-        --memo-card-height: 155px;
+        --memo-board-inner-pad: 16px;
+        --memo-card-width: 172px;
+        --memo-card-height: 142px;
         --memo-pin-size: 12px;
         --memo-pin-top-offset: 4px;
     }
 
-    /* hide nav label */
-    .memo-nav-text {
-        display: none;
+    .memo-board-topbar {
+        min-height: 54px;
+        padding: 8px 12px;
+        gap: 10px;
     }
 
-    .memo-board-toolbar {
+    .memo-board-title-group {
+        min-height: 54px;
+        max-width: calc(100% - 210px);
+    }
+
+    .memo-board-title {
+        font-size: clamp(1.6rem, 1.4vw + 0.95rem, 2rem);
+    }
+
+    .memo-board-topbar-controls {
         gap: 8px;
     }
 
+    .memo-board-toolbar {
+        gap: 6px;
+    }
+
+    .memo-theme-panel {
+        grid-template-columns: 1fr;
+        min-width: 220px;
+    }
+
     .memo-zorder-panel {
-        min-width: 62px;
-        margin-top: -4px;
-        margin-bottom: -4px;
-        padding: 6px 4px;
+        min-width: 56px;
+        margin-top: -2px;
+        margin-bottom: -2px;
+        padding: 4px 3px;
         border-radius: 10px;
     }
 
     .memo-zorder-arrow-btn {
         width: 100%;
-        height: 20px;
+        height: 18px;
         min-width: 100%;
-        min-height: 20px;
+        min-height: 18px;
     }
 
     .memo-zorder-arrow-btn svg {
-        width: 13px;
-        height: 13px;
+        width: 12px;
+        height: 12px;
     }
 
     .memo-zorder-index {
-        min-height: 20px;
-        font-size: 0.7rem;
+        min-height: 18px;
+        font-size: 0.68rem;
     }
 
     .memo-zorder-current {
-        min-width: 16px;
-        min-height: 14px;
-        font-size: 0.82rem;
+        min-width: 15px;
+        min-height: 13px;
+        font-size: 0.76rem;
     }
 
     .memo-toolbar-icon-btn {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        min-height: 36px;
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
     }
 
     .memo-board-toolbar svg {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .memo-board-toolbar .memo-toolbar-btn {
-        padding: 6px 10px;
-        font-size: 0.8rem;
+        min-height: 34px;
+        padding: 5px 10px;
+        font-size: 0.78rem;
         border-radius: 8px;
+    }
+
+    .memo-board-edit-label {
+        font-size: 10px;
+        letter-spacing: 1.2px;
     }
 
     .memo-board-frame {
@@ -494,49 +636,132 @@
 @media (max-width: 480px) {
     .memo-board-page {
         --memo-page-pad: 8px;
-        --memo-frame-pad: 14px;
-        --memo-board-inner-pad: 14px;
-        --memo-card-width: 160px;
-        --memo-card-height: 130px;
+        --memo-frame-pad: 10px;
+        --memo-board-inner-pad: 10px;
+        --memo-card-width: 124px;
+        --memo-card-height: 102px;
         --memo-pin-size: 10px;
         --memo-pin-top-offset: 3px;
     }
 
     .memo-board-topbar {
-        padding: 10px 12px;
-    }
-
-    /* toolbar becomes vertical rail */
-    .memo-board-toolbar {
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 6px;
-    }
-
-    .memo-zorder-controls {
-        gap: 4px;
-    }
-
-    .memo-board-title {
-        font-size: 1.6rem;
-    }
-
-    .memo-board-title-group {
-        max-width: calc(100% - 128px);
-    }
-
-    .memo-board-toolbar .memo-toolbar-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .memo-board-edit-label {
-        font-size: 9px;
-        letter-spacing: 1px;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "left title"
+            "controls controls";
+        align-items: center;
+        row-gap: 8px;
+        min-height: auto;
+        padding: 10px 10px 9px;
     }
 
     .memo-board-topbar-left {
+        gap: 0;
+    }
+
+    .memo-nav-btn-dashboard {
+        min-height: 34px;
+        padding: 0 10px;
+    }
+
+    .memo-nav-text {
+        display: none;
+    }
+
+    .memo-board-title-group {
+        position: static;
+        left: auto;
+        top: auto;
+        transform: none;
+        justify-self: center;
+        min-height: auto;
+        width: 100%;
+        max-width: none;
+        pointer-events: none;
+    }
+
+    .memo-board-title {
+        font-size: 1.45rem;
+        line-height: 1.05;
+    }
+
+    .memo-board-topbar-controls {
+        width: 100%;
+        justify-self: stretch;
+        justify-content: space-between;
+        align-items: center;
         gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .memo-board-edit-label-controls {
+        order: 1;
+        font-size: 10px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .memo-theme-panel-wrapper {
+        order: 2;
+    }
+
+    .memo-board-toolbar {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .memo-theme-panel {
+        left: 0;
+        right: auto;
+        min-width: 188px;
+        max-width: min(84vw, 240px);
+        padding: 10px;
+    }
+
+    .memo-toolbar-icon-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .memo-board-toolbar .memo-toolbar-btn {
+        min-height: 32px;
+        padding: 0 10px;
+        font-size: 0.76rem;
+        justify-content: center;
+    }
+
+    .memo-zorder-panel {
+        flex-direction: row;
+        align-items: center;
+        min-width: 0;
+        width: auto;
+        gap: 4px;
+        padding: 4px 6px;
+        margin: 0;
+    }
+
+    .memo-zorder-arrow-btn {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+        min-height: 24px;
+        border-radius: 6px;
+    }
+
+    .memo-zorder-index {
+        min-height: 24px;
+        padding: 0 2px;
+    }
+
+    .memo-zorder-current {
+        min-width: 16px;
+        min-height: 14px;
+        font-size: 0.74rem;
     }
 
     .memo-board-frame {
@@ -600,7 +825,7 @@
     background-image:
         linear-gradient(rgba(245, 237, 221, 0.26), rgba(245, 237, 221, 0.26)),
         linear-gradient(rgba(92, 63, 36, 0.14), rgba(92, 63, 36, 0.14)),
-        url("../assets/cork-board.webp");
+        url("../assets/cork-board-soft.webp");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

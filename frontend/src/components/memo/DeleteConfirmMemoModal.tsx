@@ -2,7 +2,7 @@
 // DeleteConfirmMemoModal.tsx
 // ============================================================================
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./DeleteConfirmMemoModal.css";
 
 import { useMemoContext } from "../../context/MemoContext";
@@ -18,22 +18,41 @@ const DeleteConfirmMemoModal = () => {
     const {
         memos,
         activeModal,
+        activeModalData,
         activeMemoId,
         closeModal,
         removeMemo,
     } = useMemoContext();
 
-    const memo = memos.find((m) => m._id === activeMemoId) ?? null;
+    const memoIds = activeModalData?.memoIds?.length
+        ? activeModalData.memoIds
+        : activeMemoId
+            ? [activeMemoId]
+            : [];
+    const selectedMemos = memoIds
+        .map((memoId) => memos.find((m) => m._id === memoId) ?? null)
+        .filter(Boolean);
+    const memo = memos.find((m) => m._id === activeMemoId) ?? selectedMemos[0] ?? null;
+    const isBulkDelete = memoIds.length > 1;
     const [isDeleting, setIsDeleting] = useState(false);
 
-    if (activeModal !== "deleteConfirm" || !memo) return null;
+    useEffect(() => {
+        if (activeModal !== "deleteConfirm") {
+            setIsDeleting(false);
+        }
+    }, [activeModal, memoIds.length]);
+
+    if (activeModal !== "deleteConfirm" || memoIds.length === 0) return null;
 
     const handleConfirm = async () => {
         if (isDeleting) return;
 
         try {
             setIsDeleting(true);
-            await removeMemo(memo._id);
+            for (const memoId of memoIds) {
+                await removeMemo(memoId);
+            }
+            activeModalData?.onConfirmSuccess?.();
             closeModal();
         } catch (err) {
             console.error("[DeleteConfirmMemoModal] Delete failed:", err);
@@ -68,11 +87,22 @@ const DeleteConfirmMemoModal = () => {
 
                 <div className="delete-memo-copy-block delete-confirm-copy-block">
                     <p className="delete-memo-text delete-confirm-message task-management-modal-subtitle">
-                        Are you sure you want to permanently delete this memo?
+                        {isBulkDelete
+                            ? `Are you sure you want to permanently delete these ${memoIds.length} memos?`
+                            : "Are you sure you want to permanently delete this memo?"}
                     </p>
-                    <p className="delete-memo-title-preview">
-                        "{memo.title}"
-                    </p>
+                    {!isBulkDelete && memo && (
+                        <p className="delete-memo-title-preview">
+                            "{memo.title}"
+                        </p>
+                    )}
+                    {isBulkDelete && (
+                        <p className="delete-memo-title-preview">
+                            {selectedMemos.length === memoIds.length
+                                ? `${memoIds.length} memos selected`
+                                : `${selectedMemos.length}/${memoIds.length} memos ready to delete`}
+                        </p>
+                    )}
                     <p className="delete-memo-note delete-confirm-note">
                         This action cannot be undone.
                     </p>
