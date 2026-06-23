@@ -26,7 +26,7 @@
     border: 1px solid rgba(23, 45, 68, 0.72);
     background-color: #2f4f71;
     background-image:
-        url("../assets/leather.webp"),
+        url("../assets/leather-soft.webp"),
         linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(10, 28, 48, 0.18));
     background-size: cover, cover;
     background-position: center;

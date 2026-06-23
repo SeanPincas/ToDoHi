@@ -10,14 +10,16 @@ import { useAuthContext } from "../../../context/AuthContext";
 import DropdownMenu, { type DropdownOption } from "../dropdownMenu/DropdownMenu";
 import type { QuoteCategory, QuoteDelayMinutes } from "../../../utils/quoteUtils";
 import { QUOTE_CATEGORIES, QUOTE_DELAY_LABELS, QUOTE_DELAY_OPTIONS } from "../../../utils/quoteUtils";
-import { BOOKMARK_STYLE_OPTIONS } from "../../../utils/bookmarkStyles";
-import { WALLPAPER_STYLE_OPTIONS } from "../../../utils/wallpaperStyles";
+import { BOOKMARK_STYLE_LABELS, BOOKMARK_STYLE_OPTIONS } from "../../../utils/bookmarkStyles";
+import { DEFAULT_FRAME_STYLE, FRAME_STYLE_LABELS, FRAME_STYLE_OPTIONS } from "../../../utils/frameStyles";
+import { WALLPAPER_STYLE_LABELS, WALLPAPER_STYLE_OPTIONS } from "../../../utils/wallpaperStyles";
 import ThemeToggle from "../themeToggle/ThemeToggle";
 import ProfilePictureCropModal from "./ProfilePictureCropModal";
 import ChangePasswordModal from "./ChangePasswordModal";
 import "./UserSettingsModal.css";
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
+import "../../../styles/ButtonStyles.css";
 
 interface Props {
     onClose: () => void;
@@ -43,12 +45,17 @@ const QUOTE_DELAY_DROPDOWN_OPTIONS: DropdownOption[] = QUOTE_DELAY_OPTIONS.map((
 
 const BOOKMARK_OPTIONS: DropdownOption[] = BOOKMARK_STYLE_OPTIONS.map((style) => ({
     value: style,
-    label: style.replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
+    label: BOOKMARK_STYLE_LABELS[style] ?? style,
 }));
 
 const WALLPAPER_OPTIONS: DropdownOption[] = WALLPAPER_STYLE_OPTIONS.map((style) => ({
     value: style,
-    label: style.replace("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()),
+    label: WALLPAPER_STYLE_LABELS[style] ?? style,
+}));
+
+const FRAME_OPTIONS: DropdownOption[] = FRAME_STYLE_OPTIONS.map((style) => ({
+    value: style,
+    label: FRAME_STYLE_LABELS[style] ?? style,
 }));
 
 const getProfilePictureSrc = (profilePicture?: string) => {
@@ -66,6 +73,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
     const [quotePreference, setQuotePreference] = useState<string>("Random");
     const [quoteDelay, setQuoteDelay] = useState<string>("10");
     const [wallpaperStyle, setWallpaperStyle] = useState("wallpaper-1");
+    const [frameStyle, setFrameStyle] = useState<string>(DEFAULT_FRAME_STYLE);
     const [bookmarkStyle, setBookmarkStyle] = useState("bookmark-1");
     const [accountMessage, setAccountMessage] = useState("");
     const [preferenceMessage, setPreferenceMessage] = useState("");
@@ -83,6 +91,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
         setResetHour(String(user.preference?.resetHour ?? 0));
         setQuoteDelay(String(user.preference?.quoteDelay ?? 10));
         setWallpaperStyle(user.preference?.wallpaperStyle ?? "wallpaper-1");
+        setFrameStyle(user.preference?.frameStyle ?? DEFAULT_FRAME_STYLE);
         setBookmarkStyle(user.preference?.bookmarkStyle ?? "bookmark-1");
 
         const selectedQuote = user.preference?.quoteCategory?.[0];
@@ -141,6 +150,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
                 resetHour: Number(resetHour),
                 quoteDelay: Number(quoteDelay) as QuoteDelayMinutes,
                 wallpaperStyle,
+                frameStyle,
                 bookmarkStyle,
                 quoteCategory: quotePreference === "Random" ? [] : [quotePreference as QuoteCategory],
             });
@@ -186,7 +196,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
 
                         <button
                             type="button"
-                            className="task-management-modal-close-btn user-settings-close-btn"
+                            className="icon-btn-square task-management-modal-close-btn user-settings-close-btn"
                             onClick={onClose}
                             aria-label="Close user settings"
                         >
@@ -300,6 +310,15 @@ const UserSettingsModal = ({ onClose }: Props) => {
                                 />
 
                                 <DropdownMenu
+                                    label="Bookmark Style"
+                                    value={BOOKMARK_OPTIONS.find((option) => option.value === bookmarkStyle)?.label ?? "Navy Flower"}
+                                    selectedValue={bookmarkStyle}
+                                    options={BOOKMARK_OPTIONS}
+                                    onChange={setBookmarkStyle}
+                                    maxHeight={220}
+                                />
+
+                                <DropdownMenu
                                     label="Quote Preference"
                                     value={QUOTE_OPTIONS.find((option) => option.value === quotePreference)?.label ?? "Random"}
                                     selectedValue={quotePreference}
@@ -319,7 +338,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
 
                                 <DropdownMenu
                                     label="Wallpaper Style"
-                                    value={WALLPAPER_OPTIONS.find((option) => option.value === wallpaperStyle)?.label ?? "Wallpaper 1"}
+                                    value={WALLPAPER_OPTIONS.find((option) => option.value === wallpaperStyle)?.label ?? "Warm Cream Paper"}
                                     selectedValue={wallpaperStyle}
                                     options={WALLPAPER_OPTIONS}
                                     onChange={setWallpaperStyle}
@@ -327,12 +346,12 @@ const UserSettingsModal = ({ onClose }: Props) => {
                                 />
 
                                 <DropdownMenu
-                                    label="Bookmark Style"
-                                    value={BOOKMARK_OPTIONS.find((option) => option.value === bookmarkStyle)?.label ?? "Bookmark 1"}
-                                    selectedValue={bookmarkStyle}
-                                    options={BOOKMARK_OPTIONS}
-                                    onChange={setBookmarkStyle}
-                                    maxHeight={220}
+                                    label="Frame Style"
+                                    value={FRAME_OPTIONS.find((option) => option.value === frameStyle)?.label ?? FRAME_STYLE_LABELS[DEFAULT_FRAME_STYLE]}
+                                    selectedValue={frameStyle}
+                                    options={FRAME_OPTIONS}
+                                    onChange={setFrameStyle}
+                                    maxHeight={180}
                                 />
                             </div>
 

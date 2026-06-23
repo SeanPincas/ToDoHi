@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
         theme: { type: String, enum: ['light', 'dark'], default: 'light' },
         bookmarkStyle: { type: String, default: "bookmark-1" },
         wallpaperStyle: { type: String, default: "default" },
+        frameStyle: { type: String, default: "frame-oak" },
         quoteCategory: {
             type: [String],
             validate: {

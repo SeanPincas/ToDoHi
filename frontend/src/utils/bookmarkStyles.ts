@@ -1,24 +1,3 @@
-import bookmark1 from "../assets/bookmark/bookmark-1.webp";
-import bookmark2 from "../assets/bookmark/bookmark-2.webp";
-import bookmark3 from "../assets/bookmark/bookmark-3.webp";
-import bookmark4 from "../assets/bookmark/bookmark-4.webp";
-import bookmark5 from "../assets/bookmark/bookmark-5.webp";
-import bookmark6 from "../assets/bookmark/bookmark-6.webp";
-import bookmark7 from "../assets/bookmark/bookmark-7.webp";
-import bookmark8 from "../assets/bookmark/bookmark-8.webp";
-import bookmark9 from "../assets/bookmark/bookmark-9.webp";
-import bookmark10 from "../assets/bookmark/bookmark-10.webp";
-import bookmark11 from "../assets/bookmark/bookmark-11.webp";
-import bookmark12 from "../assets/bookmark/bookmark-12.webp";
-import bookmark13 from "../assets/bookmark/bookmark-13.webp";
-import bookmark14 from "../assets/bookmark/bookmark-14.webp";
-import bookmark15 from "../assets/bookmark/bookmark-15.webp";
-import bookmark16 from "../assets/bookmark/bookmark-16.webp";
-import bookmark17 from "../assets/bookmark/bookmark-17.webp";
-import bookmark18 from "../assets/bookmark/bookmark-18.webp";
-import bookmark19 from "../assets/bookmark/bookmark-19.webp";
-import bookmark20 from "../assets/bookmark/bookmark-20.webp";
-
 export type BookmarkTheme = {
     image: string;
     overlayTop: string;
@@ -74,7 +53,7 @@ const createTheme = (
     ...theme,
 });
 
-const darkNavyTheme = (image: string) =>
+const navyFlowerTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(246, 244, 238, 0.18)",
         overlayBottom: "rgba(233, 227, 214, 0.12)",
@@ -126,7 +105,7 @@ const airyBlueTheme = (image: string) =>
         footerInk: "rgba(189, 220, 242, 0.88)",
     });
 
-const forestTheme = (image: string) =>
+const greenForestTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(248, 251, 241, 0.16)",
         overlayBottom: "rgba(236, 243, 225, 0.1)",
@@ -205,7 +184,7 @@ const sunflowerTheme = (image: string) =>
         logoHaloOuter: "rgba(246, 223, 156, 0.96)",
     });
 
-const blossomTheme = (image: string) =>
+const pinkBlossomTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(255, 249, 246, 0.16)",
         overlayBottom: "rgba(249, 238, 234, 0.1)",
@@ -230,7 +209,7 @@ const blossomTheme = (image: string) =>
         logoHaloOuter: "rgba(255, 220, 236, 0.96)",
     });
 
-const meadowTheme = (image: string) =>
+const daisyMeadowTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(254, 252, 241, 0.12)",
         overlayBottom: "rgba(248, 243, 221, 0.08)",
@@ -258,7 +237,7 @@ const meadowTheme = (image: string) =>
         footerInk: "rgba(54, 81, 39, 0.96)",
     });
 
-const midnightStarTheme = (image: string) =>
+const starryNightTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(8, 14, 42, 0.24)",
         overlayBottom: "rgba(4, 9, 28, 0.18)",
@@ -311,7 +290,7 @@ const jewelGlassTheme = (image: string) =>
         toggleBorder: "#6fa06d",
     });
 
-const orchardNightTheme = (image: string) =>
+const redOrchardsTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(10, 8, 7, 0.34)",
         overlayBottom: "rgba(6, 5, 4, 0.28)",
@@ -336,7 +315,7 @@ const orchardNightTheme = (image: string) =>
         logoHaloOuter: "rgba(255, 123, 148, 0.97)",
     });
 
-const roseGlassTheme = (image: string) =>
+const glassRoseTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(18, 10, 24, 0.3)",
         overlayBottom: "rgba(10, 6, 16, 0.24)",
@@ -359,7 +338,7 @@ const roseGlassTheme = (image: string) =>
         guideHover: "rgba(245, 203, 132, 0.97)",
     });
 
-const auroraTideTheme = (image: string) =>
+const auroraTidesTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(6, 27, 36, 0.34)",
         overlayBottom: "rgba(3, 17, 24, 0.28)",
@@ -509,7 +488,7 @@ const moltenAmberTheme = (image: string) =>
         toggleBorder: "#d8893b",
     });
 
-const lavenderPastureTheme = (image: string) =>
+const lavenderFieldTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(255, 241, 246, 0.18)",
         overlayBottom: "rgba(239, 222, 255, 0.14)",
@@ -569,7 +548,7 @@ const alpineSageTheme = (image: string) =>
         toggleBorder: "#8ab177",
     });
 
-const emberLakeTheme = (image: string) =>
+const sunsetLakeTheme = (image: string) =>
     createTheme(image, {
         overlayTop: "rgba(255, 205, 141, 0.14)",
         overlayBottom: "rgba(255, 159, 87, 0.1)",
@@ -630,34 +609,86 @@ const frostPineTheme = (image: string) =>
     });
 
 export const BOOKMARK_THEME_MAP: Record<string, BookmarkTheme> = {
-    default: darkNavyTheme(bookmark1),
-    "bookmark-1": darkNavyTheme(bookmark1),
-    "bookmark-2": airyBlueTheme(bookmark2),
-    "bookmark-3": forestTheme(bookmark3),
-    "bookmark-4": deepRoseTheme(bookmark4),
-    "bookmark-5": sunflowerTheme(bookmark5),
-    "bookmark-6": blossomTheme(bookmark6),
-    "bookmark-7": meadowTheme(bookmark7),
-    "bookmark-8": midnightStarTheme(bookmark8),
-    "bookmark-9": orchardNightTheme(bookmark9),
-    "bookmark-10": jewelGlassTheme(bookmark10),
-    "bookmark-11": roseGlassTheme(bookmark11),
-    "bookmark-12": auroraTideTheme(bookmark12),
-    "bookmark-13": lilacMistTheme(bookmark13),
-    "bookmark-14": charcoalSummitTheme(bookmark14),
-    "bookmark-15": verdantGlowTheme(bookmark15),
-    "bookmark-16": moltenAmberTheme(bookmark16),
-    "bookmark-17": lavenderPastureTheme(bookmark17),
-    "bookmark-18": alpineSageTheme(bookmark18),
-    "bookmark-19": emberLakeTheme(bookmark19),
-    "bookmark-20": frostPineTheme(bookmark20),
+    default: navyFlowerTheme(""),
+    "bookmark-1": navyFlowerTheme(""),
+    "bookmark-2": airyBlueTheme(""),
+    "bookmark-3": greenForestTheme(""),
+    "bookmark-4": deepRoseTheme(""),
+    "bookmark-5": sunflowerTheme(""),
+    "bookmark-6": pinkBlossomTheme(""),
+    "bookmark-7": daisyMeadowTheme(""),
+    "bookmark-8": starryNightTheme(""),
+    "bookmark-9": redOrchardsTheme(""),
+    "bookmark-10": jewelGlassTheme(""),
+    "bookmark-11": glassRoseTheme(""),
+    "bookmark-12": auroraTidesTheme(""),
+    "bookmark-13": lilacMistTheme(""),
+    "bookmark-14": charcoalSummitTheme(""),
+    "bookmark-15": verdantGlowTheme(""),
+    "bookmark-16": moltenAmberTheme(""),
+    "bookmark-17": lavenderFieldTheme(""),
+    "bookmark-18": alpineSageTheme(""),
+    "bookmark-19": sunsetLakeTheme(""),
+    "bookmark-20": frostPineTheme(""),
+};
+
+const BOOKMARK_IMAGE_LOADERS: Record<string, () => Promise<{ default: string }>> = {
+    "bookmark-1": () => import("../assets/bookmark/bookmark-1.webp"),
+    "bookmark-2": () => import("../assets/bookmark/bookmark-2.webp"),
+    "bookmark-3": () => import("../assets/bookmark/bookmark-3.webp"),
+    "bookmark-4": () => import("../assets/bookmark/bookmark-4.webp"),
+    "bookmark-5": () => import("../assets/bookmark/bookmark-5.webp"),
+    "bookmark-6": () => import("../assets/bookmark/bookmark-6.webp"),
+    "bookmark-7": () => import("../assets/bookmark/bookmark-7.webp"),
+    "bookmark-8": () => import("../assets/bookmark/bookmark-8.webp"),
+    "bookmark-9": () => import("../assets/bookmark/bookmark-9.webp"),
+    "bookmark-10": () => import("../assets/bookmark/bookmark-10.webp"),
+    "bookmark-11": () => import("../assets/bookmark/bookmark-11.webp"),
+    "bookmark-12": () => import("../assets/bookmark/bookmark-12.webp"),
+    "bookmark-13": () => import("../assets/bookmark/bookmark-13.webp"),
+    "bookmark-14": () => import("../assets/bookmark/bookmark-14.webp"),
+    "bookmark-15": () => import("../assets/bookmark/bookmark-15.webp"),
+    "bookmark-16": () => import("../assets/bookmark/bookmark-16.webp"),
+    "bookmark-17": () => import("../assets/bookmark/bookmark-17.webp"),
+    "bookmark-18": () => import("../assets/bookmark/bookmark-18.webp"),
+    "bookmark-19": () => import("../assets/bookmark/bookmark-19.webp"),
+    "bookmark-20": () => import("../assets/bookmark/bookmark-20.webp"),
 };
 
 export const BOOKMARK_STYLE_OPTIONS = Object.keys(BOOKMARK_THEME_MAP).filter(
     (style) => style !== "default"
 );
 
+export const BOOKMARK_STYLE_LABELS: Record<string, string> = {
+    "bookmark-1": "Navy Flower",
+    "bookmark-2": "Airy Blue",
+    "bookmark-3": "Green Forest",
+    "bookmark-4": "Deep Rose",
+    "bookmark-5": "Sunflower",
+    "bookmark-6": "Pink Blossom",
+    "bookmark-7": "Daisy Meadow",
+    "bookmark-8": "Starry Night",
+    "bookmark-9": "Red Orchards",
+    "bookmark-10": "Jewel Glass",
+    "bookmark-11": "Glass Rose",
+    "bookmark-12": "Aurora Tides",
+    "bookmark-13": "Lilac Mist",
+    "bookmark-14": "Charcoal Summit",
+    "bookmark-15": "Verdant Glow",
+    "bookmark-16": "Molten Amber",
+    "bookmark-17": "Lavender Field",
+    "bookmark-18": "Alpine Sage",
+    "bookmark-19": "Sunset Lake",
+    "bookmark-20": "Frost Pine",
+};
+
 export const getBookmarkTheme = (style?: string) => {
     if (!style) return BOOKMARK_THEME_MAP["bookmark-1"];
     return BOOKMARK_THEME_MAP[style] ?? BOOKMARK_THEME_MAP["bookmark-1"];
+};
+
+export const loadBookmarkThemeImage = async (style?: string) => {
+    const normalizedStyle = style && BOOKMARK_IMAGE_LOADERS[style] ? style : "bookmark-1";
+    const module = await BOOKMARK_IMAGE_LOADERS[normalizedStyle]();
+    return module.default;
 };
