@@ -478,6 +478,12 @@
 }
 
 @media (max-width: 1024px) {
+    .dashboard-header-logo {
+        width: clamp(80px, 13vw, 108px);
+        max-width: 32%;
+        opacity: 0.9;
+    }
+
     .left-page-stack {
         grid-template-rows: minmax(320px, 1fr) minmax(250px, 0.9fr);
     }

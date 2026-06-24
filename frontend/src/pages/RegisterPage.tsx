@@ -3,6 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import { useTodo } from "../context/TodoContext";
 import { Icons } from "../styles/iconLibrary";
+import {
+    USERNAME_MAX_LENGTH,
+    validateUsername,
+} from "../utils/usernameValidation";
 import "../components/common/modals/modalBaseTheme.css";
 import "../components/common/modals/taskManagementModalTheme.css";
 import "./AuthPages.css";
@@ -28,13 +32,25 @@ const RegisterPage = () => {
             return;
         }
 
+        const usernameValidation = validateUsername(username);
+        if (!usernameValidation.valid) {
+            setError(usernameValidation.message);
+            return;
+        }
+
+        const normalizedUsername = usernameValidation.normalized;
+        if (!normalizedUsername) {
+            setError("Username is required.");
+            return;
+        }
+
         if (password.trim().length < 8) {
             setError("Password must be at least 8 characters.");
             return;
         }
 
         try {
-            await register(username.trim(), email.trim(), password.trim());
+            await register(normalizedUsername, email.trim(), password.trim());
             navigate("/login", { replace: true });
         } catch (err: any) {
             setError(
@@ -71,6 +87,7 @@ const RegisterPage = () => {
                                     placeholder="Username"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
+                                    maxLength={USERNAME_MAX_LENGTH}
                                 />
                             </div>
 

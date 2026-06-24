@@ -17,7 +17,7 @@
     box-shadow:
         0 6px 12px rgba(0, 0, 0, 10);
 
-    padding: 14px 12px 12px;
+    padding: 16px 12px 12px;
 
     font-family: "Kalam", cursive;
 
@@ -102,6 +102,7 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
+    gap: 5px;
 }
 
 .memo-card-paper.scrollable {
@@ -111,26 +112,56 @@
 /* ============================ HEADER ============================ */
 .memo-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between; /* LEFT title, RIGHT emoji */
     gap: 6px;
+    padding-top: 4px;
 }
 
 
 /* ============================ TITLE ============================ */
 
+.memo-title-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    --memo-title-visible-width: calc(var(--memo-card-width, 220px) - 58px);
+}
+
+.memo-title-wrap.marquee {
+    overflow: hidden;
+}
+
 .memo-title {
     font-size: 1rem;
     font-weight: 700;
-    margin: 6px 0 0 0;
+    margin: 0;
+    line-height: 1.14;
     color: black;
 
-    /* Clamp title */
-    line-clamp: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+}
+
+.memo-title-wrap.marquee .memo-title {
+    display: inline-block;
+    min-width: max-content;
+    padding-right: 24px;
+    animation: memoCardTitleMarquee 9s linear infinite;
+}
+
+@keyframes memoCardTitleMarquee {
+    0% {
+        transform: translateX(0);
+    }
+    12% {
+        transform: translateX(0);
+    }
+    88% {
+        transform: translateX(calc(-100% + var(--memo-title-visible-width, 152px)));
+    }
+    100% {
+        transform: translateX(calc(-100% + var(--memo-title-visible-width, 152px)));
+    }
 }
 
 /* ============================ CATEGORY ============================ */
@@ -138,14 +169,17 @@
 .memo-category {
     font-size: 1.1rem;
     font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 /* ============================ DESCRIPTION ============================ */
 
 .memo-content {
     font-size: 0.85rem;
-    line-height: 1.2;
+    line-height: 1.26;
     color: black;
+    margin: 0;
 
     /* HARD CLAMP (LOCKED STANDARD) */
     line-clamp: 8;
@@ -190,22 +224,38 @@
 }
 
 /* --------------------------- TABLET --------------------------- */
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
     .memo-card-overlay {
-        padding: 12px 10px 10px;
+        padding: 13px 10px 9px;
+        border-radius: 5px;
+    }
+
+    .memo-card-paper {
+        gap: 5px;
+    }
+
+    .memo-header {
+        gap: 5px;
+        padding-top: 3px;
     }
 
     .memo-title {
-        font-size: 0.90rem;
+        font-size: 0.88rem;
+        line-height: 1.08;
+    }
+
+    .memo-title-wrap {
+        --memo-title-visible-width: calc(var(--memo-card-width, 164px) - 46px);
     }
 
     .memo-category {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .memo-content {
         line-clamp: 7;
-        font-size: 0.8rem;
+        font-size: 0.77rem;
+        line-height: 1.2;
         -webkit-line-clamp: 7;
     }
 }
@@ -213,27 +263,36 @@
 /* --------------------------- MOBILE --------------------------- */
 @media (max-width: 600px) {
     .memo-card-overlay {
-        padding: 10px 8px 8px;
+        padding: 11px 8px 7px;
         border-radius: 5px;
+    }
+
+    .memo-card-paper {
+        gap: 4px;
     }
 
     .memo-header {
         gap: 4px;
+        padding-top: 2px;
     }
 
     .memo-title {
+        font-size: 0.72rem;
+        line-height: 1.08;
+    }
 
-        font-size: 0.75rem;
+    .memo-title-wrap {
+        --memo-title-visible-width: calc(var(--memo-card-width, 118px) - 40px);
     }
 
     .memo-category {
-        font-size: 0.9rem;
+        font-size: 0.84rem;
     }
 
     .memo-content {
         line-clamp: 5;
-        font-size: 0.75rem;
-        line-height: 1.15;
+        font-size: 0.70rem;
+        line-height: 1.12;
         -webkit-line-clamp: 5;
     }
 }

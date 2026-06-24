@@ -16,6 +16,10 @@ import { WALLPAPER_STYLE_LABELS, WALLPAPER_STYLE_OPTIONS } from "../../../utils/
 import ThemeToggle from "../themeToggle/ThemeToggle";
 import ProfilePictureCropModal from "./ProfilePictureCropModal";
 import ChangePasswordModal from "./ChangePasswordModal";
+import {
+    USERNAME_MAX_LENGTH,
+    validateUsername,
+} from "../../../utils/usernameValidation";
 import "./UserSettingsModal.css";
 import "./modalBaseTheme.css";
 import "./taskManagementModalTheme.css";
@@ -123,12 +127,17 @@ const UserSettingsModal = ({ onClose }: Props) => {
         setIsSavingUsername(true);
 
         try {
-            const trimmedUsername = username.trim();
-            if (!trimmedUsername) {
-                throw new Error("Username is required");
+            const usernameValidation = validateUsername(username);
+            if (!usernameValidation.valid) {
+                throw new Error(usernameValidation.message);
             }
 
-            await updateUserProfile({ username: trimmedUsername });
+            const normalizedUsername = usernameValidation.normalized;
+            if (!normalizedUsername) {
+                throw new Error("Username is required.");
+            }
+
+            await updateUserProfile({ username: normalizedUsername });
             await refreshUser();
             setAccountMessage("Username updated successfully.");
         } catch (error) {
@@ -255,6 +264,7 @@ const UserSettingsModal = ({ onClose }: Props) => {
                                         value={username}
                                         onChange={(event) => setUsername(event.target.value)}
                                         placeholder="Enter username"
+                                        maxLength={USERNAME_MAX_LENGTH}
                                     />
                                     <button
                                         type="button"

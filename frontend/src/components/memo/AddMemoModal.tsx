@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useMemoContext } from "../../context/MemoContext";
+import MemoCardBaseOverlay from "../../styles/MemoCardBaseOverlay";
 
 import { modalOverlayStyle } from "../../styles/modalStyles";
 import "../../styles/ButtonStyles.css"
@@ -13,9 +14,11 @@ import "../common/modals/taskManagementModalTheme.css";
 import {
     MEMO_CONTENT_MAX_LENGTH,
     MEMO_TITLE_MAX_LENGTH,
+    formatMemoPreviewTextByWidth,
     memoPinColors,
     getDefaultMemoPinColor,
     memoCategoryIconMap,
+    getMemoCategoryIconKey,
     resolveMemoContainerColor,
     MEMO_CONTAINER_COLORS
 } from "../../utils/memoUtils/memoUtils";
@@ -38,6 +41,7 @@ const AddMemoModal: React.FC = () => {
     const [category, setCategory] = useState<string>("others");
     const [containerColor, setContainerColor] = useState<string>(resolveMemoContainerColor());
     const [pinColor, setPinColor] = useState<string>(getDefaultMemoPinColor());
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -50,6 +54,7 @@ const AddMemoModal: React.FC = () => {
             setCategory("others"),
             setContainerColor(resolveMemoContainerColor());
             setPinColor(getDefaultMemoPinColor());
+            setIsPreviewOpen(false);
             setErrorMsg(null);
             setLoading(false);
         }
@@ -91,13 +96,54 @@ const AddMemoModal: React.FC = () => {
         setLoading(false);
     }
 
+    const memoCategoryIconKey = getMemoCategoryIconKey(category);
+    const MemoCategoryIcon = Icons[memoCategoryIconKey];
+    const previewTitle = title.trim() || "Untitled Memo";
+    const previewContent = formatMemoPreviewTextByWidth(
+        content.trim() || "No content",
+        196,
+        '400 13.6px "Kalam", cursive'
+    );
+
     // --------------------- RENDER ------------------------------
     return (
         <div style={modalOverlayStyle} onMouseDown={handleClose}>
             <div
-                className="modal-card-base memo-modal-card task-management-modal paper-sheet-lines"
+                className="modal-card-base memo-modal-card add-memo-modal-card task-management-modal paper-sheet-lines"
                 onMouseDown={(e) => e.stopPropagation()}
             >
+                <button
+                    type="button"
+                    className={`add-memo-modal-notch ${isPreviewOpen ? "open" : ""}`}
+                    aria-label={isPreviewOpen ? "Hide live memo preview" : "Show live memo preview"}
+                    aria-pressed={isPreviewOpen}
+                    onClick={() => setIsPreviewOpen((prev) => !prev)}
+                >
+                    <Icons.Note />
+                </button>
+
+                <aside
+                    className={`add-memo-live-preview ${isPreviewOpen ? "open" : ""}`}
+                    aria-hidden={!isPreviewOpen}
+                >
+                    <div className="add-memo-live-preview-shell task-management-modal-panel">
+                        <div className="add-memo-live-preview-header">
+                            <span className="add-memo-live-preview-title">Memo Preview</span>
+                            <span className="add-memo-live-preview-meta">{category}</span>
+                        </div>
+
+                        <div className="add-memo-live-preview-card-wrap">
+                            <MemoCardBaseOverlay
+                                title={previewTitle}
+                                content={previewContent}
+                                categoryIcon={<MemoCategoryIcon />}
+                                containerColor={containerColor}
+                                pinColor={pinColor}
+                                scrollableContent={true}
+                            />
+                        </div>
+                    </div>
+                </aside>
 
                 {/* ================= HEADER ================= */}
                 <div className="memo-header task-management-modal-header">

@@ -62,7 +62,7 @@ export const TASK_CATEGORY_ICON_MAP: Record<TaskCategory, TaskIconKey> = {
     work: "Target",
     study: "Planner",
     fitness: "Flame",
-    health: "Leaf",
+    health: "Heartbeat",
     cooking: "Sun",
     relax: "HalfMoon",
     praying: "Star",
@@ -134,6 +134,19 @@ export const formatDate = (date: Date | string | null): string => {
         year: "numeric",
         month: "short",
         day: "numeric",
+    });
+};
+
+export const formatDateTime = (date: Date | string | null): string => {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
     });
 };
 

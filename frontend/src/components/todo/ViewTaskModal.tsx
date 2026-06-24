@@ -15,7 +15,7 @@ import "../common/modals/taskManagementModalTheme.css";
 
 // Utilities
 import {
-    formatDate,
+    formatDateTime,
     getTaskCategoryIconKey,
     getTaskStatusIconKey,
     safeCategoryLabel,
@@ -136,26 +136,32 @@ const ViewTaskModal = () => {
 
                     <div className="view-info-row">
                         <span className="view-info-item">
-                            <strong>Created At:</strong> {formatDate(task.createdAt)}
+                            <strong>Created At:</strong> {formatDateTime(task.createdAt)}
                         </span>
                     </div>
 
                     <div className="view-info-row">
                         <span className="view-info-item">
-                            <strong>Completed At:</strong> {formatDate(task.completedAt ?? null)}
+                            <strong>Deadline At:</strong> {formatDateTime(task.deadline ?? null)}
                         </span>
                     </div>
 
                     <div className="view-info-row">
                         <span className="view-info-item">
-                            <strong>Failed At:</strong> {formatDate(task.failedAt ?? null)}
+                            <strong>Completed At:</strong> {formatDateTime(task.completedAt ?? null)}
+                        </span>
+                    </div>
+
+                    <div className="view-info-row">
+                        <span className="view-info-item">
+                            <strong>Failed At:</strong> {formatDateTime(task.failedAt ?? null)}
                         </span>
                     </div>
 
                     {shouldShowRepeatedAt && (
                         <div className="view-info-row">
                             <span className="view-info-item">
-                                <strong>Repeated At:</strong> {formatDate(repeatedAtValue)}
+                                <strong>Repeated At:</strong> {formatDateTime(repeatedAtValue)}
                             </span>
                         </div>
                     )}
