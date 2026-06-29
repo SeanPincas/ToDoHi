@@ -136,10 +136,6 @@ const AddTaskModal: React.FC = () => {
                     </button>
                 </div>
 
-                <p className="task-management-modal-subtitle todo-modal-subtitle">
-                    Add a fresh task to today&apos;s list and set its category and paper color.
-                </p>
-
                 {/* ------------------ ERROR ------------------ */}
                 {errorMsg && (
                     <div className="todo-modal-error">{errorMsg}</div>

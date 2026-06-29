@@ -15,6 +15,7 @@ import {
     DEFAULT_FRAME_STYLE,
     FRAME_STYLE_LABELS,
     FRAME_STYLE_OPTIONS,
+    getFrameTheme,
     loadFrameStyleAsset,
     normalizeFrameStyle,
 } from "../utils/frameStyles";
@@ -161,6 +162,7 @@ const MemoBoardPage: React.FC = () => {
     }, []);
 
     const memoWallpaperTheme = getWallpaperTheme(user?.preference?.wallpaperStyle);
+    const memoFrameTheme = getFrameTheme(user?.preference?.frameStyle);
 
     useEffect(() => {
         let isActive = true;
@@ -349,6 +351,7 @@ const MemoBoardPage: React.FC = () => {
                 ["--memo-page-bg-layer-1" as string]: memoWallpaperTheme.pageLayers[0] ?? "none",
                 ["--memo-page-bg-layer-2" as string]: memoWallpaperTheme.pageLayers[1] ?? "none",
                 ["--memo-page-bg-layer-3" as string]: memoWallpaperTheme.pageLayers[2] ?? "none",
+                ["--memo-page-title-border" as string]: memoFrameTheme.titleBorder,
                 ["--memo-page-bg-size-1" as string]: memoWallpaperTheme.pageSizes?.[0] ?? "cover",
                 ["--memo-page-bg-size-2" as string]: memoWallpaperTheme.pageSizes?.[1] ?? "cover",
                 ["--memo-page-bg-size-3" as string]: memoWallpaperTheme.pageSizes?.[2] ?? "cover",
@@ -375,22 +378,16 @@ const MemoBoardPage: React.FC = () => {
                             className="memo-nav-btn memo-nav-btn-dashboard"
                             onClick={() => navigate("/")}
                         >
-                            <Icons.Home />
-                            <span className="memo-nav-text">
-                                Dashboard
+                            <span className="memo-nav-btn-content">
+                                <span className="memo-btn-icon-anchor">
+                                    <Icons.Home />
+                                </span>
+                                <span className="memo-nav-text button-label-handwritten memo-btn-text-anchor">
+                                    Dashboard
+                                </span>
                             </span>
                         </button>
-                    </div>
 
-                    {/* CENTER */}
-                    <div className="memo-board-title-group">
-                        <div className="memo-board-title">
-                            SeanPDev&apos;s Memo Board
-                        </div>
-                    </div>
-
-                    {/* RIGHT / CONTROLS */}
-                    <div className="memo-board-topbar-controls">
                         <div
                             className="memo-theme-panel-wrapper"
                             ref={themePanelRef}
@@ -439,7 +436,17 @@ const MemoBoardPage: React.FC = () => {
                                 </div>
                             ) : null}
                         </div>
+                    </div>
 
+                    {/* CENTER */}
+                    <div className="memo-board-title-group">
+                        <div className="memo-board-title">
+                            SeanPDev&apos;s Memo Board
+                        </div>
+                    </div>
+
+                    {/* RIGHT / CONTROLS */}
+                    <div className="memo-board-topbar-controls">
                         <div
                             className={`memo-board-edit-label memo-board-edit-label-inline memo-board-edit-label-controls ${boardMode === "edit"
                                 ? "visible"
@@ -484,6 +491,10 @@ const MemoBoardPage: React.FC = () => {
                                         </>
                                     ) : (
                                         <>
+                                            <div className="memo-board-edit-label memo-board-edit-label-inline memo-board-delete-label visible">
+                                                ( DELETE MODE )
+                                            </div>
+
                                             <button
                                                 className="btn-secondary-rect memo-toolbar-btn memo-toolbar-btn-cancel"
                                                 onClick={handleCancelMultiDeleteMode}
@@ -491,9 +502,13 @@ const MemoBoardPage: React.FC = () => {
                                                 aria-label="Cancel multi delete mode"
                                                 title="Cancel"
                                             >
-                                                <Icons.Close />
-                                                <span className="memo-toolbar-text">
-                                                    Cancel
+                                                <span className="memo-toolbar-btn-content">
+                                                    <span className="memo-btn-icon-anchor">
+                                                        <Icons.Close />
+                                                    </span>
+                                                    <span className="memo-toolbar-text button-label-handwritten memo-btn-text-anchor">
+                                                        Cancel
+                                                    </span>
                                                 </span>
                                             </button>
 
@@ -504,9 +519,13 @@ const MemoBoardPage: React.FC = () => {
                                                 aria-label="Delete selected memos"
                                                 title="Delete selected memos"
                                             >
-                                                <Icons.Delete />
-                                                <span className="memo-toolbar-text">
-                                                    {busyDelete ? "Deleting..." : `Delete Selected (${selectedDeleteCount})`}
+                                                <span className="memo-toolbar-btn-content">
+                                                    <span className="memo-btn-icon-anchor">
+                                                        <Icons.Delete />
+                                                    </span>
+                                                    <span className="memo-toolbar-text button-label-handwritten memo-btn-text-anchor">
+                                                        {busyDelete ? "Deleting..." : `Delete Selected (${selectedDeleteCount})`}
+                                                    </span>
                                                 </span>
                                             </button>
                                         </>
@@ -560,9 +579,13 @@ const MemoBoardPage: React.FC = () => {
                                         aria-label="Done arranging memos"
                                         title="Done"
                                     >
-                                        <Icons.Confirm />
-                                        <span className="memo-toolbar-text">
-                                            Done
+                                        <span className="memo-toolbar-btn-content">
+                                            <span className="memo-btn-icon-anchor">
+                                                <Icons.Confirm />
+                                            </span>
+                                            <span className="memo-toolbar-text button-label-handwritten memo-btn-text-anchor">
+                                                Done
+                                            </span>
                                         </span>
                                     </button>
 

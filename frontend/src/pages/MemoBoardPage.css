@@ -13,8 +13,10 @@
     --memo-pin-size: 14px;
     --memo-pin-top-offset: 5px;
     --memo-boundary-stroke: 4px;
+    --memo-header-side-reserve: clamp(200px, 20vw, 260px);
     --memo-page-bg-base: #f5efe1;
     --memo-page-title-ink: var(--blue-dark);
+    --memo-page-title-border: rgba(86, 58, 28, 0.42);
     --memo-page-bg-layer-1: radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 32%);
     --memo-page-bg-layer-2: radial-gradient(circle at 82% 22%, rgba(235, 214, 178, 0.28) 0%, rgba(235, 214, 178, 0) 34%);
     --memo-page-bg-layer-3: linear-gradient(180deg, rgba(249, 243, 232, 0.96) 0%, rgba(239, 229, 211, 0.96) 100%);
@@ -96,7 +98,7 @@
     grid-template-columns: auto 1fr auto;
     grid-template-areas: "left title controls";
     align-items: center;
-    min-height: 60px;
+    min-height: 75px;
 
     padding: 8px 16px;
     margin-bottom: var(--memo-topbar-gap);
@@ -156,6 +158,7 @@
 
     font-size: 1rem;
     font-weight: 700;
+    line-height: 1.12;
     cursor: pointer;
     color: var(--text-main);
     transition:
@@ -260,21 +263,59 @@
     white-space: nowrap;
 }
 
+.memo-nav-btn-content,
+.memo-toolbar-btn-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 100%;
+    line-height: 1;
+}
+
+.memo-btn-icon-anchor {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.memo-btn-icon-anchor svg {
+    display: block;
+    width: 1em;
+    height: 1em;
+}
+
+.memo-btn-text-anchor {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1em;
+    line-height: 1;
+    margin-top: 5px;
+    transform: none;
+}
+
 /* ============================ TITLE ============================ */
 
 .memo-board-title-group {
     grid-area: title;
     position: absolute;
-    left: 50%;
+    left: 0;
+    right: 0;
     top: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 60px;
-    width: min(100%, 720px);
-    max-width: calc(100% - 260px);
+    width: auto;
+    max-width: none;
+    padding-inline: var(--memo-header-side-reserve);
     pointer-events: none;
     z-index: 1;
 }
@@ -284,9 +325,18 @@
     font-weight: 800;
     letter-spacing: 0.6px;
     color: var(--memo-page-title-ink, var(--blue-dark));
+    text-shadow:
+        -0.9px 0 var(--memo-page-title-border, transparent),
+        0.9px 0 var(--memo-page-title-border, transparent),
+        0 -0.9px var(--memo-page-title-border, transparent),
+        0 0.9px var(--memo-page-title-border, transparent);
 
     text-align: center;
-    width: 100%;
+    width: min(100%, 980px);
+    margin: 0 auto;
+    white-space: normal;
+    overflow: visible;
+    text-wrap: balance;
     pointer-events: none;
 }
 
@@ -333,7 +383,17 @@
     gap: 8px;
 
     min-width: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+}
+
+.memo-board-delete-label {
+    width: auto;
+    flex-shrink: 0;
+    margin-top: 0;
+    justify-content: flex-start;
+    text-align: left;
+    white-space: nowrap;
+    color: var(--blue-dark);
 }
 
 /* vertical z-stack */
@@ -389,7 +449,7 @@
     align-items: center;
     justify-content: center;
     gap: 7px;
-    line-height: 1;
+    line-height: 1.12;
 }
 
 .memo-toolbar-btn-delete-selected {
@@ -532,38 +592,71 @@
 
 /* ============================ TABLET ============================ */
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
     .memo-board-page {
         --memo-page-pad: 10px;
         --memo-frame-pad: 16px;
-        --memo-board-inner-pad: 16px;
-        --memo-card-width: 172px;
-        --memo-card-height: 142px;
+        --memo-board-inner-pad: 14px;
+        --memo-card-width: 164px;
+        --memo-card-height: 134px;
         --memo-pin-size: 12px;
         --memo-pin-top-offset: 4px;
     }
 
     .memo-board-topbar {
-        min-height: 54px;
-        padding: 8px 12px;
-        gap: 10px;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "left left"
+            "controls controls";
+        align-items: start;
+        min-height: 82px;
+        padding: 8px 11px;
+        row-gap: 0;
+        column-gap: 8px;
+    }
+
+    .memo-board-topbar-left {
+        position: relative;
+        width: fit-content;
+        min-height: 32px;
+        gap: 0;
+        z-index: 3;
+    }
+
+    .memo-theme-panel-wrapper {
+        position: absolute;
+        left: 0;
+        top: calc(100% + 1px);
+        z-index: 30;
     }
 
     .memo-board-title-group {
-        min-height: 54px;
-        max-width: calc(100% - 210px);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 20px;
+        transform: none;
+        min-height: 28px;
+        padding-inline: clamp(84px, 15vw, 168px);
     }
 
     .memo-board-title {
-        font-size: clamp(1.6rem, 1.4vw + 0.95rem, 2rem);
+        font-size: clamp(1.48rem, 1.12vw + 0.92rem, 1.88rem);
+        line-height: 1.02;
     }
 
     .memo-board-topbar-controls {
-        gap: 8px;
+        width: 100%;
+        justify-self: stretch;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 7px;
+        padding-top: 1px;
     }
 
     .memo-board-toolbar {
-        gap: 6px;
+        gap: 5px;
+        flex-wrap: nowrap;
     }
 
     .memo-theme-panel {
@@ -572,18 +665,22 @@
     }
 
     .memo-zorder-panel {
-        min-width: 56px;
-        margin-top: -2px;
-        margin-bottom: -2px;
-        padding: 4px 3px;
-        border-radius: 10px;
+        flex-direction: row;
+        align-items: center;
+        min-width: 0;
+        width: auto;
+        gap: 2px;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 2px 4px;
+        border-radius: 9px;
     }
 
     .memo-zorder-arrow-btn {
-        width: 100%;
-        height: 18px;
-        min-width: 100%;
-        min-height: 18px;
+        width: 22px;
+        min-width: 22px;
+        height: 22px;
+        min-height: 22px;
     }
 
     .memo-zorder-arrow-btn svg {
@@ -592,7 +689,8 @@
     }
 
     .memo-zorder-index {
-        min-height: 18px;
+        min-height: 22px;
+        padding: 0 3px;
         font-size: 0.68rem;
     }
 
@@ -603,26 +701,26 @@
     }
 
     .memo-toolbar-icon-btn {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        min-height: 34px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
     }
 
     .memo-board-toolbar svg {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
 
     .memo-board-toolbar .memo-toolbar-btn {
-        min-height: 34px;
-        padding: 5px 10px;
-        font-size: 0.78rem;
+        min-height: 32px;
+        padding: 4px 9px;
+        font-size: 0.75rem;
         border-radius: 8px;
     }
 
     .memo-board-edit-label {
-        font-size: 10px;
-        letter-spacing: 1.2px;
+        font-size: 9px;
+        letter-spacing: 1px;
     }
 
     .memo-board-frame {
@@ -631,137 +729,185 @@
     }
 }
 
+@media (max-width: 768px) {
+    .memo-board-page {
+        --memo-page-pad: 9px;
+        --memo-frame-pad: 12px;
+        --memo-board-inner-pad: 12px;
+        --memo-card-width: 148px;
+        --memo-card-height: 122px;
+        --memo-pin-size: 11px;
+        --memo-pin-top-offset: 4px;
+    }
+
+    .memo-board-topbar {
+        min-height: 78px;
+        padding: 8px 10px;
+    }
+
+    .memo-board-title {
+        font-size: 1.54rem;
+        line-height: 1.02;
+    }
+
+    .memo-board-topbar-controls {
+        justify-content: flex-end;
+        gap: 7px;
+    }
+
+    .memo-board-edit-label-controls {
+        font-size: 9px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .memo-board-toolbar {
+        width: auto;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: nowrap;
+    }
+
+    .memo-theme-panel {
+        left: 0;
+        right: auto;
+        min-width: 206px;
+        max-width: min(86vw, 248px);
+        padding: 10px;
+    }
+
+    .memo-board-frame {
+        border-radius: 15px;
+    }
+
+    .memo-board-canvas {
+        border-radius: 12px;
+    }
+}
+
 /* ============================ PHONE ============================ */
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .memo-board-page {
         --memo-page-pad: 8px;
         --memo-frame-pad: 10px;
-        --memo-board-inner-pad: 10px;
-        --memo-card-width: 124px;
-        --memo-card-height: 102px;
+        --memo-board-inner-pad: 9px;
+        --memo-card-width: 118px;
+        --memo-card-height: 98px;
         --memo-pin-size: 10px;
         --memo-pin-top-offset: 3px;
     }
 
     .memo-board-topbar {
-        grid-template-columns: auto 1fr;
-        grid-template-areas:
-            "left title"
-            "controls controls";
-        align-items: center;
-        row-gap: 8px;
-        min-height: auto;
-        padding: 10px 10px 9px;
-    }
-
-    .memo-board-topbar-left {
-        gap: 0;
+        min-height: 68px;
+        padding: 6px 9px;
     }
 
     .memo-nav-btn-dashboard {
-        min-height: 34px;
-        padding: 0 10px;
+        min-height: 32px;
+        padding: 0 9px;
+        border-radius: 8px;
     }
 
     .memo-nav-text {
         display: none;
     }
 
-    .memo-board-title-group {
-        position: static;
-        left: auto;
-        top: auto;
-        transform: none;
-        justify-self: center;
-        min-height: auto;
-        width: 100%;
-        max-width: none;
-        pointer-events: none;
+    .memo-toolbar-btn-done .memo-toolbar-text,
+    .memo-toolbar-btn-cancel .memo-toolbar-text {
+        display: none;
     }
 
     .memo-board-title {
-        font-size: 1.45rem;
-        line-height: 1.05;
+        font-size: 1.34rem;
+        line-height: 1.02;
+    }
+
+    .memo-board-title-group {
+        top: 16px;
+        padding-inline: 58px;
     }
 
     .memo-board-topbar-controls {
-        width: 100%;
-        justify-self: stretch;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
+        gap: 6px;
+        padding-top: 0;
+        min-height: 30px;
+    }
+
+    .memo-theme-panel-wrapper {
+        top: 38px;
     }
 
     .memo-board-edit-label-controls {
-        order: 1;
-        font-size: 10px;
+        font-size: 8px;
         line-height: 1;
         white-space: nowrap;
     }
 
-    .memo-theme-panel-wrapper {
-        order: 2;
-    }
-
-    .memo-board-toolbar {
-        order: 3;
-        width: 100%;
-        justify-content: flex-start;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
     .memo-theme-panel {
-        left: 0;
-        right: auto;
-        min-width: 188px;
-        max-width: min(84vw, 240px);
-        padding: 10px;
+        min-width: 180px;
+        max-width: min(84vw, 232px);
+        padding: 9px;
     }
 
     .memo-toolbar-icon-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-        min-height: 32px;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        border-radius: 8px;
+    }
+
+    .memo-nav-theme-btn,
+    .memo-board-toolbar .memo-toolbar-btn,
+    .memo-zorder-panel {
+        min-height: 30px;
+        border-radius: 8px;
     }
 
     .memo-board-toolbar .memo-toolbar-btn {
-        min-height: 32px;
-        padding: 0 10px;
-        font-size: 0.76rem;
+        min-height: 30px;
+        padding: 0 9px;
+        font-size: 0.72rem;
         justify-content: center;
     }
 
     .memo-zorder-panel {
-        flex-direction: row;
-        align-items: center;
-        min-width: 0;
-        width: auto;
-        gap: 4px;
-        padding: 4px 6px;
-        margin: 0;
+        min-height: 30px;
+        gap: 2px;
+        padding: 0 4px;
+        align-self: center;
     }
 
     .memo-zorder-arrow-btn {
-        width: 24px;
-        min-width: 24px;
-        height: 24px;
-        min-height: 24px;
+        width: 20px;
+        min-width: 20px;
+        height: 18px;
+        min-height: 18px;
         border-radius: 6px;
     }
 
+    .memo-zorder-arrow-btn svg {
+        width: 10px;
+        height: 10px;
+    }
+
     .memo-zorder-index {
-        min-height: 24px;
+        min-height: 18px;
         padding: 0 2px;
+        font-size: 0.62rem;
     }
 
     .memo-zorder-current {
-        min-width: 16px;
-        min-height: 14px;
-        font-size: 0.74rem;
+        min-width: 14px;
+        min-height: 12px;
+        padding: 2px 3px;
+        font-size: 0.66rem;
+    }
+
+    .memo-zorder-separator,
+    .memo-zorder-total {
+        font-size: 0.62rem;
     }
 
     .memo-board-frame {
@@ -770,16 +916,38 @@
     }
 }
 
+@media (max-width: 385px) {
+    .memo-board-title {
+        font-size: 0.9rem;
+        margin-top: -5px;
+        line-height: 1;
+    }
+
+    .memo-board-title-group {
+        padding-inline: 40px;
+    }
+}
+
 @media (min-width: 1025px) and (max-width: 1366px) {
     .memo-board-page {
         --memo-page-pad: 12px;
         --memo-frame-pad: 18px;
         --memo-board-inner-pad: 20px;
+        --memo-header-side-reserve: 250px;
     }
 
     .memo-board-frame {
         height: calc(100dvh - 24px);
         max-height: calc(100dvh - 24px);
+    }
+
+    .memo-board-title {
+        font-size: clamp(1.56rem, 1.18vw + 0.66rem, 2.02rem);
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-wrap: balance;
+        line-height: 1.06;
     }
 }
 
@@ -788,22 +956,41 @@
         --memo-page-pad: 16px;
         --memo-frame-pad: 20px;
         --memo-board-inner-pad: 22px;
+        --memo-header-side-reserve: 280px;
     }
 
     .memo-board-frame {
         height: calc(100dvh - 32px);
         max-height: calc(100dvh - 32px);
     }
+
+    .memo-board-title {
+        font-size: clamp(1.74rem, 1.12vw + 0.8rem, 2.24rem);
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-wrap: balance;
+        line-height: 1.06;
+    }
 }
 
 @media (min-width: 1920px) {
     .memo-board-page {
         --memo-page-pad: 18px;
+        --memo-header-side-reserve: 285px;
     }
 
     .memo-board-frame {
         height: calc(100dvh - 36px);
         max-height: calc(100dvh - 36px);
+    }
+
+    .memo-board-title {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        text-wrap: balance;
+        line-height: 1.04;
     }
 }
 

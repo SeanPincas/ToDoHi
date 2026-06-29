@@ -63,6 +63,17 @@
     flex-shrink: 0;
 }
 
+.button-label-handwritten {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1em;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    transform: translateY(0.04em);
+}
+
 .btn-shared-base:hover,
 .btn-primary-rect:hover,
 .btn-danger-rect:hover,

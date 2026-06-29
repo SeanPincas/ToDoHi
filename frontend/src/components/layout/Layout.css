@@ -1,8 +1,8 @@
 /* --------------------------- GLOBAL LAYOUT WRAPPER --------------------------- */
 .layout-wrapper {
-    --layout-mobile-padding: 6px;
-    --layout-tablet-padding: 12px;
-    --layout-desktop-padding: 15px;
+    --layout-mobile-padding: 3px;
+    --layout-tablet-padding: 6px;
+    --layout-desktop-padding: 8px;
     --book-shell-max-sm: 100%;
     --book-shell-max-md: 740px;
     --book-shell-max-lg: 980px;
@@ -24,6 +24,7 @@
 
 .book-shell {
     --book-shell-pad: clamp(12px, 1.2vw, 18px);
+    --book-shell-radius: clamp(18px, 2vw, 26px);
     position: relative;
     width: min(100% - 12px, var(--book-shell-max-sm));
     height: calc(100vh - (2 * var(--shell-outer-pad)));
@@ -39,35 +40,13 @@
     background-position: center;
     background-repeat: no-repeat;
 
-    border-radius: clamp(18px, 2vw, 26px);
+    border-radius: var(--book-shell-radius);
     border: 1px solid rgba(23, 45, 68, 0.7);
     box-shadow:
         0 22px 42px var(--desk-shadow),
         inset 0 0 0 1px rgba(255, 255, 255, 0.2);
     box-sizing: border-box;
     overflow: visible;
-}
-
-@media (min-width: 426px) and (max-width: 767px) {
-    .layout-wrapper {
-        --shell-outer-pad: 10px;
-        padding: 10px;
-    }
-
-    .book-shell {
-        width: min(100% - 20px, var(--book-shell-max-sm));
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-    .layout-wrapper {
-        --shell-outer-pad: var(--layout-tablet-padding);
-        padding: var(--layout-tablet-padding);
-    }
-
-    .book-shell {
-        width: min(100% - 24px, var(--book-shell-max-md));
-    }
 }
 
 @media (min-width: 1200px) {
@@ -118,7 +97,7 @@
     width: 100%;
     height: 100%;
     min-height: 0;
-    border-radius: clamp(14px, 1.6vw, 20px);
+    border-radius: clamp(18px, 2vw, 26px);
     background-color: var(--paper-bg);
     background-image:
         linear-gradient(180deg, var(--page-line-top-fade), var(--page-line-bottom-fade)),
@@ -156,21 +135,81 @@
     display: block;
 }
 
-/* --------------------------- MOBILE --------------------------- */
-@media (max-width: 1023px) {
+/* --------------------------- PHONE / TABLET BOOK MODE --------------------------- */
+@media (max-width: 767px) {
+    .layout-wrapper.mobile-dashboard-nav-mode .sidebar:not(.open) {
+        display: none;
+    }
+
+    .layout-wrapper.mobile-dashboard-nav-mode .sidebar.open {
+        display: block;
+        z-index: 60;
+    }
+
     .notebook-sheet {
         --sidebar-rail-size: 46px;
     }
 
     .layout-wrapper {
         --shell-outer-pad: var(--layout-mobile-padding);
-        padding: var(--layout-mobile-padding);
+        padding-top: var(--layout-mobile-padding);
+        padding-bottom: var(--layout-mobile-padding);
+        padding-left: var(--layout-mobile-padding);
+        padding-right: 0;
+        justify-content: flex-start;
+        overflow-x: hidden;
     }
 
     .book-shell {
         --book-shell-pad: 8px;
+        --book-shell-radius: 14px;
+        width: calc(100% + clamp(44px, 12vw, 82px));
+        max-width: none;
         padding: 8px;
-        border-radius: 14px;
+        border-radius: var(--book-shell-radius);
+    }
+
+    .notebook-sheet {
+        padding: 0;
+    }
+
+    .layout-content {
+        padding: 0;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .layout-wrapper.mobile-dashboard-nav-mode .sidebar:not(.open) {
+        display: none;
+    }
+
+    .layout-wrapper.mobile-dashboard-nav-mode .sidebar.open {
+        display: block;
+        z-index: 60;
+    }
+
+    .notebook-sheet {
+        --sidebar-rail-size: 46px;
+    }
+
+    .layout-wrapper {
+        --shell-outer-pad: var(--layout-tablet-padding);
+        padding-top: var(--layout-tablet-padding);
+        padding-bottom: var(--layout-tablet-padding);
+        padding-left: calc(var(--layout-tablet-padding) + 24px);
+        padding-right: 0;
+        justify-content: flex-start;
+        overflow-x: visible;
+    }
+
+    .book-shell {
+        --book-shell-pad: 8px;
+        --book-shell-radius: 14px;
+        width: calc(100% + clamp(76px, 13vw, 132px));
+        max-width: none;
+        padding: 8px;
+        border-radius: var(--book-shell-radius);
+        transform: translateX(clamp(12px, 2.4vw, 22px));
     }
 
     .notebook-sheet {
