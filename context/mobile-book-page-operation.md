@@ -8,7 +8,7 @@ Reform the dashboard experience on tablet and phone resolutions so it no longer 
 
 Core Direction:
 Desktop keeps the current opened-book spread.
-Tablet and phone switch into a single active book-page system with slide navigation between page groups.
+Tablet and phone switch into a single active content-page system inside a still-opened-book composition with slide navigation between page groups.
 
 Execution Rule:
 This is a responsive layout reformation for narrow screens only.
@@ -42,13 +42,14 @@ Result:
 - controls compete for limited width
 - the user sees too much content at once with poor breathing space
 
-For small screens, the dashboard should feel like turning through one notebook page at a time rather than shrinking the whole open spread.
+For small screens, the dashboard should feel like turning through one notebook page at a time without losing the visual cue that the book still continues to the right.
 
 ## Mobile/Tablet North Star
 
 On phone and tablet, ToDoHi should feel like:
-- a planner page you can flip through
-- one focused sheet at a time
+- an opened planner that still extends to the right
+- one focused main sheet at a time
+- a narrow continuation strip that hints there is more in the book
 - smooth but lightweight page movement
 - touch-friendly navigation
 - readable previews instead of cramped dense dashboards
@@ -68,13 +69,33 @@ Desktop / laptop:
 
 Tablet:
 - `601px` to `1023px`
-- single-page dashboard book mode
+- single active content page with a right continuation strip
 
 Phone:
 - `600px` and below
-- single-page dashboard book mode with stronger compaction
+- single active content page with a right continuation strip and stronger compaction
 
-## Single-Page Dashboard Structure
+## Mobile Open-Book Structure
+
+Tablet and phone should still visually read as an opened book:
+
+- one main active dashboard page on the left
+- a narrow continuation strip on the right
+- the strip implies the next page exists without showing a full second page
+- the main page is the only surface that carries real dashboard content
+
+The continuation strip should:
+- stay narrow so it does not steal meaningful reading width
+- feel attached to the active page sheet
+- help preserve the book metaphor on narrow screens
+- optionally provide a tap affordance for next-page movement
+
+Important:
+- this is not a full two-page mobile spread
+- this is not a flat single-sheet dashboard either
+- it is a one-active-page mobile layout inside a still-opened-book visual shell
+
+## Active Page Content Structure
 
 Tablet and phone should use 3 dashboard page groups:
 
@@ -96,6 +117,7 @@ Tablet and phone should use 3 dashboard page groups:
 Primary navigation:
 - swipe left = next page
 - swipe right = previous page
+- optional tap on the continuation strip = next page
 
 Secondary navigation:
 - 3 clickable page indicators
@@ -105,9 +127,10 @@ Utility navigation:
 - bottom navigation bar
 
 Important:
-Do not rely on always-visible thick left/right page-edge controls because they consume valuable width and make the active page feel thinner.
+Do not rely on thick permanent edge controls that consume too much width.
 
 Use:
+- a subtle right continuation strip
 - invisible or subtle edge swipe zones if needed
 - clickable indicators
 - bottom navigation
@@ -212,7 +235,8 @@ Performance priority:
 
 When complete:
 - the dashboard feels intentional on tablet and phone
-- only one active book page is shown at a time
+- one main active book page is shown at a time
+- a narrow right continuation strip keeps the opened-book metaphor believable
 - users can swipe or tap indicators to move through dashboard pages
 - bottom nav gives quick access to memo board, planner, home, and settings
 - the opened-book metaphor stays believable without cramming the desktop spread into small screens

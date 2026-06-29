@@ -5,9 +5,9 @@
 .task-item-container {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     min-height: 30px;
-    padding: 3px 8px;
+    padding: 3px 0;
     border-bottom: 1px solid color-mix(in srgb, var(--page-line-color, var(--rule-line)) 92%, #ffffff 8%);
     background: transparent;
     cursor: pointer;
@@ -171,7 +171,7 @@
     .task-item-container {
         gap: 7px;
         min-height: 28px;
-        padding: 2px 7px;
+        padding: 2px 70px;
     }
 
     .task-left-section {

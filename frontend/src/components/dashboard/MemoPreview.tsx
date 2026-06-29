@@ -115,7 +115,7 @@ const MemoPreview: React.FC = () => {
                 <div className="memo-preview-actions">
                     <button
                         type="button"
-                        className={`icon-btn-square memo-preview-icon-btn ${layoutMode === "list" ? "active" : ""}`}
+                        className={`icon-btn-square memo-preview-icon-btn memo-preview-layout-btn ${layoutMode === "list" ? "active" : ""}`}
                         onClick={toggleLayoutMode}
                         aria-label={layoutMode === "grid" ? "Switch memo preview to list layout" : "Switch memo preview to grid layout"}
                         title={layoutMode === "grid" ? "List layout" : "Grid layout"}
@@ -125,7 +125,7 @@ const MemoPreview: React.FC = () => {
 
                     <button
                         type="button"
-                        className={`icon-btn-square memo-preview-icon-btn ${alphabetSort !== "none" ? "active" : ""} ${alphabetSort === "desc" ? "desc" : ""}`}
+                        className={`icon-btn-square memo-preview-icon-btn memo-preview-alpha-btn ${alphabetSort !== "none" ? "active" : ""} ${alphabetSort === "desc" ? "desc" : ""}`}
                         onClick={toggleAlphabetSort}
                         aria-label={
                             alphabetSort === "none"
@@ -156,7 +156,7 @@ const MemoPreview: React.FC = () => {
 
                     <button
                         type="button"
-                        className={`icon-btn-square delete memo-preview-icon-btn memo-preview-delete-toggle ${isMultiDeleteMode ? "active" : ""}`}
+                        className={`icon-btn-square delete memo-preview-icon-btn memo-preview-delete-btn memo-preview-delete-toggle ${isMultiDeleteMode ? "active" : ""}`}
                         onClick={toggleMultiDeleteMode}
                         disabled={!hasMemos || busyDelete}
                         aria-label={isMultiDeleteMode ? "Cancel multi delete mode" : "Enable multi delete mode"}
@@ -167,7 +167,7 @@ const MemoPreview: React.FC = () => {
 
                     <button
                         type="button"
-                        className="btn-green-rect memo-preview-action-btn"
+                        className="btn-green-rect icon-btn-square memo-preview-icon-btn memo-preview-action-btn memo-preview-add-btn"
                         onClick={() => navigate("/memoboard", {
                             state: {
                                 openAddMemo: true,

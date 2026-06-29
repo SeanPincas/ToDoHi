@@ -15,6 +15,7 @@ import {
     DEFAULT_FRAME_STYLE,
     FRAME_STYLE_LABELS,
     FRAME_STYLE_OPTIONS,
+    getFrameTheme,
     loadFrameStyleAsset,
     normalizeFrameStyle,
 } from "../utils/frameStyles";
@@ -161,6 +162,7 @@ const MemoBoardPage: React.FC = () => {
     }, []);
 
     const memoWallpaperTheme = getWallpaperTheme(user?.preference?.wallpaperStyle);
+    const memoFrameTheme = getFrameTheme(user?.preference?.frameStyle);
 
     useEffect(() => {
         let isActive = true;
@@ -349,6 +351,7 @@ const MemoBoardPage: React.FC = () => {
                 ["--memo-page-bg-layer-1" as string]: memoWallpaperTheme.pageLayers[0] ?? "none",
                 ["--memo-page-bg-layer-2" as string]: memoWallpaperTheme.pageLayers[1] ?? "none",
                 ["--memo-page-bg-layer-3" as string]: memoWallpaperTheme.pageLayers[2] ?? "none",
+                ["--memo-page-title-border" as string]: memoFrameTheme.titleBorder,
                 ["--memo-page-bg-size-1" as string]: memoWallpaperTheme.pageSizes?.[0] ?? "cover",
                 ["--memo-page-bg-size-2" as string]: memoWallpaperTheme.pageSizes?.[1] ?? "cover",
                 ["--memo-page-bg-size-3" as string]: memoWallpaperTheme.pageSizes?.[2] ?? "cover",
