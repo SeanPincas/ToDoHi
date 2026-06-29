@@ -3,11 +3,19 @@ const bcrypt = require('bcryptjs');         // For password hashing and comparis
 const User = require('../models/userModel'); // Mongoose User model
 const { reconcileUserCompletedTaskStat } = require("../utils/completedTaskStats");
 const { reconcileUserFailedTasksYesterdayStat } = require("../utils/failedTaskYesterdayStats");
+const { validateUsername } = require("../utils/usernameValidation");
 
 // --------------------------- REGISTER USER ---------------------------
 exports.register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
+
+        const usernameValidation = validateUsername(username);
+        if (!usernameValidation.valid) {
+            return res.status(400).json({ message: usernameValidation.message });
+        }
+
+        const normalizedUsername = usernameValidation.normalized;
 
         // ------------------- Input Validation -------------------
         // Check valid email format
@@ -29,12 +37,17 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "Email Already Used" });
         }
 
+        const existingUsername = await User.findOne({ username: normalizedUsername });
+        if (existingUsername) {
+            return res.status(400).json({ message: "Username already taken" });
+        }
+
         // ------------------- Hash Password -------------------
         const hashed = await bcrypt.hash(password, 10); // 10 salt rounds
 
         // ------------------- Create User -------------------
         const user = await User.create({
-            username,
+            username: normalizedUsername,
             email,
             password: hashed,
         });
@@ -42,7 +55,7 @@ exports.register = async (req, res) => {
         // ------------------- Return Response -------------------
         res.status(201).json({
             message: "User Created",
-            user: { username, email }, // Do not return password
+            user: { username: user.username, email }, // Do not return password
         });
     } catch (err) {
         res.status(500).json({

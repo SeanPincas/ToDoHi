@@ -28,6 +28,7 @@ interface User {
         theme: "light" | "dark";
         bookmarkStyle?: string;
         wallpaperStyle?: string;
+        frameStyle?: string;
         quoteCategory?: string[];
     };
 

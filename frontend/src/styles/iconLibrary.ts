@@ -48,6 +48,7 @@ import {
     PiHouseDuotone,
     PiNotePencilDuotone,
     PiLeafDuotone,
+    PiHeartbeatDuotone,
     PiPlantDuotone,
     PiFireDuotone,
     PiSunDuotone,
@@ -60,7 +61,9 @@ import {
     PiHandWaving,
     PiPower,
     PiShapes,
-    PiArchiveDuotone
+    PiArchiveDuotone,
+    PiTShirt,
+    PiSidebarSimple
 } from "react-icons/pi";
 
 // ============================================================================
@@ -119,6 +122,7 @@ export const Icons = {
     Memo: PiNotePencilDuotone,
     TimeSearch: PiClockCountdown,
     Leaf: PiLeafDuotone,
+    Heartbeat: PiHeartbeatDuotone,
     BranchLeaf: PiPlantDuotone,
     Flame: PiFireDuotone,
     WarningRed: PiWarningCircle,
@@ -139,5 +143,7 @@ export const Icons = {
     HandWaving: PiHandWaving,
     Off: PiPower,
     Shapes: PiShapes,
-    Archive: PiArchiveDuotone
+    Archive: PiArchiveDuotone,
+    Shirt: PiTShirt,
+    Sidebar: PiSidebarSimple
 };

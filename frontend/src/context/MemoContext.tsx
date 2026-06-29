@@ -44,6 +44,12 @@ export type MemoModalType =
     | "deleteConfirm"
     | null;
 
+export interface MemoModalPayload {
+    memoId?: string | null;
+    memoIds?: string[];
+    onConfirmSuccess?: () => void;
+}
+
 // ---------------- LAYOUT PAYLOAD ----------------
 export interface MemoLayoutPayload {
     id: string;
@@ -59,6 +65,7 @@ interface MemoContextType {
 
     // ---------------- MODAL STATE ----------------
     activeModal: MemoModalType;
+    activeModalData: MemoModalPayload | null;
 
     // ---------------- SELECTION ----------------
     activeMemoId: string | null;
@@ -82,7 +89,7 @@ interface MemoContextType {
     buildLayoutPayload: () => MemoLayoutPayload[];
 
     // ---------------- MODAL ACTIONS ----------------
-    openModal: (type: MemoModalType, memoId?: string | null) => void;
+    openModal: (type: MemoModalType, payload?: string | null | MemoModalPayload) => void;
     closeModal: () => void;
 
     setBoardMode: (mode: BoardMode) => void;
@@ -113,6 +120,7 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // ---------------- MODAL STATE ----------------
     const [activeModal, setActiveModal] = useState<MemoModalType>(null);
+    const [activeModalData, setActiveModalData] = useState<MemoModalPayload | null>(null);
 
     // ---------------- SELECTION ----------------
     const [activeMemoId, setActiveMemoId] = useState<string | null>(null);
@@ -240,14 +248,23 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // -------------------------------------------------------------------------
     // MODAL CONTROL
     // -------------------------------------------------------------------------
-    const openModal = (type: MemoModalType, memoId?: string | null) => {
+    const openModal = (type: MemoModalType, payload?: string | null | MemoModalPayload) => {
         setActiveModal(type);
-        setActiveMemoId(memoId ?? null);
+
+        if (typeof payload === "string" || payload === null || payload === undefined) {
+            setActiveMemoId(payload ?? null);
+            setActiveModalData(null);
+            return;
+        }
+
+        setActiveMemoId(payload.memoId ?? null);
+        setActiveModalData(payload);
     };
 
     const closeModal = () => {
         setActiveModal(null);
         setActiveMemoId(null);
+        setActiveModalData(null);
     };
 
     // -------------------------------------------------------------------------
@@ -268,6 +285,7 @@ export const MemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 boardMode,
 
                 activeModal,
+                activeModalData,
 
                 activeMemoId,
                 setActiveMemoId,

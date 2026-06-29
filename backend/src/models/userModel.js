@@ -1,18 +1,24 @@
 // models/userModel.js
 const mongoose = require("mongoose");
+const {
+    USERNAME_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_REGEX,
+    USERNAME_RULE_MESSAGE,
+} = require("../utils/usernameValidation");
 
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
         trim: true,
-        minlength: [3, "Username must be at least 3 characters long"],
+        minlength: [USERNAME_MIN_LENGTH, `Username must be at least ${USERNAME_MIN_LENGTH} characters long`],
+        maxlength: [USERNAME_MAX_LENGTH, `Username must be at most ${USERNAME_MAX_LENGTH} characters long`],
         validate: {
             validator: function (v) {
-                // Only allow letters, numbers, underscores, and hyphens
-                return /^[a-zA-Z0-9_-]+$/.test(v);
+                return USERNAME_REGEX.test(v);
             },
-            message: props => `${props.value} is not a valid username. Only letters, numbers, underscores, and hyphens are allowed.`,
+            message: () => USERNAME_RULE_MESSAGE,
         },
     },
     email: {
@@ -38,6 +44,7 @@ const userSchema = new mongoose.Schema({
         theme: { type: String, enum: ['light', 'dark'], default: 'light' },
         bookmarkStyle: { type: String, default: "bookmark-1" },
         wallpaperStyle: { type: String, default: "default" },
+        frameStyle: { type: String, default: "frame-oak" },
         quoteCategory: {
             type: [String],
             validate: {

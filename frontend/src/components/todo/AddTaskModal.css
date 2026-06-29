@@ -92,6 +92,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 0;
 }
 
 .todo-field {
@@ -102,6 +103,7 @@
 .todo-field-panel {
     gap: 7px;
     padding: 12px 14px;
+    overflow: visible;
 }
 
 .todo-label {
@@ -200,11 +202,14 @@
     grid-auto-columns: minmax(22px, 34px);
     column-gap: 6px;
     row-gap: 6px;
-    width: 100%;
-    padding: 4px 2px 2px 0;
+    width: fit-content;
+    max-width: 100%;
+    justify-content: center;
+    margin-inline: auto;
+    padding: 5px 4px 3px;
     margin-top: 6px;
     margin-bottom: 2px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .todo-color-option {
@@ -268,34 +273,165 @@
     .todo-modal-card {
         width: min(96vw, 96vw);
         max-width: 96vw;
-        padding: 18px 14px 16px;
+        max-height: min(88vh, 720px);
+        padding: 16px 12px 14px;
+        gap: 7px;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .todo-modal-header {
+        gap: 10px;
+    }
+
+    .todo-modal-title-group {
         gap: 8px;
     }
 
+    .todo-modal-title-group svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .todo-modal-header h3 {
+        font-size: 1.18rem;
+        line-height: 1.08;
+        min-height: unset;
+    }
+
+    .todo-modal-subtitle {
+        font-size: 0.84rem;
+        line-height: 1.35;
+        margin-bottom: 0;
+    }
+
+    .todo-modal-form {
+        gap: 8px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 2px;
+    }
+
     .todo-field-panel {
-        padding: 10px 12px;
+        gap: 6px;
+        padding: 9px 10px;
+        border-radius: 9px;
+        overflow: visible;
+    }
+
+    .todo-label {
+        font-size: 0.8rem;
+    }
+
+    .todo-input,
+    .todo-textarea,
+    .todo-dropdown {
+        padding: 8px 10px;
+        font-size: 0.88rem;
+    }
+
+    .todo-textarea {
+        min-height: 84px;
+    }
+
+    .todo-dropdown-selected {
+        font-size: 0.88rem;
+    }
+
+    .todo-dropdown-item {
+        padding: 8px 10px;
+        font-size: 0.86rem;
     }
 
     .todo-modal-footer {
         flex-direction: column;
         align-items: stretch;
+        gap: 8px;
+        margin-top: 2px;
+        padding-top: 2px;
+    }
+
+    .todo-memo-checkbox {
+        gap: 8px;
+        font-size: 0.78rem;
+        line-height: 1.2;
+    }
+
+    .todo-memo-checkbox input {
+        flex-shrink: 0;
     }
 
     .todo-footer-actions {
         width: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr;
+        gap: 7px;
     }
 
     .todo-footer-btn,
     .todo-submit-btn {
         width: 100%;
         min-width: 0;
+        min-height: 40px;
+        padding: 8px 10px;
+        font-size: 0.86rem;
     }
 
     .todo-color-grid {
-        grid-auto-columns: minmax(18px, 22px);
-        column-gap: 3px;
+        grid-auto-columns: minmax(20px, 24px);
+        column-gap: 4px;
+        row-gap: 5px;
+        margin-top: 4px;
+        padding: 5px 4px 3px;
+    }
+
+    .todo-modal-card::-webkit-scrollbar,
+    .todo-modal-form::-webkit-scrollbar,
+    .todo-dropdown-menu::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .todo-modal-card::-webkit-scrollbar-track,
+    .todo-modal-form::-webkit-scrollbar-track,
+    .todo-dropdown-menu::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .todo-modal-card::-webkit-scrollbar-thumb,
+    .todo-modal-form::-webkit-scrollbar-thumb,
+    .todo-dropdown-menu::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--paper-attach-border) 70%, #8e7a57 30%);
+        border-radius: 999px;
+    }
+
+    .todo-modal-card {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in srgb, var(--paper-attach-border) 70%, #8e7a57 30%) transparent;
+    }
+
+    .todo-modal-form,
+    .todo-dropdown-menu {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in srgb, var(--paper-attach-border) 70%, #8e7a57 30%) transparent;
+    }
+}
+
+@media (max-width: 380px) {
+    .todo-modal-card {
+        padding: 14px 10px 12px;
+    }
+
+    .todo-modal-header h3 {
+        font-size: 1.08rem;
+    }
+
+    .todo-modal-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .todo-footer-btn,
+    .todo-submit-btn {
+        font-size: 0.82rem;
     }
 }
 

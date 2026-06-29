@@ -29,6 +29,7 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
     scrollableContent = false,
 }) => {
     const resolvedContent = content || "No content";
+    const shouldMarqueeTitle = title.trim().length > 18;
 
     return (
         <div
@@ -54,9 +55,11 @@ const MemoCardBaseOverlay: React.FC<MemoCardBaseOverlayProps> = ({
             {/* ---------------- CONTENT ---------------- */}
             <div className={`memo-card-paper ${scrollableContent ? "scrollable" : ""}`}>
                 <div className="memo-header">
-                    <h4 className="memo-title">
-                        {title}
-                    </h4>
+                    <div className={`memo-title-wrap ${shouldMarqueeTitle ? "marquee" : ""}`}>
+                        <h4 className="memo-title">
+                            {title}
+                        </h4>
+                    </div>
                     {categoryIcon && (
                         <span className="memo-category">
                             {categoryIcon}

@@ -55,15 +55,7 @@ const AppRouter: React.FC = () => {
 
                                     <Route
                                         path="/memoboard"
-                                        element={
-                                            <>
-                                                <MemoBoardPage />
-                                                <AddMemoModal />
-                                                <ViewMemoModal />
-                                                <EditMemoModal />
-                                                <DeleteConfirmMemoModal />
-                                            </>
-                                        }
+                                        element={<MemoBoardPage />}
                                     />
                                 </Route>
 
@@ -82,6 +74,14 @@ const AppRouter: React.FC = () => {
                             <RepeatConfirmModal />
                             <TaskArchiveModal />
                             <LegalDocumentModal />
+
+                            {/* ===================================================== */}
+                            {/*                   GLOBAL MEMO MODALS                 */}
+                            {/* ===================================================== */}
+                            <AddMemoModal />
+                            <ViewMemoModal />
+                            <EditMemoModal />
+                            <DeleteConfirmMemoModal />
                         </MemoProvider>
                     </TodoProvider>
                 </QuoteProvider>

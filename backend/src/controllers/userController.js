@@ -1,10 +1,11 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel.js");
+const { validateUsername } = require("../utils/usernameValidation");
 
 // --------------------------- UPDATE USER PREFERENCE ---------------------------
 exports.updatePreference = async (req, res) => {
     try {
-        const { resetHour, dayTaskDelete, quoteDelay, theme, quoteCategory, bookmarkStyle, wallpaperStyle } = req.body;
+        const { resetHour, dayTaskDelete, quoteDelay, theme, quoteCategory, bookmarkStyle, wallpaperStyle, frameStyle } = req.body;
 
         const updatePayload = {};
 
@@ -34,6 +35,10 @@ exports.updatePreference = async (req, res) => {
 
         if (wallpaperStyle !== undefined) {
             updatePayload["preference.wallpaperStyle"] = wallpaperStyle;
+        }
+
+        if (frameStyle !== undefined) {
+            updatePayload["preference.frameStyle"] = frameStyle;
         }
 
         if (quoteCategory !== undefined) {
@@ -81,12 +86,12 @@ exports.uploadProfilePicture = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const { username } = req.body;
-
-        if (!username || !String(username).trim()) {
-            return res.status(400).json({ message: "Username is required" });
+        const usernameValidation = validateUsername(username);
+        if (!usernameValidation.valid) {
+            return res.status(400).json({ message: usernameValidation.message });
         }
 
-        const normalizedUsername = String(username).trim();
+        const normalizedUsername = usernameValidation.normalized;
 
         const existingUser = await User.findOne({
             username: normalizedUsername,
