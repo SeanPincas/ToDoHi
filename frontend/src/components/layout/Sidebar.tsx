@@ -146,6 +146,40 @@ const Sidebar = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (!open) return;
+
+        const handlePointerDownOutside = (event: MouseEvent | PointerEvent) => {
+            const sidebarElement = sidebarRef.current;
+            const target = event.target as Node | null;
+
+            if (!sidebarElement || !target) return;
+            if (sidebarElement.contains(target)) return;
+
+            setOpen(false);
+        };
+
+        document.addEventListener("pointerdown", handlePointerDownOutside);
+
+        return () => {
+            document.removeEventListener("pointerdown", handlePointerDownOutside);
+        };
+    }, [open]);
+
+    useEffect(() => {
+        const handleOpenSidebarBookmark = () => {
+            setOpen(true);
+            clearHoverTimeout();
+            setHoveredTab(null);
+        };
+
+        window.addEventListener("todohi:open-sidebar-bookmark", handleOpenSidebarBookmark);
+
+        return () => {
+            window.removeEventListener("todohi:open-sidebar-bookmark", handleOpenSidebarBookmark);
+        };
+    }, []);
+
     const measureSidebarBounds = useCallback(() => {
         const shell = sidebarRef.current?.closest(".book-shell") as HTMLElement | null;
         const dashboardContainer = document.querySelector(".dashboard-container") as HTMLElement | null;

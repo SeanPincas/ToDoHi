@@ -87,8 +87,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    font-size: clamp(18px, 1.5vw, 24px);
+    gap: 8px;
+    font-size: clamp(20px, 1.6vw, 26px);
     font-weight: 700;
     line-height: 1;
     white-space: nowrap;
@@ -97,8 +97,8 @@
 }
 
 .memo-preview-title-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     flex: 0 0 auto;
 }
 
@@ -148,6 +148,16 @@
 
 .memo-preview-icon-btn.active {
     background: color-mix(in srgb, var(--paper-bg) 62%, var(--blue-soft) 38%);
+}
+
+.memo-preview-add-btn {
+    background: var(--button-success-bg);
+    border-color: color-mix(in srgb, var(--success-accent) 74%, #3d6f3a 26%);
+    color: var(--text-main);
+}
+
+.memo-preview-add-btn:hover {
+    background: var(--button-success-hover);
 }
 
 .memo-preview-sort-stack {
@@ -559,7 +569,13 @@
     }
 
     .memo-preview-title {
-        font-size: 16px;
+        gap: 7px;
+        font-size: 18px;
+    }
+
+    .memo-preview-title-icon {
+        width: 17px;
+        height: 17px;
     }
 
     .memo-preview-header-flower {
@@ -590,6 +606,150 @@
         bottom: 4px;
         width: 54px;
         height: 54px;
+    }
+}
+
+@media (max-width: 600px) {
+    .memo-preview-card {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    .memo-preview-card::after {
+        left: 7px;
+        right: 6px;
+        height: 10px;
+    }
+
+    .memo-preview-header {
+        grid-template-columns: 38px minmax(56px, 84px) minmax(0, 1fr) 30px 30px;
+        grid-template-rows: auto auto;
+        align-items: center;
+        column-gap: 4px;
+        row-gap: 5px;
+    }
+
+    .memo-preview-header-left {
+        grid-column: 1;
+        grid-row: 1;
+        width: 38px;
+    }
+
+    .memo-preview-link-btn {
+        width: 38px;
+        height: 30px;
+        min-width: 38px;
+        min-height: 30px;
+    }
+
+    .memo-preview-header-flower {
+        position: absolute;
+        left: 1px;
+        top: 50%;
+        transform: translateY(-48%);
+        width: 180px;
+        max-width: none;
+        height: 100px;
+    }
+
+    .memo-preview-title {
+        grid-column: 2 / 4;
+        grid-row: 1;
+        justify-self: center;
+        align-self: center;
+        padding-top: 20px;
+        min-width: 0;
+        gap: 6px;
+        font-size: 18px;
+        padding-inline: 2px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .memo-preview-title span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .memo-preview-title-icon {
+        width: 17px;
+        height: 17px;
+    }
+
+    .memo-preview-actions {
+        display: contents;
+    }
+
+    .memo-preview-delete-btn {
+        grid-column: 4;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    .memo-preview-add-btn {
+        grid-column: 5;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    .memo-preview-add-btn,
+    .memo-preview-delete-btn,
+    .memo-preview-layout-btn,
+    .memo-preview-alpha-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        padding: 0;
+    }
+
+    .memo-preview-layout-btn {
+        grid-column: 4;
+        grid-row: 2;
+        justify-self: end;
+    }
+
+    .memo-preview-alpha-btn {
+        grid-column: 5;
+        grid-row: 2;
+        justify-self: end;
+    }
+
+    .memo-preview-list-container {
+        padding: 6px;
+    }
+
+    .memo-preview-list.grid-layout {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-items: stretch;
+        column-gap: 8px;
+        row-gap: 8px;
+        padding: 2px 2px 8px;
+    }
+
+    .memo-preview-item.grid-layout {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        padding: 13px 8px 24px;
+        gap: 4px;
+    }
+
+    .memo-preview-item-title {
+        font-size: 0.88rem;
+    }
+
+    .memo-preview-category,
+    .memo-preview-created-at {
+        font-size: 0.58rem;
+    }
+
+    .memo-preview-maya-bird {
+        right: 6px;
+        bottom: 3px;
+        width: 46px;
+        height: 46px;
     }
 }
 

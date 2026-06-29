@@ -16,6 +16,7 @@
     --memo-header-side-reserve: clamp(200px, 20vw, 260px);
     --memo-page-bg-base: #f5efe1;
     --memo-page-title-ink: var(--blue-dark);
+    --memo-page-title-border: rgba(86, 58, 28, 0.42);
     --memo-page-bg-layer-1: radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 32%);
     --memo-page-bg-layer-2: radial-gradient(circle at 82% 22%, rgba(235, 214, 178, 0.28) 0%, rgba(235, 214, 178, 0) 34%);
     --memo-page-bg-layer-3: linear-gradient(180deg, rgba(249, 243, 232, 0.96) 0%, rgba(239, 229, 211, 0.96) 100%);
@@ -324,6 +325,11 @@
     font-weight: 800;
     letter-spacing: 0.6px;
     color: var(--memo-page-title-ink, var(--blue-dark));
+    text-shadow:
+        -0.9px 0 var(--memo-page-title-border, transparent),
+        0.9px 0 var(--memo-page-title-border, transparent),
+        0 -0.9px var(--memo-page-title-border, transparent),
+        0 0.9px var(--memo-page-title-border, transparent);
 
     text-align: center;
     width: min(100%, 980px);

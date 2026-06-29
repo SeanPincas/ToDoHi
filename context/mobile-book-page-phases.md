@@ -12,7 +12,8 @@ Core responsive rule:
 - tablet and phone below `1024px` switch to a single active dashboard page system
 
 Core product direction:
-- one focused dashboard book page at a time on tablet/phone
+- one focused main dashboard page at a time on tablet/phone
+- preserve an opened-book feel with a narrow right continuation strip
 - swipe left/right navigation between dashboard page groups
 - clickable page indicators
 - bottom navigation for direct access and shortcuts
@@ -139,10 +140,10 @@ Done when:
 
 ---
 
-## Phase 2 - Mobile Single-Page Layout Shell
+## Phase 2 - Mobile Open-Book Layout Shell
 
 Purpose:
-- build the actual one-page-at-a-time visual layout
+- build the actual one-page-at-a-time visual layout while preserving the mobile opened-book feel
 
 ### Phase 2.1 - Mobile Page Wrapper
 Goal:
@@ -150,15 +151,17 @@ Goal:
 
 Steps:
 - add mobile-only page viewport wrapper
+- add a main active page region
+- add a narrow right continuation strip
 - place page groups inside a slideable track
-- keep page width stable and fully readable
+- keep the main page width stable and fully readable
 
 Primary files:
 - `frontend/src/pages/DashboardPage.tsx`
 - `frontend/src/pages/DashboardPage.css`
 
 Done when:
-- mobile dashboard visually behaves like one active page with hidden siblings
+- mobile dashboard visually behaves like one active content page with hidden siblings and a visible continuation strip
 
 ### Phase 2.2 - Slide Transition
 Goal:
@@ -166,6 +169,7 @@ Goal:
 
 Steps:
 - use a simple horizontal transform transition
+- keep the continuation strip visually attached during movement
 - keep the motion subtle and performant
 - avoid heavy page-curl or 3D effects
 
@@ -221,6 +225,7 @@ Goal:
 Steps:
 - swipe left = next page
 - swipe right = previous page
+- optional tap on the continuation strip = next page
 - clamp at first and last page
 - keep the implementation light
 
@@ -557,7 +562,7 @@ Recommended start:
 This operation is successful when:
 - desktop remains untouched
 - tablet and phone no longer show a cramped two-page spread
-- the dashboard feels like one planner page at a time
+- the dashboard feels like one planner page at a time while still hinting at the next page through a right continuation strip
 - users can navigate by swipe, indicators, and bottom nav
 - previews stay readable and stable
 - narrow-screen UX feels intentional instead of squeezed

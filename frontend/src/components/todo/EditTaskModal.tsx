@@ -11,6 +11,7 @@ import {
     modalOverlayStyle,
 } from "../../styles/modalStyles";
 import "../common/modals/modalBaseTheme.css";
+import "../common/modals/taskManagementModalTheme.css";
 
 import { DropdownMenu } from "../common/dropdownMenu";
 
@@ -106,41 +107,48 @@ const EditTaskModal = () => {
             onMouseDown={handleCancel}
         >
             <div
-                className="modal-card-base edit-modal-card"
+                className="modal-card-base edit-modal-card task-management-modal paper-sheet-lines"
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 {/* HEADER */}
-                <div className="edit-header">
-                    <h2>Edit Task</h2>
-                    <button className="icon-btn-square" onClick={handleCancel}>
+                <div className="edit-header task-management-modal-header">
+                    <div className="task-management-modal-title-group edit-title-group">
+                        <Icons.Edit />
+                        <h3>Edit Task</h3>
+                    </div>
+                    <button
+                        className="icon-btn-square task-management-modal-close-btn"
+                        onClick={handleCancel}
+                        aria-label="Close edit task modal"
+                    >
                         <Icons.Close />
                     </button>
                 </div>
 
                 {/* TITLE */}
-                <div className="edit-field">
-                    <label>Title</label>
+                <label className="edit-field edit-field-panel task-management-modal-panel">
+                    <span className="edit-label">Title</span>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Task Title"
                     />
-                </div>
+                </label>
 
                 {/* DESCRIPTION */}
-                <div className="edit-field">
-                    <label>Description</label>
+                <label className="edit-field edit-field-panel task-management-modal-panel">
+                    <span className="edit-label">Description</span>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Task Description..."
                         rows={4}
                     />
-                </div>
+                </label>
 
                 {/* CATEGORY */}
-                <div className="edit-field">
+                <div className="edit-field edit-field-panel task-management-modal-panel">
                     <DropdownMenu
                         label="Category"
                         value={safeCategoryLabel(category)}
@@ -150,7 +158,7 @@ const EditTaskModal = () => {
                 </div>
 
                 {/* STATUS */}
-                <div className="edit-field">
+                <div className="edit-field edit-field-panel task-management-modal-panel">
                     <DropdownMenu
                         label="Status"
                         value={safeStatusLabel(status)}
@@ -160,13 +168,13 @@ const EditTaskModal = () => {
                 </div>
 
                 {/* CONTAINER COLOR */}
-                <div className="todo-field">
-                    <span className="todo-label">Task Color</span>
-                    <div className="todo-color-grid">
+                <div className="edit-field edit-field-panel task-management-modal-panel">
+                    <span className="edit-label">Task Color</span>
+                    <div className="edit-color-grid">
                         {getContainerColors().map((c) => (
                             <div
                                 key={c.hex}
-                                className={`todo-color-option ${
+                                className={`edit-color-option ${
                                     containerColor === c.hex ? "selected" : ""
                                 }`}
                                 style={{ backgroundColor: c.hex }}
@@ -178,11 +186,11 @@ const EditTaskModal = () => {
 
                 {/* ACTIONS */}
                 <div className="edit-actions">
-                    <button className="btn-cancel" onClick={handleCancel}>
+                    <button className="btn-secondary-rect edit-action-btn" onClick={handleCancel}>
                         Cancel
                     </button>
                     <button
-                        className="btn-primary"
+                        className="btn-primary-rect edit-action-btn edit-save-btn"
                         onClick={handleSave}
                         disabled={saving}
                     >

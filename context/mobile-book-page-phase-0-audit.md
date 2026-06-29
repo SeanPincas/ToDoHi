@@ -8,7 +8,7 @@ Phase 0 - Current Narrow-Screen Dashboard Audit
 
 Purpose:
 Document the current dashboard structure, responsive behavior, and interaction
-conflicts before implementing the mobile/tablet single-page book mode.
+conflicts before implementing the mobile/tablet one-active-page open-book mode.
 
 Source files reviewed:
 - `frontend/src/pages/DashboardPage.tsx`
@@ -80,6 +80,9 @@ Reason:
 Recommended implementation direction:
 - keep `DashboardPage.tsx` as the orchestration point
 - introduce a mobile-only page-group wrapper at the dashboard page level
+- shape that wrapper as:
+  - one main active page region
+  - one narrow right continuation strip
 - do not rebuild `TodoPreview`, `MemoPreview`, `DashboardStats`, or `DailyPlanPreview`
   as separate mobile versions unless later tuning requires it
 
@@ -104,7 +107,8 @@ Current responsive behavior is halfway between desktop spread and stacked layout
 
 Even though the spread collapses to one column, it still behaves like:
 - a stacked desktop composition
-- not a focused one-page-at-a-time notebook system
+- not a focused one-active-page notebook system
+- not an opened-book composition with a visible continuation cue
 
 That creates:
 - too much content visible at once
@@ -134,7 +138,7 @@ So the current breakpoint structure must be refactored.
 - but mobile page-slide mode will need more deliberate overflow control
 
 3. `opened-book-spread` currently changes from 3-column spread to 1-column stack
-- this is not enough for the new one-page navigation model
+- this is not enough for the new one-active-page plus continuation-strip model
 
 4. `left-page-stack` and `right-page-chart-stack` still depend on desktop-oriented
 row sizing and min-heights
